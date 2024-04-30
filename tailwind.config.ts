@@ -20,6 +20,9 @@ const config: Config = {
       },
       spacing:{
         radius: '10px'
+      },
+      fontFamily:{
+   
       }
     },
   },

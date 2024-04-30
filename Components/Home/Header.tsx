@@ -9,7 +9,7 @@ export default function Header() {
                 <MersehSvg classname='max-w-[38px] basis-1/12 flex-none' />
                 <div className=' basis-3/12 flex-none'>
                     <div className='flex flex-row justify-center  items-center gap-2 cursor-pointer'>
-                        <span className='font-[400] text-black1 text-[14px]'>دسته‌بندی کالاها</span>
+                        <span className='font-[400] text-black1 text-[14px] '>دسته‌بندی کالاها</span>
                         <Chevron_Down classname='w-[11px]  fill-[#303030]'/>
                     </div>
                 </div>
