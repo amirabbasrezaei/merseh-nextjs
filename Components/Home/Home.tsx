@@ -17,10 +17,10 @@ const IRANYekanXFaNum = localFont({
       weight: '100',
       style:'sans'
     },
-    {
-      path: '../../public/fonts/Iranyekan_x_pro/woff2/IRANYekanXFaNum-UltraLight.woff2',
-      weight: '200',
-    },
+    // {
+    //   path: '../../public/fonts/Iranyekan_x_pro/Woff2/IRANYekanXFaNum-UltraLight.woff2',
+    //   weight: '200',
+    // },
     {
       path: '../../public/fonts/Iranyekan_x_pro/woff2/IRANYekanXFaNum-Light.woff2',
       weight: '300',
