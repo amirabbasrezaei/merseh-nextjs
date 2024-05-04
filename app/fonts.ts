@@ -4,7 +4,7 @@ import localFont from "next/font/local";
 export const IRANYekanXFaNum = localFont({
   src: [
     {
-      path: "./fonts/Iranyekan_x_pro/woff2/iranyekanxfanum-thin.woff2",
+      path: "../public/fonts/Iranyekan_x_pro/Woff2/iranyekanxfanum-thin.woff2",
       weight: "100",
       style: "sans",
 
@@ -36,7 +36,7 @@ export const YekanBakh = localFont({
     //   style: "sans",
     // },
     {
-      path: "./fonts/yekanbakh/woff2/yekanbakhfanum-light.woff2",
+      path: "../public/fonts/yekanbakh/woff2/yekanbakhfanum-light.woff2",
       weight: "300",
     },
     // {
