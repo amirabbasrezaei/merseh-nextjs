@@ -26,7 +26,7 @@ export const IRANYekanXFaNum = localFont({
     //   weight: "normal",
     // },
   ],
-});
+}); 
 
 export const YekanBakh = localFont({
   src: [
