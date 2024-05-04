@@ -37,7 +37,7 @@ export default function Header() {
         </div>
       </div>
       <div className="basis-2/6 flex flex-row justify-end gap-10 items-center">
-        {isLoading ? <div className="w-[130px] h-7 text-[#e9e9e9]"><Skeleton baseColor="#fff"  duration={1} highlightColor="#e9e9e9" enableAnimation direction="rtl" className="h-full "  /></div> : data?.isVerified ? (
+        {isLoading ? <div className="w-[130px] h-7 text-[#e9e9e9]"><Skeleton baseColor="#e9e9e9"  duration={1} highlightColor="#fff"  enableAnimation direction="rtl" className="h-full "  /></div> : data?.isVerified ? (
           <div className="flex flex-row items-center gap-4 w-[130px] justify-center">
             <Profile_Svg classname="w-[17px] h-auto fill-[#303030]" />
             <span className="text-[#303030] font-[300] text-[13px]">{`${data?.name} ${data?.familyName}`}</span>
