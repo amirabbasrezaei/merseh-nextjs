@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id               Int                @id @default(autoincrement())
+  name             String
+  price            Int
+  imageUrl         String
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @default(now())
+  variateTypes     Json
+  ProductVariation ProductVariation[]
+}
+
+model ProductVariation {
+  id          Int     @id @default(autoincrement())
+  price       Int
+  variateName String
+  value       String
+  ProductId   Int
+  Product     Product @relation(fields: [ProductId], references: [id])
+}
+
+model User {
+  id             String    @id @default(uuid())
+  name           String    @db.VarChar(20)
+  familyName     String?
+  password       String?
+  email          String?   @unique
+  phoneNumber    String    @unique
+  role           role      @default(USER)
+  loginCode      String?
+  isVerified     Boolean   @default(false)
+  credit         Int       @default(0)
+  Payment        Payment[]
+  Session        Session[]
+  createdAt      DateTime  @default(now())
+  lastLogin      DateTime?
+  numberOfLogins Int?      @default(1)
+}
+
+model Session {
+  id         String   @id @default(uuid())
+  expireDate DateTime @default(now())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+model Payment {
+  id                   Int       @id @default(autoincrement())
+  payment_create_date  DateTime  @default(now())
+  payment_success_date DateTime?
+  userId               String
+  trackId              String?   @unique
+  status               Int?
+  isPayed              Boolean   @default(false)
+  servicePaymentId     String?   @unique
+  paymentUrl           String?
+  value                Int
+  user                 User      @relation(fields: [userId], references: [id])
+  cardNumber           String?
+  paymentDescription   String?
+}
+
+enum role {
+  USER
+  SUPERADMIN
+}

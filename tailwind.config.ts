@@ -13,17 +13,17 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
-      colors:{
+      colors: {
         black1: "#303030",
         hover1: "#F3F3F3",
-        green1: "#00BD84"
+        green1: "#00BD84",
       },
-      spacing:{
-        radius: '10px'
+      spacing: {
+        radius: "10px",
       },
-      fontFamily:{
-   
-      }
+      fontFamily: {
+        yekanbakh: ["YekanBakh"],
+      },
     },
   },
   plugins: [],

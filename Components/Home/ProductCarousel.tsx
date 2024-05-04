@@ -20,6 +20,7 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
             loop: true,
             slides: { perView: 5, spacing: 10 },
             renderMode: "precision",
+            defaultAnimation:{},
             created(s) {
                 setTimeout(() => {
                     s.moveToIdx(1, true, animation)
@@ -32,7 +33,7 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
             },
             animationEnded(s) {
                 setTimeout(() => { s.moveToIdx(s.track.details.abs + 1, true, animation) }, sliderStartDelay)
-            },
+            }
         },
         [
             // add plugins here
