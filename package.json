@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npx prisma generate && next build",
-    "start": "npx prisma migrate deploy && next start"
+    "build": " next build",
+    "start": "next start"
   },
   "dependencies": {
     "@prisma/client": "^5.13.0",
@@ -24,11 +24,13 @@
     "jsonwebtoken": "^9.0.2",
     "keen-slider": "^6.8.6",
     "next": "14.2.3",
+    "postcss": "^8.4.38",
     "prisma": "^5.13.0",
     "react": "^18",
     "react-dom": "^18",
     "react-loading-skeleton": "^3.4.0",
     "sharp": "^0.33.3",
+    "tailwindcss": "^3.4.3",
     "zod": "^3.23.4"
   },
   "devDependencies": {
@@ -37,8 +39,6 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }
 }
