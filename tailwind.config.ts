@@ -17,6 +17,7 @@ const config: Config = {
         black1: "#303030",
         hover1: "#F3F3F3",
         green1: "#00BD84",
+        green2: "#00A573",
       },
       spacing: {
         radius: "10px",
