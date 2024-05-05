@@ -40,7 +40,7 @@ export default function Auth({
       className="h-[280px] relative bg-white w-[320px] flex flex-col  px-6 items-center  border borer-[#DCDCDC] rounded-[8px]"
     >
       {isModal ? (
-        <div onClick={() => setShowAuthModal(false)}>
+        <div className="cursor-pointer" onClick={() => setShowAuthModal(false)}>
           <XMark_Svg classname="absolute w-4 h-auto right-2 top-2 fill-[#777777]" />
         </div>
       ) : null}

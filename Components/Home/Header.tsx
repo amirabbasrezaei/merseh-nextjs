@@ -25,7 +25,7 @@ export default function Header() {
   useEffect(() => {}, [status]);
   return (
     <header className="h-[116px] px-6 w-full  flex items-center mb-[-70px]">
-      <div className="flex items-center gap-12 basis-4/6  h-full ">
+      <div className="flex items-center gap-12 basis-9/12  h-full ">
         <MersehSvg classname="max-w-[38px] basis-1/12 flex-none" />
         <div className=" basis-3/12 flex-none">
           <div className="flex flex-row justify-center  items-center gap-2 cursor-pointer">
@@ -41,10 +41,10 @@ export default function Header() {
             placeholder="جستجو در میان محصولات"
             className="bg-[#F6F6F6] w-full h-full placeholder:text-[15px] text-black1 placeholder:text-[#8b8b8b] px-5 pr-[50px] grow rounded-[10px] appearance-none outline-none"
           />
-          <Magnifier classname="absolute top-[15px] right-[15px]" />
+          <Magnifier classname="absolute top-[15px] right-[15px] w-[20px] h-auto" />
         </div>
       </div>
-      <div className="basis-2/6 flex flex-row justify-end gap-10 items-center">
+      <div className="basis-3/12 flex flex-row justify-end gap-10 items-center">
         {isLoading ? (
           <div className="w-[130px] h-7 text-[#e9e9e9]">
             <Skeleton

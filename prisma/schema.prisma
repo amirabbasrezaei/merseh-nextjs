@@ -22,6 +22,7 @@ model Product {
   updatedAt        DateTime           @default(now())
   variateTypes     Json
   ProductVariation ProductVariation[]
+  category         Category[]
 }
 
 model ProductVariation {
@@ -31,6 +32,15 @@ model ProductVariation {
   value       String
   ProductId   Int
   Product     Product @relation(fields: [ProductId], references: [id])
+}
+
+model Category {
+  id               String     @id @default(uuid())
+  title            String
+  parentCategoryId String?
+  parentCategory   Category?  @relation("SubCategories", fields: [parentCategoryId], references: [id])
+  subCategories    Category[] @relation("SubCategories")
+  products         Product[]
 }
 
 model User {
