@@ -68,7 +68,7 @@ export default function Slider() {
         setOpacities1(newOpacity);
       },
       animationEnded(s) {
-        setSliderControl(s.track.details.abs + 1);
+        setSliderControl1(s.track.details.abs + 1);
       },
     },
     [
