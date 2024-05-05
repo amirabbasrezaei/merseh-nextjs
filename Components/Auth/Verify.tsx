@@ -6,31 +6,42 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { MersehSvg, Merseh_typography } from "../SVGS";
-import { YekanBakh } from "@/app/fonts";
 import { trpc } from "@/utils/trpc";
 import classNames from "classnames";
+import Router from "next/router";
+import { useRouter } from "next/navigation";
 
 interface Props {
   setLoginStatus: Dispatch<SetStateAction<number>>;
   phoneNumber: string;
+  isModal: boolean;
 }
 
-export default function Verify({ phoneNumber, setLoginStatus }: Props) {
+export default function Verify({
+  phoneNumber,
+  setLoginStatus,
+  isModal,
+}: Props) {
+  const router = useRouter();
   const {
     mutate: mutateVerifyLoginCode,
     isSuccess: isVerifyLoginCodeSuccess,
     isPending,
     data,
-    error
+    error,
   } = trpc.user.verifyLoginCode.useMutation();
 
   const inputRef = useRef(null);
   const [code, setCode] = useState<string>("");
-
+  const utils = trpc.useUtils();
   useEffect(() => {
-    console.log(data, error)
-  }, [data, error])
+    if (data?.accessToken) {
+      if (isModal) {
+        console.log("refresh");
+        utils.user.userInfo.refetch();
+      }
+    }
+  }, [data, error]);
 
   return (
     <div className=" justify-center items-center  w-full">
@@ -91,7 +102,10 @@ export default function Verify({ phoneNumber, setLoginStatus }: Props) {
           تائید رمز یکبار مصرف
         </span>
       </button>
-      <div className="w-full mt-4 cursor-pointer" onClick={() => setLoginStatus(0)}>
+      <div
+        className="w-full mt-4 cursor-pointer"
+        onClick={() => setLoginStatus(0)}
+      >
         <span className="text-gray-600 text-[13px]">تغییر شماره</span>
       </div>
     </div>

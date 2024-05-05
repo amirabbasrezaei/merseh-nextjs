@@ -1,5 +1,5 @@
 import React from 'react'
-import { MersehSvg } from './SVGS'
+import { MersehSvg } from './Home/SVGS'
 
 export default function Footer() {
     return (
@@ -19,7 +19,7 @@ export default function Footer() {
             </div>
             <div className='basis-1/3 flex flex-col'></div>
             <div className='basis-1/3 flex flex-col'>
-                as
+               
             </div>
 
         </footer>

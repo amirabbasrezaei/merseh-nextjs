@@ -5,7 +5,7 @@ import Header from "./Header";
 import Slider from "./Slider";
 import Main_Categories from "./Main_Categories";
 import ProductCarousel from "./ProductCarousel";
-import Footer from "./Footer";
+import Footer from "../Footer";
 
 export default function Home() {
   return (

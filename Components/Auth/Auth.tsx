@@ -1,16 +1,17 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import Login from "./Verify";
 import { YekanBakh } from "@/app/fonts";
-import { Loading_SVG, MersehSvg, Merseh_typography } from "../SVGS";
+import { Loading_SVG, MersehSvg, Merseh_typography, XMark_Svg } from "../Home/SVGS";
 import { trpc } from "@/utils/trpc";
 import classnames from "classnames";
 
 import Signup from "./Signup";
 import Verify from "./Verify";
-
-export default function Auth() {
+type Props = {
+  isModal: boolean;
+  setShowAuthModal: React.Dispatch<React.SetStateAction<boolean>>;
+};
+export default function Auth({ isModal = false, setShowAuthModal }: Props) {
   const [loginStatus, setLoginStatus] = useState(0);
   const [input, setInput] = useState<string>("");
   const { data, isPending, mutate, status } =
@@ -26,7 +27,13 @@ export default function Auth() {
     }
   }, [status]);
   return (
-    <div className="h-[280px] w-[320px] flex flex-col  px-6 items-center  border borer-[#DCDCDC] rounded-[8px]">
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="h-[280px] relative bg-white w-[320px] flex flex-col  px-6 items-center  border borer-[#DCDCDC] rounded-[8px]"
+    >
+      {isModal ? <div onClick={() => setShowAuthModal(false)}>
+        <XMark_Svg classname="absolute w-4 h-auto right-2 top-2 fill-[#777777]" />
+      </div> : null}
       <div className="flex flex-row  basis-4/12 items-center justify-between w-full ">
         <span
           className={`${YekanBakh.className} text-[#4e4e4e] font-[600] text-[14px]`}
@@ -74,7 +81,11 @@ export default function Auth() {
           </button>
         </form>
       ) : loginStatus == 1 ? (
-        <Verify setLoginStatus={setLoginStatus} phoneNumber={input} />
+        <Verify
+          isModal={isModal}
+          setLoginStatus={setLoginStatus}
+          phoneNumber={input}
+        />
       ) : (
         <Signup />
       )}

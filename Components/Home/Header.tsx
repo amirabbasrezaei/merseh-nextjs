@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Chevron_Down,
   Login_icon,
@@ -9,11 +9,19 @@ import {
   Shop_Cart,
 } from "./SVGS";
 import { trpc } from "@/utils/trpc";
-import Skeleton from 'react-loading-skeleton'
-import 'react-loading-skeleton/dist/skeleton.css'
-
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+import { createPortal } from "react-dom";
+import Auth from "../Auth/Auth";
+import { AnimatePresence, motion } from "framer-motion";
 export default function Header() {
-  const { data, status, isLoading } = trpc.user.userInfo.useQuery();
+  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+  const { data, status, isLoading } = trpc.user.userInfo.useQuery(undefined, {
+    retry: false,
+    networkMode: "online",
+    gcTime: 0,
+  });
+
   useEffect(() => {}, [status]);
   return (
     <header className="h-[116px] px-6 w-full  flex items-center mb-[-70px]">
@@ -37,18 +45,55 @@ export default function Header() {
         </div>
       </div>
       <div className="basis-2/6 flex flex-row justify-end gap-10 items-center">
-        {isLoading ? <div className="w-[130px] h-7 text-[#e9e9e9]"><Skeleton baseColor="#e9e9e9"  duration={1} highlightColor="#fff"  enableAnimation direction="rtl" className="h-full "  /></div> : data?.isVerified ? (
+        {isLoading ? (
+          <div className="w-[130px] h-7 text-[#e9e9e9]">
+            <Skeleton
+              baseColor="#e9e9e9"
+              duration={1}
+              highlightColor="#fff"
+              enableAnimation
+              direction="rtl"
+              className="h-full "
+            />
+          </div>
+        ) : data?.isVerified ? (
           <div className="flex flex-row items-center gap-4 w-[130px] justify-center">
             <Profile_Svg classname="w-[17px] h-auto fill-[#303030]" />
             <span className="text-[#303030] font-[300] text-[13px]">{`${data?.name} ${data?.familyName}`}</span>
           </div>
         ) : (
-          <div className="flex flex-row justify-center items-center gap-2 hover:bg-hover1  px-4 py-2 rounded-[10px] cursor-pointer w-[130px]">
-            <span className="text-[13px] text-black1 font-[400]">
-              ورود | عضویت
-            </span>
-            <Login_icon classname="w-[15px] mt-[2px] fill-[#303030]" />
-          </div>
+          <>
+            <div
+              onClick={() => setShowAuthModal(true)}
+              className="flex flex-row justify-center items-center gap-2 hover:bg-hover1  px-4 py-2 rounded-[10px] cursor-pointer w-[130px]"
+            >
+              <span className="text-[13px] text-black1 font-[400]">
+                ورود | عضویت
+              </span>
+              <Login_icon classname="w-[15px] mt-[2px] fill-[#303030]" />
+            </div>
+
+            {createPortal(
+              <AnimatePresence mode="wait">
+                {showAuthModal && (
+                  <motion.div
+                    key="portal"
+                    animate={{ opacity: 1, backdropFilter: "blur(10px)" }}
+                    exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+                    transition={{ duration: 0.3 }}
+                    onClick={(e) => {
+                      setShowAuthModal(false);
+                      e.stopPropagation();
+                    }}
+                    className="w-full h-full   flex items-center justify-center fixed left-0 right-0  top-0 bottom-0 "
+                  >
+                    <Auth setShowAuthModal={setShowAuthModal} isModal={true} />
+                  </motion.div>
+                )}
+              </AnimatePresence>,
+              document.body
+            )}
+          </>
         )}
 
         <div className="p-3 hover:bg-hover1 cursor-pointer rounded-[15px]">
