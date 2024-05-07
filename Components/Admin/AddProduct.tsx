@@ -10,10 +10,8 @@ export default function AddProduct() {
   const [images, setImages] = useState<imageType[]>([]);
   const [name, setName] = useState<string>("");
   const [price, setPrice] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [files, setFiles] = useState();
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
-  const reader = new FileReader();
   const [flag, setFlag] = useState(false);
   useEffect(() => {
     if ((files as any)?.length && !flag) {
@@ -23,6 +21,7 @@ export default function AddProduct() {
   }, [files]);
 
   useEffect(() => {
+    const reader = new FileReader();
     if (
       (files as any)?.length &&
       currentImageIndex < (files as any)?.length &&
@@ -158,7 +157,7 @@ export default function AddProduct() {
           </div>
         </div>
       </div>
-      <button disabled={isLoading}>submit</button>
+      <button >submit</button>
     </form>
   );
 }

@@ -17,10 +17,9 @@ model Product {
   id               Int                @id @default(autoincrement())
   name             String
   price            Int
-  imageUrl         String
+  imageNames       String[]
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @default(now())
-  variateTypes     Json
   ProductVariation ProductVariation[]
   category         Category[]
 }
