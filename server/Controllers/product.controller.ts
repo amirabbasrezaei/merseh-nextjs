@@ -50,11 +50,11 @@ export function addProductController({
   const BUCKET = process.env.LIARA_BUCKET_NAME;
 
   let buckets: Buckets | undefined;
-  console.log(input.images.length)
-  // for (let image of input.images) {
-  //   const decodeImage = Buffer.from(image.base64, "base64");
-  //   fs.writeFileSync(`./addproductImages/${image.name}.png`, decodeImage);
-  // }
+
+  for (let image of input.images) {
+    const decodeImage = Buffer.from(image.base64, "base64");
+    fs.writeFileSync(`./addproductImages/${image.name}.png`, decodeImage);
+  }
   // const file = fs.readFileSync();
 
   // const handleUpload = async () => {

@@ -57,17 +57,20 @@ export default function AddProduct() {
     }
   }, [currentImageIndex, files]);
 
+  useEffect(() => {
+    console.log(images);
+  }, [images]);
+
   return (
     <form
-      onChange={(e) => {
-        setCurrentImageIndex(0);
-        setImages([]);
-        setFlag(false);
-        setFiles((e.target as any).files);
-      }}
       className="w-full max-w-lg"
       onSubmit={(e) => {
         e.preventDefault();
+        console.log({
+          images: images,
+          name: name,
+          price: price,
+        });
         mutateAsync({
           images: images,
           name: name,
@@ -76,7 +79,17 @@ export default function AddProduct() {
       }}
     >
       <div>
-        <input multiple type="file" accept="image/*" />
+        <input
+          onChange={(e) => {
+            setCurrentImageIndex(0);
+            setImages([]);
+            setFlag(false);
+            setFiles((e.target as any).files);
+          }}
+          multiple
+          type="file"
+          accept="image/*"
+        />
       </div>
       <div className="flex flex-wrap -mx-3 mb-6">
         <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
