@@ -45,7 +45,7 @@ export const AddProductControllerArgSchema = z.object({
   name: z.string(),
   price: z.string(),
   images: z.array(imageType),
-  categoryId: z.string().optional(),
+  categoryId: z.string(),
 });
 
 type AddProductControllerArg = z.infer<typeof AddProductControllerArgSchema>;
@@ -63,7 +63,7 @@ export async function addProductController({
     },
   });
 
-  const imagePathFolder = path.join(__dirname, "addProductImages");
+  const imagePathFolder = path.join("./public/Images/" + "addProductImages/")
   const dir = fs.mkdir(imagePathFolder, () => {
     // if (err) {
     //   console.error(err);
@@ -73,7 +73,7 @@ export async function addProductController({
   for (let image of input.images) {
     const decodeImage = Buffer.from(image.base64, "base64");
 
-    fs.writeFileSync(`${imagePathFolder}/${image.name}`, decodeImage);
+    await fs.writeFileSync(`${imagePathFolder}/${image.name}`, decodeImage);
   }
 
   const handleUpload = async (image: any, imageName: string) => {
@@ -84,29 +84,27 @@ export async function addProductController({
       Key: "productImages/" + imageName,
     };
 
-    try {
-      return await client.send(new PutObjectCommand(params));
-    } catch (error) {
-      console.log(error);
-    }
+    client.send(new PutObjectCommand(params), (error, data) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log(data);
+      }
+    });
   };
 
   function readFiles(dirname: any) {
     fs.readdir(dirname, (err, filenames) => {
       if (err) {
         throw new Error(err as any);
-        return;
+
       }
-      console.log(filenames);
       filenames.forEach((fileName) => {
         try {
-          (async () => {
-            return await fs.readFileSync(`${dirname}\\${fileName}`, {
-              encoding: "utf-8",
-            });
-          })().then((res) => {
-            handleUpload(res, fileName);
-          });
+
+            const image =  fs.readFileSync(`${dirname}\\${fileName}`);
+
+            handleUpload(image, fileName);
 
           return { status: "ok" };
         } catch (error) {
@@ -116,6 +114,7 @@ export async function addProductController({
     });
   }
 
+
   try {
     readFiles(imagePathFolder);
     await prisma.product.create({
@@ -123,6 +122,11 @@ export async function addProductController({
         imageNames: input.images.map((img) => img.name),
         name: input.name,
         price: Number(input.price),
+        category: {
+          connect:{
+            id: Number(input.categoryId)
+          }
+        }
       },
     });
     await fs.rmSync(imagePathFolder, { recursive: true, force: true });

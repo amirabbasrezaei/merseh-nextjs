@@ -20,7 +20,6 @@ export default function Products() {
     searchTerm: "",
   });
 
-  
   const {
     mutate: mutate,
     data,
@@ -28,12 +27,20 @@ export default function Products() {
   } = trpc.product.filterProduct.useMutation({});
 
   useEffect(() => {
-
-    mutate({
-      categoryId: String(filter.categoryId),
-      searchTerm: filter.searchTerm,
-    });
+    const timeOut = setTimeout(() => {
+      mutate({
+        categoryId: String(filter.categoryId),
+        searchTerm: filter.searchTerm,
+      });
+    }, 500);
+    return () => {
+      clearTimeout(timeOut);
+    };
   }, [filter]);
+
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
 
   return (
     <section className="flex flex-row w-full mt-10 px-10 overflow-visible">
@@ -45,15 +52,17 @@ export default function Products() {
               ? // @ts-ignore
                 data.map((pr, index) => (
                   <ProductCard
-                  key={pr.id}
-                  imageNames={pr.imageNames}
+                    key={index}
+                    imageNames={pr.imageNames}
                     price={pr.price}
                     title={pr.name}
                     pathname={`product/${String(pr.id)}`}
                     isLoading={true}
                   />
                 ))
-              : Array.from(Array(8)).map((_,i) => <ProductCardSkeleton key={i} />)}
+              : Array.from(Array(8)).map((_, i) => (
+                  <ProductCardSkeleton key={i} />
+                ))}
           </AnimatePresence>
         </div>
       </div>

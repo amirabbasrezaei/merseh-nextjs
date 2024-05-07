@@ -107,25 +107,18 @@ export async function filterProductController({
 }: ArgsStructure<FilterProductArgs>) {
   const { prisma } = ctx;
   const { categoryId, searchTerm } = input;
-  console.log(input);
+  
   const filterProducts = await prisma.product.findMany({
     where: {
-      name: {
-        contains: searchTerm,
-      },
-      AND: categoryId?.length
-        ? [
-            {
-              category: {
-                every: {
-                  id: Number(categoryId),
-                },
-              },
-            },
-          ]
-        : [],
+      category:categoryId?.length ? {
+        some:{
+          id: Number(categoryId)
+        }
+      } : {}
+
     },
   });
 
+  // console.log(filterProducts)
   return filterProducts;
 }
