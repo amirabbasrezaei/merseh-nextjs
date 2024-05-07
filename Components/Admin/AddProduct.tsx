@@ -23,7 +23,6 @@ export default function AddProduct() {
   }, [files]);
 
   useEffect(() => {
-    console.log(currentImageIndex, files);
     if (
       (files as any)?.length &&
       currentImageIndex < (files as any)?.length &&
@@ -56,7 +55,6 @@ export default function AddProduct() {
         }
       })();
     }
-    console.log(images);
   }, [currentImageIndex, files]);
 
   return (
