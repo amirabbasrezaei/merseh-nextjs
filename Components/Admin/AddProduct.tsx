@@ -20,12 +20,15 @@ export default function AddProduct() {
       setFlag(true);
       setFiles(Array.prototype.slice.call(files) as any);
     }
-
   }, [files]);
 
   useEffect(() => {
-    console.log(currentImageIndex, files)
-    if ((files as any)?.length && currentImageIndex < (files as any)?.length && flag) {
+    console.log(currentImageIndex, files);
+    if (
+      (files as any)?.length &&
+      currentImageIndex < (files as any)?.length &&
+      flag
+    ) {
       (async () => {
         if ((files as any)[currentImageIndex] !== undefined) {
           const chooseImage = (files as any)[currentImageIndex];
@@ -34,7 +37,9 @@ export default function AddProduct() {
               setImages((state: imageType[]) => [
                 ...state,
                 {
-                  base64: res.target?.result as string,
+                  base64: (res.target?.result as string)
+                    .replace("data:", "")
+                    .replace(/^.+,/, ""),
                   name: chooseImage.name,
                 },
               ]);
@@ -42,7 +47,6 @@ export default function AddProduct() {
             });
 
             promise.then(({ nextIndex, status }: any) => {
-
               if (status === true) {
                 setCurrentImageIndex(nextIndex as number);
               }
@@ -58,8 +62,8 @@ export default function AddProduct() {
   return (
     <form
       onChange={(e) => {
-        setCurrentImageIndex(0)
-        setImages([])
+        setCurrentImageIndex(0);
+        setImages([]);
         setFlag(false);
         setFiles((e.target as any).files);
       }}
