@@ -1,6 +1,7 @@
+import { z } from "zod";
 import { Context } from "../context";
 
-type ProductRouterArgsController<T = null> = T extends null
+type ArgsStructure<T = null> = T extends null
   ? {
       ctx: Context;
     }
@@ -9,13 +10,9 @@ type ProductRouterArgsController<T = null> = T extends null
       input: T;
     };
 
-export async function categoriesController({
-  ctx,
-}: ProductRouterArgsController) {
+export async function categoriesController({ ctx }: ArgsStructure) {
   const { prisma } = ctx;
   const categories = await prisma.category.findMany();
-
-
 
   interface categoryRawType {
     id: string;
@@ -58,8 +55,6 @@ export async function categoriesController({
 
     data = data.filter((cat) => cat.insertedIntoParent !== true);
 
-
-
     function cleanData(data: categoryFinalType[]) {
       if (data.length == 0) {
         return data;
@@ -96,5 +91,41 @@ export async function categoriesController({
     return cleanData(data);
   }
 
-  return perpareCategories(categories);
+  return perpareCategories(categories as unknown as categoryFinalType[]);
+}
+
+export const FilterProductArgsSchema = z.object({
+  categoryId: z.string().optional(),
+  searchTerm: z.string().optional(),
+});
+
+type FilterProductArgs = z.infer<typeof FilterProductArgsSchema>;
+
+export async function filterProductController({
+  ctx,
+  input,
+}: ArgsStructure<FilterProductArgs>) {
+  const { prisma } = ctx;
+  const { categoryId, searchTerm } = input;
+  console.log(input);
+  const filterProducts = await prisma.product.findMany({
+    where: {
+      name: {
+        contains: searchTerm,
+      },
+      AND: categoryId?.length
+        ? [
+            {
+              category: {
+                every: {
+                  id: Number(categoryId),
+                },
+              },
+            },
+          ]
+        : [],
+    },
+  });
+
+  return filterProducts;
 }

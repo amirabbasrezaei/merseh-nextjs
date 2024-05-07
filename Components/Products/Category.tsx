@@ -1,14 +1,22 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Chevron_Down } from "../Home/SVGS";
-import { categoryType } from "./Categories";
+import { categoryType } from "./Filter";
 import { AnimatePresence, motion } from "framer-motion";
 import classNames from "classnames";
+import { filterTypeArgs } from "./Products";
 interface Props {
   name: string;
   subCategory?: categoryType[];
+  setFilter: Dispatch<SetStateAction<filterTypeArgs>>;
+  catId: string;
 }
 
-export default function Category({ name, subCategory = [] }: Props) {
+export default function Category({
+  name,
+  subCategory = [],
+  setFilter,
+  catId,
+}: Props) {
   const [showCategory, setShowCategory] = useState(false);
 
   const getCategories = (data: categoryType[], parentAnimation: boolean) => {
@@ -18,10 +26,10 @@ export default function Category({ name, subCategory = [] }: Props) {
     const [showSubCategory, setShowSubCategory] = useState(false);
 
     return data.map((cat: categoryType) => (
-      <motion.div   className="   ">
+      <motion.div key={cat.id} className="">
         <div
           onClick={(e) => {
-            setShowSubCategory(state => !state);
+            setShowSubCategory((state) => !state);
             e.stopPropagation();
           }}
           className="flex flex-row gap-1 items-center  mb-3"
@@ -29,16 +37,34 @@ export default function Category({ name, subCategory = [] }: Props) {
           {cat.subCategories?.length ? (
             <Chevron_Down classname="w-3 fill-black1 h-3" />
           ) : null}
-          <span className={classNames("text-[13px] text-black1 cursor-poiner" , cat.subCategories?.length ?  "" : "mr-3" )}>{cat.title}</span>
+          <span
+            onClick={() =>
+              setFilter((state) => ({ ...state, categoryId: cat.id }))
+            }
+            style={{ cursor: "pointer" }} // it doesn't work with taiwlind
+            className={classNames(
+              "text-[13px] text-black1 cursor-poiner",
+              cat.subCategories?.length ? "" : "mr-3"
+            )}
+          >
+            {cat.title}
+          </span>
         </div>
 
         {cat.subCategories?.length ? (
           <motion.div
-            animate={{ scale: showSubCategory ? 1 : 0, opacity: showSubCategory ? 1 : 0, height:showSubCategory? "fit-content" : 0  }}
+            animate={{
+              scale: showSubCategory ? 1 : 0,
+              opacity: showSubCategory ? 1 : 0,
+              height: showSubCategory ? "fit-content" : 0,
+            }}
             className="pr-4  flex-col mt-3"
             style={{ originX: 1, originY: 0.5 }}
           >
-            {getCategories(cat.subCategories as categoryType[], parentAnimation)}
+            {getCategories(
+              cat.subCategories as categoryType[],
+              parentAnimation
+            )}
           </motion.div>
         ) : null}
       </motion.div>
@@ -54,16 +80,25 @@ export default function Category({ name, subCategory = [] }: Props) {
         {subCategory?.length ? (
           <Chevron_Down classname="w-3 fill-black1 h-3" />
         ) : null}
-        <span className="text-[13px] text-black1 cursor-pointer">{name}</span>
+        <span
+          onClick={() =>
+            setFilter((state) => ({ ...state, categoryId: catId }))
+          }
+          className="text-[13px] text-black1 cursor-pointer"
+        >
+          {name}
+        </span>
       </div>
 
       <motion.div
-      dir="rtl"
-      initial={{scale: 0, height:0}}
-        animate={{ scale: showCategory ? 1 : 0, opacity: showCategory ? 1 : 0, height:showCategory? "fit-content" : 0 }}
+        initial={{ scale: 0, height: 0 }}
+        animate={{
+          scale: showCategory ? 1 : 0,
+          opacity: showCategory ? 1 : 0,
+          height: showCategory ? "fit-content" : 0,
+        }}
         style={{ originX: 1, originY: 0.5 }}
-        transition={{damping: 1}}
-        
+        transition={{ damping: 1 }}
         className="pr-4 flex-col mb-5"
       >
         {/* <span>afdf</span> */}

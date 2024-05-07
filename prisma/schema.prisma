@@ -35,9 +35,9 @@ model ProductVariation {
 }
 
 model Category {
-  id               String     @id @default(uuid())
+  id               Int        @id @default(autoincrement())
   title            String
-  parentCategoryId String?
+  parentCategoryId Int?
   parentCategory   Category?  @relation("SubCategories", fields: [parentCategoryId], references: [id])
   subCategories    Category[] @relation("SubCategories")
   products         Product[]
