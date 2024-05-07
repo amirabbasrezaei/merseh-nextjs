@@ -4,7 +4,7 @@ const nextConfig = {
         remotePatterns: [
           {
             protocol: 'https',
-            hostname: 'merseh.storage.iran.liara.space',
+            hostname: 'static.merseh.ir',
 
           },
         ],

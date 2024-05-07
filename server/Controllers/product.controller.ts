@@ -2,16 +2,15 @@ import { Product } from "@prisma/client";
 import { Context } from "../context";
 import { z } from "zod";
 import fs from "fs";
-import { S3 } from "aws-sdk";
-import { Buckets } from "aws-sdk/clients/s3";
-import path from "path";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import path, { dirname } from "path";
+import { TRPCError } from "@trpc/server";
 
 const ACCESSKEY = process.env.LIARA_ACCESS_KEY;
 const SECRETKEY = process.env.LIARA_SECRET_KEY;
 const ENDPOINT = process.env.LIARA_ENDPOINT;
 const BUCKET = process.env.LIARA_BUCKET_NAME;
 
-require("aws-sdk/lib/maintenance_mode_message").suppress = true;
 type ProductRouterArgsController<T = null> = T extends null
   ? {
       ctx: Context;
@@ -50,13 +49,19 @@ export const AddProductControllerArgSchema = z.object({
 });
 
 type AddProductControllerArg = z.infer<typeof AddProductControllerArgSchema>;
-export function addProductController({
+export async function addProductController({
   input,
-  ctx
+  ctx,
 }: ProductRouterArgsController<AddProductControllerArg>) {
-  const {prisma} = ctx
-
-  let buckets: Buckets | undefined;
+  const { prisma } = ctx;
+  const client = new S3Client({
+    region: "default",
+    endpoint: ENDPOINT as string,
+    credentials: {
+      accessKeyId: ACCESSKEY as string,
+      secretAccessKey: SECRETKEY as string,
+    },
+  });
 
   const imagePathFolder = path.join(__dirname, "addProductImages");
   const dir = fs.mkdir(imagePathFolder, () => {
@@ -72,85 +77,58 @@ export function addProductController({
   }
 
   const handleUpload = async (image: any, imageName: string) => {
-    if (!image) {
-      console.log("Please select a file");
-      return;
-    }
+    console.log(image)
+    const params = {
+      Body: image,
+      Bucket: BUCKET,
+      Key: "productImages/" + imageName,
+    };
+
     try {
-      const s3 = new S3({
-        accessKeyId: ACCESSKEY,
-        secretAccessKey: SECRETKEY,
-        endpoint: ENDPOINT,
-      });
-
-      const params = {
-        Bucket: BUCKET,
-        Key: "images/" + imageName,
-        Body: image,
-        ACL: "public-read",
-      };
-
-      const response = await s3.upload(params as any).promise();
-      const signedUrl = s3.getSignedUrl("getObject", {
-        Bucket: BUCKET,
-        Key: imageName,
-        Expires: 3600,
-      });
-
-      console.log("getSignedUrl:", signedUrl);
-
-      // Get permanent link
-      const permanentSignedUrl = s3.getSignedUrl("getObject", {
-        Bucket: BUCKET,
-        Key: imageName,
-        Expires: 31536000, // 1 year
-      });
-      return true
+      return await client.send(new PutObjectCommand(params));
     } catch (error) {
       console.log(error);
     }
   };
 
   function readFiles(dirname: any) {
-    
     fs.readdir(dirname, (err, filenames) => {
       if (err) {
-        new Error(err as any);
+        throw new Error(err as any);
         return;
       }
+      console.log(filenames);
       filenames.forEach((fileName) => {
         try {
-          fs.readFile(
-            `${dirname}\\${fileName}`,
-            "utf-8",
-            function (err, content) {
-              if (err) {
-                return;
-              }
-  
-              handleUpload(content, fileName);
-            }
-          );
+          (async () => {
+            return await fs.readFileSync(`${dirname}\\${fileName}`, {
+              encoding: "utf-8",
+            });
+          })().then((res) => {
+            handleUpload(res, fileName);
+          });
 
-          
-
-          return {status: "ok", }
+          return { status: "ok" };
         } catch (error) {
-          
+          throw new Error(error as any);
         }
-        
       });
     });
-
-    prisma.product.create({
-      data:{
-        imageNames:  input.images.map((img) => img.name),
-        name: input.name,
-        price: Number(input.price),
-        
-      }
-    })
   }
 
-  readFiles(imagePathFolder);
+  try {
+    readFiles(imagePathFolder);
+    await prisma.product.create({
+      data: {
+        imageNames: input.images.map((img) => img.name),
+        name: input.name,
+        price: Number(input.price),
+      },
+    });
+    await fs.rmSync(imagePathFolder, { recursive: true, force: true });
+    console.log("product added succesfully");
+    return { status: "ok" };
+  } catch (error) {
+    console.log(error);
+  }
 }

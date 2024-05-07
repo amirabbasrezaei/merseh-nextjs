@@ -3,6 +3,7 @@ import React, { Dispatch, SetStateAction, useState } from "react";
 import Category from "./Category";
 import { filterTypeArgs } from "./Products";
 import { Magnifier } from "../Home/SVGS";
+import Categories from "./Categories";
 interface Props {
   setFilter: Dispatch<SetStateAction<filterTypeArgs>>;
   filter: filterTypeArgs;
@@ -17,7 +18,7 @@ export interface categoryType {
 [];
 
 export default function Filter({ setFilter, filter }: Props) {
-  const { data } = trpc.product.categories.useQuery();
+  
 
   return (
     <div className="basis-3/12 flex flex-col gap-10">
@@ -35,19 +36,7 @@ export default function Filter({ setFilter, filter }: Props) {
           className="bg-transparent  h-full placeholder:text-[13px] w-full text-black1 placeholder:text-[#8b8b8b]  pr-2  appearance-none outline-none"
         />
       </div>
-      <div>
-        <h4 className="text-black1 text-[18px] mb-4">دسته‌بندی‌ ها</h4>
-        {data?.length &&
-          data.map((cat) => (
-            <Category
-              setFilter={setFilter}
-              catId={cat.id}
-              key={cat.id}
-              name={cat.title}
-              subCategory={cat.subCategories}
-            />
-          ))}
-      </div>
+      <Categories setFilter={setFilter}/>
     </div>
   );
 }

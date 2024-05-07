@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import ProductCard from "../Product/ProductCard";
 
 import Filter from "./Filter";
-import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
+
 import ProductCardSkeleton from "../Product/ProductCardSkeleton";
 import { AnimatePresence } from "framer-motion";
 
@@ -28,7 +28,7 @@ export default function Products() {
   } = trpc.product.filterProduct.useMutation({});
 
   useEffect(() => {
-    console.log({});
+
     mutate({
       categoryId: String(filter.categoryId),
       searchTerm: filter.searchTerm,
@@ -45,14 +45,15 @@ export default function Products() {
               ? // @ts-ignore
                 data.map((pr, index) => (
                   <ProductCard
-                    imageUrl={pr.imageUrl}
+                  key={pr.id}
+                  imageNames={pr.imageNames}
                     price={pr.price}
                     title={pr.name}
                     pathname={`product/${String(pr.id)}`}
                     isLoading={true}
                   />
                 ))
-              : Array.from(Array(8)).map(() => <ProductCardSkeleton />)}
+              : Array.from(Array(8)).map((_,i) => <ProductCardSkeleton key={i} />)}
           </AnimatePresence>
         </div>
       </div>

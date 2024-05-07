@@ -87,7 +87,7 @@ export default function AddProduct() {
           }}
           multiple
           type="file"
-          accept="image/*"
+          // accept="image/*"
         />
       </div>
       <div className="flex flex-wrap -mx-3 mb-6">
