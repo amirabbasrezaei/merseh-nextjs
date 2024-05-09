@@ -1,17 +1,22 @@
 import {
   FilterProductArgsSchema,
   categoriesController,
+  createCategory,
+  createCategorySchema,
   filterProductController,
 } from "../Controllers/category.controller";
 import {
   AddProductControllerArgSchema,
   addProductController,
-  getProductsController,
+  getProductController,
+  getProductInputSchema,
 } from "../Controllers/product.controller";
 import { publicProcedure, router } from "../trpc";
 
 export const productRouter = router({
-  getproducts: publicProcedure.query(getProductsController),
+  getproduct: publicProcedure
+    .input(getProductInputSchema)
+    .query(getProductController),
   categories: publicProcedure.query(categoriesController),
   filterProduct: publicProcedure
     .input(FilterProductArgsSchema)
@@ -19,4 +24,7 @@ export const productRouter = router({
   addProduct: publicProcedure
     .input(AddProductControllerArgSchema)
     .mutation(addProductController),
+  createCategory: publicProcedure
+    .input(createCategorySchema)
+    .mutation(createCategory),
 });

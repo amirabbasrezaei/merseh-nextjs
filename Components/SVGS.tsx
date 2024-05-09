@@ -120,11 +120,11 @@ export function Magnifier({ classname = "" }: Props) {
 
 export function Check({ classname = "" }: Props) {
   return (
-    <svg viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" className={classname}>
       <g clipPath="url(#clip0_354_869)">
         <path
           d="M9.07045 1.9668C9.19731 2.08789 9.19731 2.28711 9.07045 2.4082L3.50498 7.7207C3.37812 7.8418 3.16941 7.8418 3.04255 7.7207L0.0961216 4.9082C-0.0307385 4.78711 -0.0307385 4.58789 0.0961216 4.4668C0.222982 4.3457 0.431687 4.3457 0.558547 4.4668L3.27376 7.05859L8.60803 1.9668C8.73489 1.8457 8.94359 1.8457 9.07045 1.9668Z"
-          fill="#F3F3F3"
+          
         />
       </g>
       <defs>
@@ -227,6 +227,18 @@ export function XMark_Svg({ classname = "" }: Props) {
       viewBox="0 0 384 512"
     >
       <path d="M324.5 411.1c6.2 6.2 16.4 6.2 22.6 0s6.2-16.4 0-22.6L214.6 256 347.1 123.5c6.2-6.2 6.2-16.4 0-22.6s-16.4-6.2-22.6 0L192 233.4 59.5 100.9c-6.2-6.2-16.4-6.2-22.6 0s-6.2 16.4 0 22.6L169.4 256 36.9 388.5c-6.2 6.2-6.2 16.4 0 22.6s16.4 6.2 22.6 0L192 278.6 324.5 411.1z" />
+    </svg>
+  );
+}
+
+export function Plus_Svg({ classname = "" }: Props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 448 512"
+      className={classname}
+    >
+      <path d="M240 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V240H32c-8.8 0-16 7.2-16 16s7.2 16 16 16H208V448c0 8.8 7.2 16 16 16s16-7.2 16-16V272H416c8.8 0 16-7.2 16-16s-7.2-16-16-16H240V64z" />
     </svg>
   );
 }

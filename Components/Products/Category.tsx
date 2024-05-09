@@ -1,14 +1,16 @@
-import { Dispatch, SetStateAction, useState } from "react";
-import { Chevron_Down } from "../Home/SVGS";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Check, Chevron_Down, Plus_Svg } from "../SVGS";
 import { categoryType } from "./Filter";
 import { AnimatePresence, motion } from "framer-motion";
 import classNames from "classnames";
 import { filterTypeArgs } from "./Products";
+import { trpc } from "@/utils/trpc";
 interface Props {
   name: string;
   subCategory?: categoryType[];
   setFilter: Dispatch<SetStateAction<filterTypeArgs>>;
-  catId: string;
+  catId: number;
+  isAddProductPage?: boolean;
 }
 
 export default function Category({
@@ -16,14 +18,31 @@ export default function Category({
   subCategory = [],
   setFilter,
   catId,
+  isAddProductPage,
 }: Props) {
   const [showCategory, setShowCategory] = useState(false);
 
-  const getCategories = (data: categoryType[], parentAnimation: boolean) => {
+  const { mutate: mutateCreateCategory, data } =
+    trpc.product.createCategory.useMutation();
+  const { refetch } = trpc.product.categories.useQuery();
+  useEffect(() => {
+    refetch();
+  }, [data]);
+
+  const getCategories = (
+    data: categoryType[],
+    parentAnimation: boolean,
+    catId: number[]
+  ) => {
     if (data.length < 1) {
       return;
     }
     const [showSubCategory, setShowSubCategory] = useState(false);
+    const [showCreateCategory, setShowCreateCategory] = useState<{
+      state: boolean;
+      key?: number;
+    }>({ state: false });
+    const [newCategoryTitle, setNewCategoryTitle] = useState("");
 
     return data.map((cat: categoryType) => (
       <motion.div key={cat.id} className="">
@@ -38,9 +57,14 @@ export default function Category({
             <Chevron_Down classname="w-3 fill-black1 h-3" />
           ) : null}
           <span
-            onClick={() =>
-              setFilter((state) => ({ ...state, categoryId: cat.id }))
-            }
+            onClick={() => {
+              console.log(catId);
+              setFilter((state) => ({
+                ...state,
+                categoryId: cat.id,
+                parentCategories: catId,
+              }));
+            }}
             style={{ cursor: "pointer" }} // it doesn't work with taiwlind
             className={classNames(
               "text-[13px] text-black1 cursor-poiner",
@@ -49,7 +73,42 @@ export default function Category({
           >
             {cat.title}
           </span>
+          {isAddProductPage ? (
+            <div
+              onClick={() =>
+                setShowCreateCategory((state) => ({
+                  state: !state.state,
+                  key: cat.id,
+                }))
+              }
+            >
+              <Plus_Svg
+                classname={classNames(
+                  "w-[14px] h-auto fill-black1 ",
+                  (showCreateCategory.state && showCreateCategory.key == cat.id) ? "rotate-[45deg]" : "rotate-0"
+                )}
+              />
+            </div>
+          ) : null}
         </div>
+        {showCreateCategory.state && showCreateCategory.key == cat.id ? (
+          <div className="flex flex-row gap-2">
+            <input
+              onChange={(e) => setNewCategoryTitle(e.target.value)}
+              className="mr-3 border border-100 rounded-md"
+            />
+            <div
+              onClick={() =>
+                mutateCreateCategory({
+                  title: newCategoryTitle,
+                  parentId: cat.id,
+                })
+              }
+            >
+              <Check classname="w-[35px] h-[35px] fill-green-500 bg-gray-100 rounded-full p-2" />
+            </div>
+          </div>
+        ) : null}
 
         {cat.subCategories?.length ? (
           <motion.div
@@ -63,7 +122,8 @@ export default function Category({
           >
             {getCategories(
               cat.subCategories as categoryType[],
-              parentAnimation
+              parentAnimation,
+              [...catId, cat.id]
             )}
           </motion.div>
         ) : null}
@@ -82,12 +142,19 @@ export default function Category({
         ) : null}
         <span
           onClick={() =>
-            setFilter((state) => ({ ...state, categoryId: catId }))
+            setFilter((state) => ({
+              ...state,
+              categoryId: catId,
+              parentCategories: [Number(catId)],
+            }))
           }
           className="text-[13px] text-black1 cursor-pointer"
         >
           {name}
         </span>
+        {isAddProductPage ? (
+          <Plus_Svg classname="w-[14px] h-auto fill-black1 " />
+        ) : null}
       </div>
 
       <motion.div
@@ -102,7 +169,9 @@ export default function Category({
         className="pr-4 flex-col mb-5"
       >
         {/* <span>afdf</span> */}
-        {subCategory?.length ? getCategories(subCategory, showCategory) : null}
+        {subCategory?.length
+          ? getCategories(subCategory, showCategory, [catId])
+          : null}
       </motion.div>
     </div>
   );

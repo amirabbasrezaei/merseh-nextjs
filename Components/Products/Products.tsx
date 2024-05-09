@@ -10,15 +10,13 @@ import ProductCardSkeleton from "../Product/ProductCardSkeleton";
 import { AnimatePresence } from "framer-motion";
 
 export type filterTypeArgs = {
-  categoryId?: string;
+  categoryId?: number;
   searchTerm?: string;
+  parentCategories?: number[];
 };
 
 export default function Products() {
-  const [filter, setFilter] = useState<filterTypeArgs>({
-    categoryId: "",
-    searchTerm: "",
-  });
+  const [filter, setFilter] = useState<filterTypeArgs>({});
 
   const {
     mutate: mutate,
@@ -29,7 +27,7 @@ export default function Products() {
   useEffect(() => {
     const timeOut = setTimeout(() => {
       mutate({
-        categoryId: String(filter.categoryId),
+        categoryId: filter.categoryId,
         searchTerm: filter.searchTerm,
       });
     }, 500);
@@ -54,7 +52,7 @@ export default function Products() {
                   <ProductCard
                     key={index}
                     imageNames={pr.imageNames}
-                    price={pr.price}
+                    price={pr.price || 0}
                     title={pr.name}
                     pathname={`product/${String(pr.id)}`}
                     isLoading={true}

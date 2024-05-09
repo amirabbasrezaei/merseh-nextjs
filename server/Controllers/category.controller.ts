@@ -15,9 +15,9 @@ export async function categoriesController({ ctx }: ArgsStructure) {
   const categories = await prisma.category.findMany();
 
   interface categoryRawType {
-    id: string;
+    id: number;
     title: string;
-    parentCategoryId: string | null;
+    parentCategoryId: number | null;
   }
 
   interface categoryFinalType extends categoryRawType {
@@ -95,7 +95,7 @@ export async function categoriesController({ ctx }: ArgsStructure) {
 }
 
 export const FilterProductArgsSchema = z.object({
-  categoryId: z.string().optional(),
+  categoryId: z.number().optional(),
   searchTerm: z.string().optional(),
 });
 
@@ -107,18 +107,43 @@ export async function filterProductController({
 }: ArgsStructure<FilterProductArgs>) {
   const { prisma } = ctx;
   const { categoryId, searchTerm } = input;
-  
+
   const filterProducts = await prisma.product.findMany({
     where: {
-      category:categoryId?.length ? {
-        some:{
-          id: Number(categoryId)
-        }
-      } : {}
-
+      name: { contains: searchTerm },
+      category: categoryId
+        ? {
+            some: {
+              id: categoryId,
+            },
+          }
+        : {},
     },
   });
 
   // console.log(filterProducts)
   return filterProducts;
+}
+
+export const createCategorySchema = z.object({
+  title: z.string(),
+  parentId: z.number(),
+});
+
+type CreateCategoryArgs = z.infer<typeof createCategorySchema>;
+
+export async function createCategory({
+  input,
+  ctx,
+}: ArgsStructure<CreateCategoryArgs>) {
+  const { prisma } = ctx;
+  const newCategory = await prisma.category.create({
+    data: {
+      title: input.title,
+      parentCategoryId: input.parentId,
+    },
+  });
+  console.log(input);
+
+  return newCategory;
 }

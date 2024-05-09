@@ -4,8 +4,13 @@ import { btoa } from "buffer";
 import React, { useEffect, useState } from "react";
 import Categories from "../Products/Categories";
 import { filterTypeArgs } from "../Products/Products";
+import { Plus_Svg } from "../SVGS";
 
 type imageType = { base64: string; name: string };
+type variation = {
+  variationName: string;
+  variations: { name: string; price: number }[];
+};
 
 export default function AddProduct() {
   const { mutateAsync } = trpc.product.addProduct.useMutation({});
@@ -16,6 +21,7 @@ export default function AddProduct() {
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [flag, setFlag] = useState(false);
   const [filter, setFilter] = useState<filterTypeArgs>({});
+  const [variations, setVariations] = useState<variation[]>([]);
   useEffect(() => {
     if ((files as any)?.length && !flag) {
       setFlag(true);
@@ -63,9 +69,50 @@ export default function AddProduct() {
     console.log(images);
   }, [images]);
 
+  const handleVariationInput = (
+    variationIndex: number,
+    variationName: string
+  ) => {
+    let copy = [...variations];
+    copy[variationIndex].variationName = variationName;
+    setVariations(copy);
+  };
+
+  const handleVariationTypeInput = (
+    variationIndex: number,
+    variationTypeIndex: number,
+    input: { price?: number; name?: string }
+  ) => {
+    const { name, price } = input;
+    let copy = [...variations];
+
+    copy[variationIndex].variations[variationTypeIndex] = {
+      name: name
+        ? name
+        : copy[variationIndex].variations[variationTypeIndex].name,
+      price: price
+        ? price
+        : copy[variationIndex].variations[variationTypeIndex].price,
+    };
+
+    setVariations(copy);
+  };
+
+  const addVariationType = (variationIndex: number) => {
+    variations[variationIndex].variations.push({
+      name: "",
+      price: 0,
+    });
+    setVariations((state) => [...state]);
+  };
+
+  useEffect(() => {
+    console.log(variations);
+  }, [variations]);
+
   return (
     <form
-      className="w-full max-w-lg"
+      className="w-full max-w-lg flex flex-col gap-10"
       onSubmit={(e) => {
         e.preventDefault();
         console.log({
@@ -79,6 +126,8 @@ export default function AddProduct() {
             name: name,
             price: price,
             categoryId: String(filter.categoryId),
+            parentCategories: filter.parentCategories,
+            productVariations: variations.length ? variations : [],
           }).then((res) => console.log(res));
         }
       }}
@@ -107,14 +156,10 @@ export default function AddProduct() {
           <input
             value={name}
             onChange={(e) => setName(e.currentTarget.value)}
-            className="appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+            className="appearance-none block w-full bg-gray-200 text-gray-700 border  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
             id="grid-first-name"
             type="text"
-            placeholder="Jane"
           />
-          <p className="text-red-500 text-xs italic">
-            Please fill out this field.
-          </p>
         </div>
         <div className="w-full md:w-1/2 px-3">
           <label
@@ -125,17 +170,111 @@ export default function AddProduct() {
           </label>
           <input
             className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-            id="grid-last-name"
-            type="text"
-            placeholder="Doe"
+            id="grid-price"
+            type="number"
             value={price}
             onChange={(e) => setPrice(e.currentTarget.value)}
           />
         </div>
       </div>
+      <div className="flex flex-col gap-4 justify-center  w-full">
+        <h3 className="text-lg ">انواع محصول</h3>
+        {variations.map((variation, variationIndex) => (
+          <div
+            key={variationIndex}
+            className="flex flex-row justify-center  gap-4"
+          >
+            <div className="flex flex-col gap-1 h-full">
+              <label
+                htmlFor="variation_name"
+                className="text-black1 text-[14px] font-[500] mr-3"
+              >
+                اسم ویژگی
+              </label>
+              <div className="flex flex-row items-center">
+                <input
+                  value={variation.variationName}
+                  onChange={(e) =>
+                    handleVariationInput(variationIndex, e.target.value)
+                  }
+                  id="variation_name"
+                  type="text"
+                  className="border ml-3 border-gray-100 h-10 w-[200px] rounded-[13px]"
+                />
+                <span className="text-[20px] text-gray-600">:</span>
+              </div>
+            </div>
+            <div className="flex flex-col items-center gap-4">
+              <div className="flex flex-col gap-5">
+                {variation.variations.map(
+                  (variationType, variationTypeIndex) => (
+                    <div className="flex flex-row gap-3 bg-gray-50 rounded-[13px] p-3">
+                      <div className="flex flex-col gap-1">
+                        <label className="text-black1 text-[14px] font-[500] mr-3">
+                          نوع {variationTypeIndex + 1}
+                        </label>
+                        <input
+                          value={variationType.name}
+                          onChange={(e) =>
+                            handleVariationTypeInput(
+                              variationIndex,
+                              variationTypeIndex,
+                              { name: e.target.value }
+                            )
+                          }
+                          type="text"
+                          className="border border-gray-100 h-10 w-[100px] rounded-[13px]"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-black1 text-[14px] font-[500] mr-3">
+                          قیمت
+                        </label>
+                        <input
+                          onChange={(e) =>
+                            handleVariationTypeInput(
+                              variationIndex,
+                              variationTypeIndex,
+                              { price: Number(e.target.value) }
+                            )
+                          }
+                          value={variationType.price}
+                          type="text"
+                          className="border border-gray-100 h-10 w-[100px] rounded-[13px]"
+                        />
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
+              <div
+                onClick={() => addVariationType(variationIndex)}
+                className="bg-gray-50 h-[40px]  w-[40px] flex items-center justify-center rounded-[14px] p-[9px]"
+              >
+                <Plus_Svg classname="w-[20px] h-auto fill-gray-800" />
+              </div>
+            </div>
+          </div>
+        ))}
 
-      <Categories setFilter={setFilter} />
-      <button>submit</button>
+        <div
+          onClick={() =>
+            setVariations((state: variation[]) => [
+              ...state,
+              { variationName: "", variations: [{ name: "", price: 0 }] },
+            ])
+          }
+          className="bg-gray-100 cursor-pointer h-10 w-[200px] gap-1 rounded-[13px] justify-center flex items-center"
+        >
+          <span>افزودن ویژگی</span>
+          <Plus_Svg classname="w-4 h-4 fill-green2" />
+        </div>
+      </div>
+
+      <Categories isAddProductPage={true} setFilter={setFilter} />
+      <button className="bg-green2 h-10 text-white w-[300px] rounded-[13px]">
+        افزودن محصول
+      </button>
     </form>
   );
 }

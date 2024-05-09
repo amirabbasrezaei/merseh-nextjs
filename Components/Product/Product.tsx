@@ -1,47 +1,179 @@
-"use client"
-import Image from 'next/image'
-import React, { useState } from 'react'
+"use client";
 
-import image from "@/public/Images/small_bottle_oil.png";
+import React, { useEffect, useState } from "react";
+import { trpc } from "@/utils/trpc";
+import classNames from "classnames";
+import ProductImages from "./ProductImages";
+import Button from "../Button";
+import splitNumber from "../utils/splitNumber";
+import Skeleton from "react-loading-skeleton";
+import { atom, useRecoilState } from "recoil";
+import { shopingCartStateAtom } from "../ShoppingCart";
 
-export default function Product() {
-    type BuyOptions = {
-        
+type Props = {
+  productId: string;
+};
+
+type ProductVariation = {
+  price: number;
+  variationValueid: number;
+  variationId: number;
+} | null;
+export default function Product({ productId }: Props) {
+  const {
+    data: productData,
+    isFetched,
+    isLoading,
+  } = trpc.product.getproduct.useQuery({
+    productId,
+  });
+  const [shopingCartState, setShoppingCart] =
+    useRecoilState(shopingCartStateAtom);
+
+  const initialProduct: ProductVariation = productData?.product?.variations
+    ?.length
+    ? {
+        variationId: 0,
+        variationValueid: 0,
+        price: 0,
+      }
+    : null;
+
+  const [selectedProductVariation, setSelectedProductVariation] =
+    useState<ProductVariation>(initialProduct);
+  useEffect(() => {
+    if (isFetched) {
+      setSelectedProductVariation(
+        productData?.product?.variations?.length
+          ? {
+              variationId: productData.product.variations[0].id,
+              variationValueid:
+                productData.product.variations[0].variations[0].id,
+              price: productData.product.variations[0].variations[0].price,
+            }
+          : null
+      );
     }
-    const [buyOptions, setBuyOptions] = useState()
+    console.log(selectedProductVariation);
+  }, [isFetched]);
+
+  const updateShoppingCart = (
+    price: number,
+    variationId?: number,
+    variationValueId?: number
+  ) => {
+    const newShoppingCartItem = {
+      name: productData?.product?.name,
+      price,
+      numberOfProduct: 1,
+      variationValueId,
+      variationId,
+    };
+
+    setShoppingCart((lastShoppingCartState: any) => {
+      if (lastShoppingCartState?.length) {
+        return [...lastShoppingCartState, newShoppingCartItem];
+      } else {
+        return [newShoppingCartItem];
+      }
+    });
+  };
+
   return (
-    <div className="h-[400px] w-full flex flex-row mt-[85px]">
-    <div className="h-full w-full basis-4/12">
-      <Image
-        className="h-full w-full"
-        style={{ objectFit: "contain" }}
-        src={image}
-        alt="small_bottle"
-      />
-    </div>
-    <div className="h-full  w-full basis-5/12 p-4 flex flex-col gap-5">
-      <h3 className="text-[24px]">روغن ارگان</h3>
-      <div className="flex flex-row items-center gap-2">
-        <span className="ml-4 text-[18px] text-[#252525]">نوع</span>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <input
-              className="appearance-none border border-[#DFDFDF] w-[20px] h-[20px] rounded-full"
-              type="radio"
-            />
-            <span className="text-[14px] text-[#535353]">بی بو</span>
+    <div className="h-[600px] w-full flex flex-row mt-[85px]">
+      <div className="h-full w-full basis-4/12 ">
+        {productData?.product ? (
+          <ProductImages imageUrls={productData.product.imageUrls} />
+        ) : null}
+      </div>
+      <div className="h-full  w-full basis-4/12 p-4 flex flex-col gap-5">
+        <h3 className="text-[24px]">{productData?.product?.name}</h3>
+
+        {productData?.product?.variations.map((variation) => (
+          <div key={variation.id} className="flex flex-row items-center gap-2">
+            <span className="ml-4 text-[18px] text-[#252525]">
+              {variation.variationName}
+            </span>
+            <div className="flex flex-col gap-5">
+              <div className="flex items-center gap-4">
+                {variation.variations.map(
+                  (variationType, variationTypeIndex) => (
+                    <div
+                      key={variationType.id}
+                      className="flex items-center gap-2"
+                    >
+                      <div className="w-[21px]  h-[21px] flex items-center justify-center border-2 border-[#DFDFDF] rounded-full">
+                        <input
+                          checked={
+                            selectedProductVariation?.variationId ===
+                              variation.id &&
+                            selectedProductVariation.variationValueid ===
+                              variationType.id
+                          }
+                          onChange={(e) =>
+                            e.target.checked &&
+                            setSelectedProductVariation({
+                              price: variationType.price,
+                              variationId: variation.id,
+                              variationValueid: variationType.id,
+                            })
+                          }
+                          className={classNames(
+                            "appearance-none text-center center w-[15px]  h-[15px] rounded-full",
+                            selectedProductVariation?.variationId ===
+                              variation.id &&
+                              selectedProductVariation.variationValueid ===
+                                variationType.id
+                              ? "checked:bg-green1"
+                              : ""
+                          )}
+                          type="radio"
+                        />
+                      </div>
+                      <span className="text-[14px] text-[#535353]">
+                        {variationType.name}
+                      </span>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <input
-              className="appearance-none checked:bg-black border p-2 border-[#DFDFDF] w-[20px] h-[20px] rounded-full"
-              type="radio"
-            />
-            <span className="text-[14px] text-[#535353]">با بو</span>
+        ))}
+      </div>
+      <div className="h-full flex flex-col items-center justify-center w-full basis-4/12 ">
+        <div className="w-[70%] py-6 gap-5 border border-[#EAEAEA] rounded-[8px] flex flex-col items-center justify-center ">
+          <div className="flex flex-row items-center justify-center gap-1 w-[80%]">
+            {isLoading ? (
+              <div className="animate-pulse h-8 w-full bg-gray-100" />
+            ) : (
+              <>
+                <span className="text-green1 text-[25px] font-[600]">
+                  {selectedProductVariation?.price
+                    ? splitNumber(selectedProductVariation?.price)
+                    : splitNumber(productData?.product?.price)}
+                </span>
+                <span className="text-black1 text-[10px]">تومان</span>
+              </>
+            )}
           </div>
+          <Button
+            text="افزودن به سبد خرید"
+            className="w-[80%]"
+            onClick={() =>
+              updateShoppingCart(
+                selectedProductVariation?.price
+                  ? selectedProductVariation.price
+                  : productData?.product?.price
+                  ? productData?.product.price
+                  : 0,
+                selectedProductVariation?.variationId,
+                selectedProductVariation?.variationValueid
+              )
+            }
+          />
         </div>
       </div>
     </div>
-    <div className="h-full bg-red-200 w-full basis-3/12 "></div>
-  </div>
-  )
+  );
 }

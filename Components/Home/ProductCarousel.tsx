@@ -5,7 +5,7 @@ import Image from 'next/image'
 import image1 from '../../public/Images/small_bottle_oil.png'
 import image2 from '../../public/Images/sunflower_oil.png'
 import image3 from '../../public/Images/olive_oil.png'
-import { Chevron_Down_sharp_light } from './SVGS'
+import { Chevron_Down_sharp_light } from '../SVGS'
 interface props {
     title: string;
     sliderStartDelay: number

@@ -2,16 +2,16 @@ import { trpc } from "@/utils/trpc";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import Category from "./Category";
 import { filterTypeArgs } from "./Products";
-import { Magnifier } from "../Home/SVGS";
+import { Magnifier } from "../SVGS";
 import Categories from "./Categories";
 interface Props {
   setFilter: Dispatch<SetStateAction<filterTypeArgs>>;
   filter: filterTypeArgs;
 }
 export interface categoryType {
-  id: string;
+  id: number;
   title: string;
-  parentCategoryId: string | null;
+  parentCategoryId: number | null;
   subCategories?: any[] | undefined;
   insertedIntoParent?: boolean | undefined;
 }

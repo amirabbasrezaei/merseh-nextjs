@@ -19,16 +19,14 @@ export default function ProductCard({
   pathname,
   isLoading,
 }: ProductCardProps) {
-  console.log(
-    `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${imageNames[0]}`
-  );
+
   return (
     <motion.div
       transition={{ duration: 0.3 }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="    flex justify-center "
+      className="flex justify-center "
     >
       <Link href={{ pathname }}>
         <div className="border h-[350px] w-[200px] py-1 gap-3 flex flex-col items-center justify-center relative   border-[#EDEDED] rounded-[12px]">

@@ -4,9 +4,10 @@ import Category from "./Category";
 import { filterTypeArgs } from "./Products";
 interface Props {
   setFilter: Dispatch<SetStateAction<filterTypeArgs>>;
+  isAddProductPage?: boolean
 }
 
-export default function Categories({ setFilter }: Props) {
+export default function Categories({ setFilter, isAddProductPage=false }: Props) {
   const { data } = trpc.product.categories.useQuery();
   return (
     <div>
@@ -19,6 +20,7 @@ export default function Categories({ setFilter }: Props) {
             key={cat.id}
             name={cat.title}
             subCategory={cat.subCategories}
+            isAddProductPage={isAddProductPage}
           />
         ))}
     </div>

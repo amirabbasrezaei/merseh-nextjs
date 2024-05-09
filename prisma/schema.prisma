@@ -22,15 +22,49 @@ model Product {
   updatedAt        DateTime           @default(now())
   ProductVariation ProductVariation[]
   category         Category[]
+  ProductForOrder  ProductForOrder[]
+}
+
+model ProductVariationValue {
+  id                 Int              @id @default(autoincrement())
+  name               String
+  price              Int
+  ProductVariationId Int
+  ProductVariation   ProductVariation @relation(fields: [ProductVariationId], references: [id])
+
+  ProductForOrder ProductForOrder[]
 }
 
 model ProductVariation {
-  id          Int     @id @default(autoincrement())
-  price       Int
-  variateName String
-  value       String
-  ProductId   Int
-  Product     Product @relation(fields: [ProductId], references: [id])
+  id              Int                     @id @default(autoincrement())
+  variateName     String
+  values          ProductVariationValue[]
+  ProductId       Int
+  Product         Product                 @relation(fields: [ProductId], references: [id])
+  ProductForOrder ProductForOrder[]
+}
+
+model ProductForOrder {
+  id                      Int                    @id @default(autoincrement())
+  numberOfproduct         Int
+  Order                   Order?                 @relation(fields: [orderId], references: [id])
+  orderId                 Int?
+  productId               Int
+  Product                 Product                @relation(fields: [productId], references: [id])
+  productVariationId      Int?
+  ProductVariation        ProductVariation?      @relation(fields: [productVariationId], references: [id])
+  productVariationValueId Int?
+  ProductVariationValue   ProductVariationValue? @relation(fields: [productVariationValueId], references: [id])
+}
+
+model Order {
+  id              Int               @id @default(autoincrement())
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @default(now())
+  status          OrderStatus
+  ProductForOrder ProductForOrder[]
+  userId          String
+  user            User              @relation(fields: [userId], references: [id])
 }
 
 model Category {
@@ -58,6 +92,7 @@ model User {
   createdAt      DateTime  @default(now())
   lastLogin      DateTime?
   numberOfLogins Int?      @default(1)
+  order          Order[]
 }
 
 model Session {
@@ -87,4 +122,11 @@ model Payment {
 enum role {
   USER
   SUPERADMIN
+}
+
+enum OrderStatus {
+  ACTIVE
+  PAYED
+  DELIVERED
+  DELIVERING
 }

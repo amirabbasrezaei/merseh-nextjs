@@ -6,7 +6,7 @@ import {
   MersehSvg,
   Merseh_typography,
   XMark_Svg,
-} from "../Home/SVGS";
+} from "../SVGS";
 import { trpc } from "@/utils/trpc";
 import classnames from "classnames";
 

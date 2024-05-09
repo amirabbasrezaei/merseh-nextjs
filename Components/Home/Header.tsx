@@ -7,13 +7,14 @@ import {
   MersehSvg,
   Profile_Svg,
   Shop_Cart,
-} from "./SVGS";
+} from "../SVGS";
 import { trpc } from "@/utils/trpc";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { createPortal } from "react-dom";
 import Auth from "../Auth/Auth";
 import { AnimatePresence, motion } from "framer-motion";
+import ShoppingCart from "../ShoppingCart";
 export default function Header() {
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const { data, status, isLoading } = trpc.user.userInfo.useQuery(undefined, {
@@ -24,7 +25,7 @@ export default function Header() {
 
   useEffect(() => {}, [status]);
   return (
-    <header className="h-[116px] px-6 w-full  flex items-center mb-[-70px]">
+    <header className="h-[116px] px-6 w-full  flex items-center mb-[-70px] flex-none">
       <div className="flex items-center gap-12 basis-9/12  h-full ">
         <MersehSvg classname="max-w-[38px] basis-1/12 flex-none" />
         <div className=" basis-3/12 flex-none">
@@ -95,10 +96,8 @@ export default function Header() {
             )}
           </>
         )}
-
-        <div className="p-3 hover:bg-hover1 cursor-pointer rounded-[15px]">
-          <Shop_Cart classname=" " />
-        </div>
+        <ShoppingCart />
+        
       </div>
     </header>
   );
