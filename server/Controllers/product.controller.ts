@@ -21,7 +21,7 @@ type ProductRouterArgsController<T = null> = T extends null
     };
 
 export const getProductInputSchema = z.object({
-  productId: z.string(),
+  productId: z.number(),
 });
 const productVariation = z.object({
   variationName: z.string(),
@@ -48,7 +48,7 @@ const productVariationForPayload = z.object({
 export const getProductPayloadSchema = z.object({
   product: z
     .object({
-      id: z.string(),
+      id: z.number(),
       name: z.string(),
       imageUrls: z.array(z.string()),
       price: z.number(),
@@ -91,7 +91,7 @@ export async function getProductController({
       return { message: "product doesn't found", error: "" };
     }
     const result = {
-      id: String(product.id),
+      id: product.id,
       imageUrls: product.imageNames.map(
         (imgName) =>
           `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${imgName}`

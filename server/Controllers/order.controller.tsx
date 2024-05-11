@@ -10,23 +10,36 @@ type ArgsStructure<T = null> = T extends null
       input: T;
     };
 
-export const createOrderInputSchema = z.object({
-  productId: z.number(),
-  productVariationId: z.number().optional(),
-  productVariationValueid: z.number().optional(),
-  numberOfProduct: z.number(),
-});
+export const activeOrderInputSchema = z.array(
+  z.object({
+    productId: z.number(),
+    variationId: z.number().optional(),
+    variationValueId: z.number().optional(),
+    numberOfProduct: z.number(),
+  })
+);
 
-type CreateOrderInput = z.infer<typeof createOrderInputSchema>;
+type ActiveOrderInput = z.infer<typeof activeOrderInputSchema>;
 
-export async function createOrderController({
+export async function updateActiveOrderController({
   ctx,
   input,
-}: ArgsStructure<CreateOrderInput>) {
+}: ArgsStructure<ActiveOrderInput>) {
   const { prisma, user } = ctx;
+
   try {
-    const createdOrder = await prisma.order.create({
-      data: {
+    const findActiveOrder = await prisma.order.findFirst({
+      where: {
+        status: "ACTIVE",
+        userId: user.userId,
+      },
+    });
+
+    let activeOrder = await prisma.order.upsert({
+      where: {
+        id: findActiveOrder?.id || -1,
+      },
+      create: {
         status: "ACTIVE",
         user: {
           connect: {
@@ -34,25 +47,78 @@ export async function createOrderController({
           },
         },
         ProductForOrder: {
-          create:
-            input?.productVariationId && input?.productVariationValueid
+          create: input.map((prOrder) =>
+            prOrder?.variationId && prOrder?.variationValueId
               ? {
-                  productId: input.productId,
-                  productVariationId: input.productVariationId,
-                  productVariationValueId: input.productVariationValueid,
-                  numberOfproduct: input.numberOfProduct,
+                  productId: prOrder.productId,
+                  productVariationId: prOrder.variationId,
+                  productVariationValueId: prOrder.variationValueId,
+                  numberOfproduct: prOrder.numberOfProduct,
                 }
               : {
-                  productId: input.productId,
-                  numberOfproduct: input.numberOfProduct,
-                },
+                  productId: prOrder.productId,
+                  numberOfproduct: prOrder.numberOfProduct,
+                }
+          ),
+        },
+      },
+      update: {
+        ProductForOrder: {
+          deleteMany: { orderId: findActiveOrder?.id },
+          create: input.map((prOrder) =>
+            prOrder?.variationId && prOrder?.variationValueId
+              ? {
+                  productId: prOrder.productId,
+                  productVariationId: prOrder.variationId,
+                  productVariationValueId: prOrder.variationValueId,
+                  numberOfproduct: prOrder.numberOfProduct,
+                }
+              : {
+                  productId: prOrder.productId,
+                  numberOfproduct: prOrder.numberOfProduct,
+                }
+          ),
+        },
+      },
+      include: {
+        ProductForOrder: {
+          include: {
+            Product: {
+              select: {
+                imageNames: true,
+                name: true,
+                price: true,
+                id: true,
+              },
+            },
+            ProductVariationValue: {
+              select: {
+                name: true,
+                price: true,
+              },
+            },
+          },
         },
       },
     });
 
-    return { result: "ok", newOrder: createdOrder, error: null };
+    const addProductImages = {
+      ...activeOrder,
+      ProductForOrder: activeOrder.ProductForOrder.map((e) => ({
+        ...e,
+        Product: {
+          ...e.Product,
+          imageUrls: e.Product.imageNames.map(
+            (imgName) =>
+              `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${imgName}`
+          ),
+        },
+      })),
+    };
+
+    return { result: "ok", activeOrder: addProductImages, error: null };
   } catch (error) {
-    return { result: "failed", newOrder: null, error };
+    return { result: "failed", activeOrder: null, error };
   }
 }
 
@@ -66,19 +132,33 @@ export async function getActiveOrderController({ ctx }: ArgsStructure) {
         },
         status: "ACTIVE",
       },
-      include:{
+      include: {
         ProductForOrder: {
-          include:{
+          include: {
             Product: true,
-            ProductVariationValue: true
-          }
-        }
-
-      }
+            ProductVariationValue: true,
+          },
+        },
+      },
     });
 
+
+
     if (activeOrder) {
-      return { result: "ok", activeOrder, error: null };
+      const addProductImages = {
+        ...activeOrder,
+        ProductForOrder: activeOrder.ProductForOrder.map((e) => ({
+          ...e,
+          Product: {
+            ...e.Product,
+            imageUrls: e.Product.imageNames.map(
+              (imgName) =>
+                `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${imgName}`
+            ),
+          },
+        })),
+      };
+      return { result: "ok", activeOrder: addProductImages, error: null };
     }
     return {
       result: "no_order",

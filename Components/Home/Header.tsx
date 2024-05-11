@@ -14,7 +14,9 @@ import "react-loading-skeleton/dist/skeleton.css";
 import { createPortal } from "react-dom";
 import Auth from "../Auth/Auth";
 import { AnimatePresence, motion } from "framer-motion";
-import ShoppingCart from "../ShoppingCart";
+import HeaderShoppingCart from "../ShoppingCart/HeaderShoppingCart";
+import { useRecoilState } from "recoil";
+import { themeRecoilStateAtom } from "../ThemeController";
 export default function Header() {
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const { data, status, isLoading } = trpc.user.userInfo.useQuery(undefined, {
@@ -23,7 +25,19 @@ export default function Header() {
     gcTime: 0,
   });
 
-  useEffect(() => {}, [status]);
+  const [themeStore, setThemeStore] = useRecoilState(themeRecoilStateAtom);
+  useEffect(() => {
+    if (themeStore.openAuthModal) {
+      setShowAuthModal(true);
+    }
+  }, [themeStore]);
+
+  useEffect(() => {
+    if (showAuthModal === false) {
+      setThemeStore({ openAuthModal: false });
+    }
+  }, [showAuthModal]);
+
   return (
     <header className="h-[116px] px-6 w-full  flex items-center mb-[-70px] flex-none">
       <div className="flex items-center gap-12 basis-9/12  h-full ">
@@ -79,7 +93,7 @@ export default function Header() {
                 {showAuthModal && (
                   <motion.div
                     key="portal"
-                    animate={{ opacity: 1, backdropFilter: "blur(10px)" }}
+                    animate={{ opacity: 1, backdropFilter: "blur(2px)" }}
                     exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
                     transition={{ duration: 0.3 }}
                     onClick={(e) => {
@@ -96,8 +110,7 @@ export default function Header() {
             )}
           </>
         )}
-        <ShoppingCart />
-        
+        <HeaderShoppingCart />
       </div>
     </header>
   );

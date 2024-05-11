@@ -36,9 +36,6 @@ export default function Products() {
     };
   }, [filter]);
 
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
 
   return (
     <section className="flex flex-row w-full mt-10 px-10 overflow-visible">

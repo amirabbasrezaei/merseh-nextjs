@@ -18,10 +18,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const AuthorizeStatus = cookies().get("AuthorizeStatus")?.value;
+  console.log(AuthorizeStatus)
   return (
     <html lang="en" dir="rtl">
       <body
-        className={`overflow-x-hidden bg-white ${IRANYekanXFaNum.className}`}
+        className={`overflow-x-hidden  bg-[#00bd84] ${IRANYekanXFaNum.className}`}
       >
         <RecoilRootProvider>
           <TRPC_Provider>

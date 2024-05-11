@@ -8,7 +8,7 @@ import Button from "../Button";
 import splitNumber from "../utils/splitNumber";
 import Skeleton from "react-loading-skeleton";
 import { atom, useRecoilState } from "recoil";
-import { shopingCartStateAtom } from "../ShoppingCart";
+import { shopingCartStateAtom } from "../ShoppingCart/HeaderShoppingCart";
 
 type Props = {
   productId: string;
@@ -25,7 +25,7 @@ export default function Product({ productId }: Props) {
     isFetched,
     isLoading,
   } = trpc.product.getproduct.useQuery({
-    productId,
+    productId: Number(productId),
   });
   const [shopingCartState, setShoppingCart] =
     useRecoilState(shopingCartStateAtom);
@@ -54,7 +54,6 @@ export default function Product({ productId }: Props) {
           : null
       );
     }
-    console.log(selectedProductVariation);
   }, [isFetched]);
 
   const updateShoppingCart = (
@@ -68,13 +67,27 @@ export default function Product({ productId }: Props) {
       numberOfProduct: 1,
       variationValueId,
       variationId,
+      productId: productData?.product?.id,
     };
 
+    console.log(newShoppingCartItem)
+
     setShoppingCart((lastShoppingCartState: any) => {
-      if (lastShoppingCartState?.length) {
-        return [...lastShoppingCartState, newShoppingCartItem];
+      if (lastShoppingCartState?.orderitems?.length) {
+        return {
+          updateActiveOrder: lastShoppingCartState.updateActiveOrder,
+          showCart: true,
+          orderitems: [
+            ...lastShoppingCartState.orderitems,
+            newShoppingCartItem,
+          ],
+        };
       } else {
-        return [newShoppingCartItem];
+        return {
+          updateActiveOrder: lastShoppingCartState.updateActiveOrder,
+          showCart: true,
+          orderitems: [newShoppingCartItem],
+        };
       }
     });
   };

@@ -6,35 +6,33 @@ import { NextResponse } from "next/server";
 interface IsUserAuthed {
   next: any;
   ctx: Context;
+  path: string;
 }
 
 // interface NextArgs extends Context {
 //   user: object
 // }
 
-export const isUserAuthed = async ({ ctx, next }: IsUserAuthed) => {
+export const isUserAuthed = async (opts: IsUserAuthed) => {
+  const { ctx, next, path } = opts;
   cookies().set("AuthorizeStatus", "", { httpOnly: true });
   const { res } = ctx;
 
   const { accessToken, accessTokenPayload } = await getUser(res);
-  // console.log("user", accessTokenPayload ? accessTokenPayload :  accessToken);
-  if (!accessToken) {
-    // @ts-ignore
-    const accessToRestrictrdPaths = res.params.trpc
-      .split(",")
-      .map((route: any) => route.split("."))
-      .map((e: any, i: number) => e[1])
-      .filter((e: any) => e !== "userInfo").length;
 
-    if (accessToRestrictrdPaths) {
-      cookies().set("AuthorizeStatus", "need_login", { httpOnly: true });
+  if (!accessToken) {
+    if (path !== "user.userInfo" && path !== "order.getActiveOrder") {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+
+        message: JSON.stringify({ need_login_now: true }),
+      });
     }
 
-    cookies().set("AuthorizeStatus", "need_login", { httpOnly: true });
     throw new TRPCError({
       code: "UNAUTHORIZED",
-      cause: "you are not authorize to request",
-      message: "please log in",
+
+      message: JSON.stringify({ need_login_now: false, text:"please log in" }),
     });
   }
 

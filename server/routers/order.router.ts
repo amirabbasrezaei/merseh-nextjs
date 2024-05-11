@@ -1,13 +1,13 @@
 import {
-  createOrderController,
-  createOrderInputSchema,
+  activeOrderInputSchema,
   getActiveOrderController,
+  updateActiveOrderController,
 } from "../Controllers/order.controller";
 import { router, userProtectedProcedure } from "../trpc";
 
 export const orderRouter = router({
-  createorder: userProtectedProcedure
-    .input(createOrderInputSchema)
-    .mutation(createOrderController),
+  updateActiveOrder: userProtectedProcedure
+    .input(activeOrderInputSchema)
+    .mutation(updateActiveOrderController),
   getActiveOrder: userProtectedProcedure.query(getActiveOrderController),
 });

@@ -1,4 +1,5 @@
 "use client";
+import { trpc } from "@/utils/trpc";
 import React, { useEffect } from "react";
 import { atom, useRecoilState } from "recoil";
 
@@ -10,18 +11,23 @@ interface Props {
 type ThemeType = {
   openAuthModal: boolean;
 };
-const themeRecoilStateAtom = atom<ThemeType>({
+export const themeRecoilStateAtom = atom<ThemeType>({
   key: "theme",
   default: { openAuthModal: false },
 });
 
 export default function ThemeController({ children, AuthorizeStatus }: Props) {
+  
   const [themeStore, setThemeStore] = useRecoilState(themeRecoilStateAtom);
+  const {ssrContext} = trpc.useUtils()
 
-  useEffect(() => {
-    if (AuthorizeStatus === "need_login") {
-      setThemeStore({ openAuthModal: true });
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (AuthorizeStatus === "need_login") {
+  //     setThemeStore({ openAuthModal: true });
+  //   }
+  //   else {
+  //     setThemeStore({ openAuthModal: false });
+  //   }
+  // }, [ssrContext]);
   return <>{children}</>;
 }
