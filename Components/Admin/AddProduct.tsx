@@ -208,7 +208,10 @@ export default function AddProduct() {
               <div className="flex flex-col gap-5">
                 {variation.variations.map(
                   (variationType, variationTypeIndex) => (
-                    <div className="flex flex-row gap-3 bg-gray-50 rounded-[13px] p-3">
+                    <div
+                      key={variationTypeIndex}
+                      className="flex flex-row gap-3 bg-gray-50 rounded-[13px] p-3"
+                    >
                       <div className="flex flex-col gap-1">
                         <label className="text-black1 text-[14px] font-[500] mr-3">
                           نوع {variationTypeIndex + 1}

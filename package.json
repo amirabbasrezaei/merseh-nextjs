@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "npx prisma generate && next build",
-    "start": "npx prisma migrate deploy && next start",
-    "lint": "next lint"
+    "start": "npx prisma migrate deploy && next start"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.569.0",
