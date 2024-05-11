@@ -35,6 +35,7 @@ export async function createUserController({
 }: UserRouterArgsController<CreateUser>): Promise<CreateUserPayload> {
   const { prisma } = ctx;
   const { phoneNumber, nameAndFamily } = input;
+  
   const findUser = await prisma.user.findUnique({
     where: {
       phoneNumber,
