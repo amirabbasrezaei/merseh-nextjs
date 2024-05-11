@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npx prisma generate  && next build",
-    "start": " next start && npx prisma migrate deploy",
+    "build": "npx prisma generate  && npx prisma migrate deploy && next build",
+    "start": " next start ",
     "lint": "next lint"
   },
   "dependencies": {
