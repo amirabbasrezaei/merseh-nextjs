@@ -29,7 +29,7 @@ export default function Category({
     refetch();
   }, [data]);
 
-  const getCategories = (
+  const GetCategories = (
     data: categoryType[],
     parentAnimation: boolean,
     catId: number[]
@@ -120,7 +120,7 @@ export default function Category({
             className="pr-4  flex-col mt-3"
             style={{ originX: 1, originY: 0.5 }}
           >
-            {getCategories(
+            {GetCategories(
               cat.subCategories as categoryType[],
               parentAnimation,
               [...catId, cat.id]
@@ -170,7 +170,7 @@ export default function Category({
       >
         {/* <span>afdf</span> */}
         {subCategory?.length
-          ? getCategories(subCategory, showCategory, [catId])
+          ? GetCategories(subCategory, showCategory, [catId])
           : null}
       </motion.div>
     </div>
