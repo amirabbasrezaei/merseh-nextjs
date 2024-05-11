@@ -2,7 +2,7 @@
 import React from "react";
 import Button from "../Button";
 import { useRecoilState } from "recoil";
-import { shopingCartStateAtom } from "./HeaderShoppingCart";
+import { ShoppingCart, shopingCartStateAtom } from "./HeaderShoppingCart";
 import Image from "next/image";
 import Link from "next/link";
 import { Minus_Svg, Plus_Svg } from "../SVGS";
@@ -10,32 +10,111 @@ import splitNumber from "../utils/splitNumber";
 
 export default function Cart() {
   const [shoppingCart, setShoppingCart] = useRecoilState(shopingCartStateAtom);
+
+  const incrementProductNumber = (
+    variationValueId: number | undefined,
+    productId: number
+  ) => {
+    if (variationValueId) {
+      const newValue = shoppingCart.orderitems.map(
+        (prOrder: ShoppingCart["orderitems"][0]) => {
+          if (prOrder.variationValueId === variationValueId) {
+            return { ...prOrder, numberOfProduct: prOrder.numberOfProduct + 1 };
+          }
+          return prOrder;
+        }
+      );
+      setShoppingCart((state) => ({
+        ...state,
+        orderitems: newValue,
+        updateActiveOrder: true
+      }));
+      return;
+    }
+
+    if (productId) {
+      const newValue = shoppingCart.orderitems.map(
+        (prOrder: ShoppingCart["orderitems"][0]) => {
+          if (prOrder.productId === productId) {
+            return { ...prOrder, numberOfProduct: prOrder.numberOfProduct + 1 };
+          }
+          return prOrder;
+        }
+      );
+      setShoppingCart((state: ShoppingCart) => ({
+        ...state,
+        orderitems: newValue,
+        updateActiveOrder: true
+      }));
+    }
+  };
+
+  const decrementProductNumber = (
+    variationValueId: number | undefined,
+    productId: number
+  ) => {
+    if (variationValueId) {
+      const newValue = shoppingCart.orderitems.map(
+        (prOrder: ShoppingCart["orderitems"][0]) => {
+          if (prOrder.variationValueId === variationValueId) {
+            return { ...prOrder, numberOfProduct: prOrder.numberOfProduct - 1 };
+          }
+          return prOrder;
+        }
+      );
+      setShoppingCart((state) => ({
+        ...state,
+        orderitems: newValue,
+        updateActiveOrder: true
+      }));
+      return;
+    }
+
+    if (productId) {
+      const newValue = shoppingCart.orderitems.map(
+        (prOrder: ShoppingCart["orderitems"][0]) => {
+          if (prOrder.productId === productId) {
+            return { ...prOrder, numberOfProduct: prOrder.numberOfProduct - 1 };
+          }
+          return prOrder;
+        }
+      );
+      setShoppingCart((state: ShoppingCart) => ({
+        ...state,
+        orderitems: newValue,
+        updateActiveOrder: true
+      }));
+    }
+  };
+
+  const removeProductFromOrder = (
+    variationValueId: number | undefined,
+    productId: number
+  ) => {
+    if (variationValueId) {
+      const remainProducts = shoppingCart.orderitems.filter(
+        (pr) => pr.variationValueId !== variationValueId
+      );
+      setShoppingCart((state) => ({
+        ...state,
+        orderitems: remainProducts,
+        updateActiveOrder: true
+      }));
+      return;
+    }
+    if (productId) {
+      const remainProducts = shoppingCart.orderitems.filter(
+        (pr) => pr.productId !== productId
+      );
+      setShoppingCart((state) => ({
+        ...state,
+        orderitems: remainProducts,
+        updateActiveOrder: true,
+      }));
+    }
+  };
   return (
     <section className="flex flex-row w-full gap-4 p-10">
-      {/* <div className="basis-2/3 flex flex-col">
-        <div id="table_head" className="bg-gray-100 rounded-sm flex flex-row justify-between">
-          <span className=""></span>
-          <span>قیمت واحد</span>
-          <span>تعداد</span>
-          <span>قیمت نهایی</span>
-        </div>
-        {shoppingCart.orderitems?.map((prOrder) => (
-            <div className="pb-6 flex flex-row w-full justify-between">
-              <div className="flex flex-row items-center">
-                <Image
-                  alt={prOrder.imageUrl?.split("/").at(-1) || ""}
-                  width={120}
-                  height={120}
-                  src={prOrder.imageUrl || ""}
-                />
-                {prOrder.name}
-              </div>
-              <div></div>
-              <div>{prOrder.numberOfProduct}</div>
-              <div>1961</div>
-            </div>
-          ))}
-      </div> */}
       <table className="table-auto basis-2/3 ">
         <thead className="bg-[#F5F5F5] rounded-lg ">
           <tr className="font-[300]  h-10 rounded-lg">
@@ -70,12 +149,41 @@ export default function Cart() {
                   </div>
                 </Link>
               </td>
-              <td className="text-center text-[#444444]">{splitNumber(prOrder.price)}</td>
+              <td className="text-center text-[#444444]">
+                {splitNumber(prOrder.price)}
+              </td>
               <td className="text-center ">
                 <div className="text-center flex flex-row items-center justify-center gap-6">
-                  <Plus_Svg classname="w-5 h-5 fill-[#444444]" />
-                  <span className="text-center text-[18px] text-[#444444]">{prOrder.numberOfProduct}</span>
-                  <Minus_Svg classname="w-5 h-5 fill-[#444444]" />
+                  <div
+                    onClick={() => {
+                      incrementProductNumber(
+                        prOrder.variationValueId,
+                        prOrder.productId
+                      );
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <Plus_Svg classname="w-5 h-5 fill-[#444444]" />
+                  </div>
+                  <span className="text-center text-[18px] text-[#444444]">
+                    {prOrder.numberOfProduct}
+                  </span>
+                  <div
+                    onClick={() => {
+                      prOrder.numberOfProduct <= 1
+                        ? removeProductFromOrder(
+                            prOrder.variationValueId,
+                            prOrder.productId
+                          )
+                        : decrementProductNumber(
+                            prOrder.variationValueId,
+                            prOrder.productId
+                          );
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <Minus_Svg classname="w-5 h-5 fill-[#444444]" />
+                  </div>
                 </div>
               </td>
               <td className="text-center text-[#444444]">

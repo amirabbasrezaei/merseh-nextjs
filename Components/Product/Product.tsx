@@ -70,7 +70,7 @@ export default function Product({ productId }: Props) {
       productId: productData?.product?.id,
     };
 
-    console.log(newShoppingCartItem)
+
 
     setShoppingCart((lastShoppingCartState: any) => {
       if (lastShoppingCartState?.orderitems?.length) {

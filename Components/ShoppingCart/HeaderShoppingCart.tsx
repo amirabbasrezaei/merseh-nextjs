@@ -28,39 +28,62 @@ export type ShoppingCart = {
 function handleUpdateActiveOrder() {
   return ({ setSelf, onSet }: any) => {
     onSet((newValue: ShoppingCart, oldValue: ShoppingCart) => {
-      if (newValue.orderitems.length) {
-        let temp: ShoppingCart = { ...newValue, orderitems: [] };
-        for (let prOrderA of newValue.orderitems) {
-          // @ts-ignore
-          for (let prOrderB of newValue.orderitems) {
-            if (prOrderA.variationValueId === prOrderB.variationValueId) {
-              const findIndex = temp.orderitems.findIndex(
-                // @ts-ignore
-                (e) => e.variationValueId === prOrderB.variationValueId
-              );
+      if (newValue.orderitems.length > oldValue.orderitems.length) {
+        const newPrOrder = newValue.orderitems.at(-1);
+        const findIndex_On_Variation = oldValue.orderitems.findIndex(
+          (e) => e.variationValueId === newPrOrder?.variationValueId
+        );
+        const findIndex_On_Product = oldValue.orderitems.findIndex(
+          (e) => e.productId === newPrOrder?.productId
+        );
+        console.log(newPrOrder);
+        if (findIndex_On_Variation !== -1 && newPrOrder?.variationValueId) {
+          const temp: ShoppingCart["orderitems"] = [
+            ...oldValue.orderitems.slice(0, findIndex_On_Variation),
+            ...oldValue.orderitems.slice(findIndex_On_Variation + 1),
+            {
+              ...oldValue.orderitems[findIndex_On_Variation],
+              numberOfProduct:
+                oldValue.orderitems[findIndex_On_Variation].numberOfProduct + 1,
+            },
+          ];
 
-              console.log(findIndex > -1, temp?.orderitems);
-              if (findIndex && findIndex > -1 ) {
-                const alteredTempPr = (temp.orderitems[findIndex] = {
-                  ...temp.orderitems[findIndex],
-                  numberOfProduct: ++temp.orderitems[findIndex].numberOfProduct,
-                });
-                temp = {
-                  ...temp,
-                  orderitems: [],
-                };
-              } 
-            }
-            else {
-              temp.orderitems.push(prOrderB);
-            }
-          }
+          setSelf({
+            ...newValue,
+            updateActiveOrder: true,
+            orderitems: temp,
+          });
+          return;
+        } else if (
+          findIndex_On_Product !== -1 &&
+          !newPrOrder?.variationValueId
+        ) {
+          const temp: ShoppingCart["orderitems"] = [
+            ...oldValue.orderitems.slice(0, findIndex_On_Product),
+            ...oldValue.orderitems.slice(findIndex_On_Product + 1),
+            {
+              ...oldValue.orderitems[findIndex_On_Product],
+              numberOfProduct:
+                oldValue.orderitems[findIndex_On_Product].numberOfProduct + 1,
+            },
+          ];
+
+          setSelf({
+            ...newValue,
+            updateActiveOrder: true,
+            orderitems: temp,
+          });
+          return;
+        } else {
+          setSelf({ ...newValue, updateActiveOrder: true });
+          return;
         }
-        setSelf(temp);
+      } else if (newValue.orderitems.length < oldValue.orderitems.length) {
+        setSelf({ ...newValue, updateActiveOrder: false });
+        return;
+      } else {
+        setSelf({ ...newValue, updateActiveOrder: false });
       }
-      // if (newValue.orderitems?.length !== oldValue.orderitems?.length) {
-      //   setSelf({ ...newValue, updateActiveOrder: true });
-      // }
     });
   };
 }
@@ -114,10 +137,7 @@ export default function HeaderShoppingCart() {
     useRecoilState(shopingCartStateAtom);
 
   useEffect(() => {
-    if (
-      shoppingCartState.orderitems?.length &&
-      shoppingCartState.updateActiveOrder
-    ) {
+    if (shoppingCartState.updateActiveOrder) {
       mutateActiveOrder(shoppingCartState.orderitems);
     }
   }, [shoppingCartState]);
