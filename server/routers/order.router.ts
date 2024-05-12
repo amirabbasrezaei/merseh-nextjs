@@ -11,4 +11,3 @@ export const orderRouter = router({
     .mutation(updateActiveOrderController),
   getActiveOrder: userProtectedProcedure.query(getActiveOrderController),
 });
- 
