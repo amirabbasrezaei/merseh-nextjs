@@ -10,7 +10,25 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("NEXT_PUBLIC_DATABASE_URL")
+  url      = env("DATABASE_URL")
+}
+
+model Address {
+  id         String  @id @default(uuid())
+  title      String
+  coordinate Float[]
+  cityId     String
+  city       City    @relation(fields: [cityId], references: [id])
+  Order      Order[]
+  User       User?   @relation(fields: [userId], references: [id])
+  userId     String?
+}
+
+model City {
+  id      String    @id @default(uuid())
+  Address Address[]
+  name    String
+  engName String
 }
 
 model Product {
@@ -65,6 +83,8 @@ model Order {
   ProductForOrder ProductForOrder[]
   userId          String
   user            User              @relation(fields: [userId], references: [id])
+  Address         Address?          @relation(fields: [addressId], references: [id])
+  addressId       String?
 }
 
 model Category {
@@ -93,6 +113,7 @@ model User {
   lastLogin      DateTime?
   numberOfLogins Int?      @default(1)
   order          Order[]
+  Addresses      Address[]
 }
 
 model Session {

@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Button from "../Button";
 import { useRecoilState } from "recoil";
 import { ShoppingCart, shopingCartStateAtom } from "./HeaderShoppingCart";
@@ -8,7 +8,7 @@ import Link from "next/link";
 import { Minus_Svg, Plus_Svg } from "../SVGS";
 import splitNumber from "../utils/splitNumber";
 
-export default function Cart() {
+export default function Checkout() {
   const [shoppingCart, setShoppingCart] = useRecoilState(shopingCartStateAtom);
 
   const incrementProductNumber = (
@@ -27,7 +27,7 @@ export default function Cart() {
       setShoppingCart((state) => ({
         ...state,
         orderitems: newValue,
-        updateActiveOrder: true
+        updateActiveOrder: true,
       }));
       return;
     }
@@ -44,7 +44,7 @@ export default function Cart() {
       setShoppingCart((state: ShoppingCart) => ({
         ...state,
         orderitems: newValue,
-        updateActiveOrder: true
+        updateActiveOrder: true,
       }));
     }
   };
@@ -65,7 +65,7 @@ export default function Cart() {
       setShoppingCart((state) => ({
         ...state,
         orderitems: newValue,
-        updateActiveOrder: true
+        updateActiveOrder: true,
       }));
       return;
     }
@@ -82,7 +82,7 @@ export default function Cart() {
       setShoppingCart((state: ShoppingCart) => ({
         ...state,
         orderitems: newValue,
-        updateActiveOrder: true
+        updateActiveOrder: true,
       }));
     }
   };
@@ -98,7 +98,7 @@ export default function Cart() {
       setShoppingCart((state) => ({
         ...state,
         orderitems: remainProducts,
-        updateActiveOrder: true
+        updateActiveOrder: true,
       }));
       return;
     }
@@ -113,9 +113,10 @@ export default function Cart() {
       }));
     }
   };
+
   return (
-    <section className="flex flex-row w-full gap-4 p-10">
-      <table className="table-auto basis-2/3 ">
+    <section className="flex flex-row w-full gap-[40px] p-10">
+      <table className="table-auto basis-9/12 ">
         <thead className="bg-[#F5F5F5] rounded-lg ">
           <tr className="font-[300]  h-10 rounded-lg">
             <th className="font-[400] text-black1"> </th>
@@ -135,8 +136,8 @@ export default function Cart() {
                 >
                   <Image
                     alt={prOrder.imageUrl?.split("/").at(-1) || ""}
-                    width={120}
-                    height={120}
+                    width={160}
+                    height={160}
                     src={prOrder.imageUrl || ""}
                   />
                   <div className="flex flex-row gap-2 items-center">
@@ -193,20 +194,42 @@ export default function Cart() {
           ))}
         </tbody>
       </table>
-      <div className="h-full gap-4 flex flex-col items-center justify-center w-full basis-1/3 ">
-        <div className="w-[70%] py-6 gap-5 border border-[#EAEAEA] rounded-[8px] flex flex-col items-center justify-center ">
-          <div className="flex flex-row items-center justify-center gap-1 w-[80%]">
-            {true ? (
+      <div className="h-full gap-4 flex flex-col items-center justify-center w-full basis-3/12 ">
+        <div className="w-full py-6 gap-5 border border-[#EAEAEA] rounded-[8px] flex flex-col items-center justify-center ">
+          <div className="flex flex-col items-center justify-center gap-4 w-[80%]">
+            <div className="flex flex-row gap-2 items-center justify-between w-full">
+              <span className="text-lightBlack text-[15px] font-[500]">
+                جمع سبد خرید
+              </span>
+              <span className="text-green1 font-[600] text-[18px]">
+                {splitNumber(shoppingCart.price?.totalPrice)}
+                <span className="text-[10px] text-black1 font-[400]">
+                  {" "}
+                  تومان
+                </span>
+              </span>
+            </div>
+            <div className="flex flex-row gap-2 items-center justify-between w-full">
+              <span className="text-lightBlack text-[15px] font-[500]">
+                هزینه ارسال
+              </span>
+              <span className="text-green1 font-[400] text-[15px]">
+                وابسته به نوع ارسال
+              </span>
+            </div>
+            {/* {shoppingCart.updateActiveOrder ? (
               <div className="animate-pulse h-8 w-full bg-gray-100" />
             ) : (
               <>
-                <span className="text-green1 text-[25px] font-[600]"></span>
+                <span className="text-green1 text-[25px] font-[600]">{splitNumber(shoppingCart.price?.totalPrice)}</span>
                 <span className="text-black1 text-[10px]">تومان</span>
               </>
-            )}
+            )} */}
           </div>
         </div>
-        <Button text="تائید و ثبت سفارش" className="w-[70%]" />
+        <Link className="w-full h-full" href={"/cart/shipping"}>
+          <Button text="تائید و ثبت سفارش" className="w-full" />
+        </Link>
       </div>
     </section>
   );

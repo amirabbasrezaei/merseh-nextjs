@@ -1,4 +1,3 @@
-
 import { prisma } from "../context";
 import jwt, { Secret } from "jsonwebtoken";
 import { Session, User } from "prisma/prisma-client";
@@ -8,15 +7,14 @@ import type { TRPCError as Error } from "@trpc/server";
 
 import { cookies } from "next/headers";
 
-type GetUserSession =
-  | {
-      session: Session;
-      user: User;
-    }
-  | Error;
+type GetUserSession = {
+  session: Session | null;
+  user: User | null;
+};
 
 async function getUserSession(sessionId: string): Promise<GetUserSession> {
   try {
+    
     const session = await prisma.session.findUnique({
       where: {
         id: sessionId,
@@ -39,25 +37,25 @@ async function getUserSession(sessionId: string): Promise<GetUserSession> {
         }),
       ]);
 
-      if (user == null) {
-        throw new TRPCError({ code: "NOT_FOUND", cause: "کاربر یافت نشد" });
+      if (user !== null) {
+        return { user, session };
       }
-
-      return { user, session };
     }
+    return { session: null, user: null };
   } catch (error) {
-    console.log("session doesn't found");
-    throw new TRPCError({
-      code: "UNAUTHORIZED",
-      cause: "لطفا وارد حساب کاربری خود شوید",
-    });
+    // throw new TRPCError({
+    //   code: "UNAUTHORIZED",
+    //   cause: "لطفا وارد حساب کاربری خود شوید",
+    // });
+    console.log(error);
+    return { session: null, user: null };
   }
-
-  throw new TRPCError({ code: "NOT_FOUND", cause: "کاربر یافت نشد" });
 }
 
 async function checkRefreshToken(): Promise<{ user: User | null }> {
+  
   const refreshToken = cookies().get("refreshToken")?.value;
+  
   if (refreshToken) {
     const verifyRefreshToken = jwt.verify(
       refreshToken,
@@ -69,11 +67,13 @@ async function checkRefreshToken(): Promise<{ user: User | null }> {
       .then(({ user }: any) => {
         return { user };
       })
-      .catch(() => {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "you are not authorize to request",
-        });
+      .catch((err) => {
+        // throw new TRPCError({
+        //   code: "UNAUTHORIZED",
+        //   message: "you are not authorize to request",
+        // });
+        console.log(err);
+        return null;
       });
   }
   return { user: null };
@@ -98,9 +98,7 @@ type GetUser = {
   refreshTokenPayload: RefreshTokenPayload | null;
 };
 
-export async function getUser(
-  res: Response
-): Promise<GetUser> {
+export async function getUser(res: Response): Promise<GetUser> {
   const userWithAccessToken = checkAccessToken();
   if (userWithAccessToken) {
     return {
@@ -112,6 +110,7 @@ export async function getUser(
   }
   const payload: GetUser = await checkRefreshToken()
     .then(async ({ user }) => {
+      
       if (!user) {
         return { accessToken: null, refreshToken: null };
       }

@@ -48,12 +48,13 @@ function handleUpdateActiveOrder() {
                 oldValue.orderitems[findIndex_On_Variation].numberOfProduct + 1,
             },
           ];
-
-          setSelf({
+          const result = {
             ...newValue,
             updateActiveOrder: true,
             orderitems: temp,
-          });
+          };
+          localStorage.setItem("shopCart", JSON.stringify(result));
+          setSelf(result);
           return;
         } else if (
           findIndex_On_Product !== -1 &&
@@ -69,20 +70,27 @@ function handleUpdateActiveOrder() {
             },
           ];
 
-          setSelf({
+          const result = {
             ...newValue,
             updateActiveOrder: true,
             orderitems: temp,
-          });
+          };
+          localStorage.setItem("shopCart", JSON.stringify(result.orderitems));
+          setSelf(result);
           return;
         } else {
-          setSelf({ ...newValue, updateActiveOrder: true });
+          const result = { ...newValue, updateActiveOrder: true };
+          localStorage.setItem("shopCart", JSON.stringify(result.orderitems));
+          setSelf(result);
+
           return;
         }
       } else if (newValue.orderitems.length < oldValue.orderitems.length) {
+        localStorage.setItem("shopCart", JSON.stringify(newValue.orderitems));
         setSelf({ ...newValue, updateActiveOrder: false });
         return;
       } else {
+        localStorage.setItem("shopCart", JSON.stringify(newValue.orderitems));
         setSelf({ ...newValue, updateActiveOrder: false });
       }
     });
@@ -91,7 +99,13 @@ function handleUpdateActiveOrder() {
 
 export const shopingCartStateAtom = atom<ShoppingCart>({
   key: "ShopingCart",
-  default: { orderitems: [], showCart: false, updateActiveOrder: false },
+  default: {
+    orderitems: JSON.parse(
+      localStorage.getItem("shopCart") || ""
+    ) as ShoppingCart["orderitems"],
+    showCart: false,
+    updateActiveOrder: false,
+  },
   effects: [handleUpdateActiveOrder()],
 });
 
@@ -120,7 +134,7 @@ const cartAnimation = {
 };
 
 export default function HeaderShoppingCart() {
-  const [_, setThemeStore] = useRecoilState(themeRecoilStateAtom);
+  const [themeStore, setThemeStore] = useRecoilState(themeRecoilStateAtom);
 
   const { data: activeOrderData } = trpc.order.getActiveOrder.useQuery(
     undefined,
@@ -142,6 +156,16 @@ export default function HeaderShoppingCart() {
       mutateActiveOrder(shoppingCartState.orderitems);
     }
   }, [shoppingCartState]);
+
+  useEffect(() => {
+    if (shoppingCartState.updateActiveOrder) {
+      mutateActiveOrder(
+        JSON.parse(
+          localStorage.getItem("shopCart") || ""
+        ) as ShoppingCart["orderitems"]
+      );
+    }
+  }, [themeStore]);
 
   useEffect(() => {
     if (activeOrderData?.activeOrder) {
@@ -166,12 +190,17 @@ export default function HeaderShoppingCart() {
       setShoppingCartState((state: any) => ({
         ...state,
         orderitems: activeShoppingCart,
+        price: activeOrderData.price,
       }));
     }
   }, [activeOrderData]);
 
   useEffect(() => {
-    if (JSON.parse(updateActiveOrderError?.message || "{}").need_login_now) {
+    console.log(updateActiveOrderError?.data);
+    if (
+      JSON.parse(updateActiveOrderError?.message || JSON.stringify({ "": "" }))
+        .need_login_now
+    ) {
       setThemeStore({ openAuthModal: true });
     }
   }, [updateActiveOrderError]);
@@ -200,6 +229,7 @@ export default function HeaderShoppingCart() {
         ...state,
         orderitems: activeShoppingCart,
         updateActiveOrder: false,
+        price: updateActiveOrderData.price,
       }));
     }
   }, [updateActiveOrderData]);
@@ -292,7 +322,7 @@ export default function HeaderShoppingCart() {
                         </div>
                         <Link
                           className="bg-green1 rounded-[10px] w-full items-center justify-center flex "
-                          href={"/cart"}
+                          href={"/cart/checkout"}
                           onClick={() =>
                             setShoppingCartState((state) => ({
                               ...state,

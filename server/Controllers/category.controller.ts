@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { Context } from "../context";
 
-type ArgsStructure<T = null> = T extends null
+export type ArgsStructure<T = null> = T extends null
   ? {
       ctx: Context;
     }

@@ -73,7 +73,7 @@ export default function HeaderShoppingCartItem({
           </div>
           <span>{numberOfProduct}</span>
           <span className="text-[14px] text-black1 font-[500]">
-            {splitNumber(price)}
+            {splitNumber(price * numberOfProduct)}
           </span>
         </div>
       </motion.div>

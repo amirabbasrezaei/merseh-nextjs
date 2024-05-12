@@ -105,9 +105,9 @@ export async function updateActiveOrderController({
     let totalPrice: number = 0;
     for (let pr of activeOrder.ProductForOrder) {
       if (pr.ProductVariationValue?.price) {
-        totalPrice += pr.ProductVariationValue.price;
+        totalPrice += pr.ProductVariationValue.price * pr.numberOfproduct;
       } else if (!pr.ProductVariationValue?.price) {
-        totalPrice += pr.Product.price;
+        totalPrice += pr.Product.price * pr.numberOfproduct;
       }
     }
 
@@ -172,13 +172,13 @@ export async function getActiveOrderController({ ctx }: ArgsStructure) {
       };
 
       let totalPrice: number = 0;
-      for (let pr of activeOrder.ProductForOrder) {
-        if (pr.ProductVariationValue?.price) {
-          totalPrice += pr.ProductVariationValue.price;
-        } else if (!pr.ProductVariationValue?.price) {
-          totalPrice += pr.Product.price;
-        }
+    for (let pr of activeOrder.ProductForOrder) {
+      if (pr.ProductVariationValue?.price) {
+        totalPrice += pr.ProductVariationValue.price * pr.numberOfproduct;
+      } else if (!pr.ProductVariationValue?.price) {
+        totalPrice += pr.Product.price * pr.numberOfproduct;
       }
+    }
 
       return {
         result: "ok",

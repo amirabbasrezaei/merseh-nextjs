@@ -8,7 +8,7 @@ import { trpc } from "@/utils/trpc";
 
 interface Props {
   data: categoryType[];
-  parentAnimation: boolean;
+  parentAnimation?: boolean;
   catId: number[];
   setFilter: Dispatch<SetStateAction<filterTypeArgs>>;
   isAddProductPage: boolean | undefined;
@@ -17,7 +17,7 @@ interface Props {
 export default function GetCategories({
   catId,
   data,
-  parentAnimation,
+  parentAnimation = false,
   setFilter,
   isAddProductPage,
 }: Props) {

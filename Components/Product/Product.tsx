@@ -8,7 +8,7 @@ import Button from "../Button";
 import splitNumber from "../utils/splitNumber";
 import Skeleton from "react-loading-skeleton";
 import { atom, useRecoilState } from "recoil";
-import { shopingCartStateAtom } from "../ShoppingCart/HeaderShoppingCart";
+import { shopingCartStateAtom } from "../Cart/HeaderShoppingCart";
 
 type Props = {
   productId: string;

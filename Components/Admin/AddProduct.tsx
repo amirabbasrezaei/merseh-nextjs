@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import Categories from "../Products/Categories";
 import { filterTypeArgs } from "../Products/Products";
 import { Plus_Svg } from "../SVGS";
+import GetCategories from "../Products/GetCategories";
 
 type imageType = { base64: string; name: string };
 type variation = {
@@ -273,6 +274,7 @@ export default function AddProduct() {
           <Plus_Svg classname="w-4 h-4 fill-green2" />
         </div>
       </div>
+      
 
       <Categories isAddProductPage={true} setFilter={setFilter} />
       <button className="bg-green2 h-10 text-white w-[300px] rounded-[13px]">

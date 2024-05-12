@@ -213,7 +213,7 @@ export async function addProductController({
           ? {
               create: input.productVariations.map((variation) => ({
                 variateName: variation.variationName,
-                value: {
+                values: {
                   createMany: {
                     data: variation.variations.map((variationValue) => ({
                       name: variationValue.name,

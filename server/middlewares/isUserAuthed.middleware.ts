@@ -2,7 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { Context } from "../context";
 import { getUser } from "../utils/getUser";
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+
 interface IsUserAuthed {
   next: any;
   ctx: Context;
@@ -21,19 +21,21 @@ export const isUserAuthed = async (opts: IsUserAuthed) => {
   const { accessToken, accessTokenPayload } = await getUser(res);
 
   if (!accessToken) {
+
     if (path !== "user.userInfo" && path !== "order.getActiveOrder") {
       throw new TRPCError({
         code: "UNAUTHORIZED",
-
-        message: JSON.stringify({ need_login_now: true }),
+        cause:"",
+        message: JSON.stringify({ need_login_now: true }) || "",
       });
     }
 
     throw new TRPCError({
       code: "UNAUTHORIZED",
 
-      message: JSON.stringify({ need_login_now: false, text:"please log in" }),
+      message: JSON.stringify({ need_login_now: false, text:"please log in" }) || "",
     });
+
   }
 
   return next({

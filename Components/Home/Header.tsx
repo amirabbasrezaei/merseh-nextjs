@@ -14,7 +14,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 import { createPortal } from "react-dom";
 import Auth from "../Auth/Auth";
 import { AnimatePresence, motion } from "framer-motion";
-import HeaderShoppingCart from "../ShoppingCart/HeaderShoppingCart";
+import HeaderShoppingCart from "../Cart/HeaderShoppingCart";
 import { useRecoilState } from "recoil";
 import { themeRecoilStateAtom } from "../ThemeController";
 export default function Header() {
