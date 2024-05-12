@@ -23,6 +23,7 @@ export type ShoppingCart = {
       }[];
   showCart: boolean;
   updateActiveOrder: boolean;
+  price?: { totalPrice: number };
 };
 
 function handleUpdateActiveOrder() {

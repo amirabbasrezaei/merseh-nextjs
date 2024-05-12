@@ -102,6 +102,15 @@ export async function updateActiveOrderController({
       },
     });
 
+    let totalPrice: number = 0;
+    for (let pr of activeOrder.ProductForOrder) {
+      if (pr.ProductVariationValue?.price) {
+        totalPrice += pr.ProductVariationValue.price;
+      } else if (!pr.ProductVariationValue?.price) {
+        totalPrice += pr.Product.price;
+      }
+    }
+
     const addProductImages = {
       ...activeOrder,
       ProductForOrder: activeOrder.ProductForOrder.map((e) => ({
@@ -116,9 +125,14 @@ export async function updateActiveOrderController({
       })),
     };
 
-    return { result: "ok", activeOrder: addProductImages, error: null };
+    return {
+      result: "ok",
+      activeOrder: addProductImages,
+      price: { totalPrice },
+      error: null,
+    };
   } catch (error) {
-    return { result: "failed", activeOrder: null, error };
+    return { result: "failed", activeOrder: null, error, price: {} };
   }
 }
 
@@ -142,8 +156,6 @@ export async function getActiveOrderController({ ctx }: ArgsStructure) {
       },
     });
 
-
-
     if (activeOrder) {
       const addProductImages = {
         ...activeOrder,
@@ -158,15 +170,38 @@ export async function getActiveOrderController({ ctx }: ArgsStructure) {
           },
         })),
       };
-      return { result: "ok", activeOrder: addProductImages, error: null };
+
+      let totalPrice: number = 0;
+      for (let pr of activeOrder.ProductForOrder) {
+        if (pr.ProductVariationValue?.price) {
+          totalPrice += pr.ProductVariationValue.price;
+        } else if (!pr.ProductVariationValue?.price) {
+          totalPrice += pr.Product.price;
+        }
+      }
+
+      return {
+        result: "ok",
+        activeOrder: addProductImages,
+        price: { totalPrice },
+        error: null,
+        message: "",
+      };
     }
     return {
       result: "no_order",
       activeOrder: null,
       error: null,
       message: "no active order",
+      price: {},
     };
   } catch (error) {
-    return { result: "error", activeOrder: null, error: error };
+    return {
+      result: "error",
+      activeOrder: null,
+      error,
+      price: {},
+      message: "",
+    };
   }
 }
