@@ -14,21 +14,39 @@ datasource db {
 }
 
 model Address {
-  id         String  @id @default(uuid())
-  title      String
-  coordinate Float[]
-  cityId     String
-  city       City    @relation(fields: [cityId], references: [id])
-  Order      Order[]
-  User       User?   @relation(fields: [userId], references: [id])
-  userId     String?
+  id                 String   @id @default(uuid())
+  title              String
+  latitude           Float
+  longitude          Float
+  cityId             Int
+  city               City     @relation(fields: [cityId], references: [id])
+  Order              Order[]
+  User               User?    @relation(fields: [userId], references: [id])
+  userId             String?
+  postalCode         BigInt?
+  addressDetails     String
+  Province           Province @relation(fields: [provinceId], references: [id])
+  provinceId         Int
+  reciverPhoneNumber String
+  reciverName        String
+  reciverFamilyName  String
 }
 
-model City {
-  id      String    @id @default(uuid())
+model Province {
+  id      Int       @id @default(autoincrement())
   Address Address[]
   name    String
   engName String
+  City    City[]
+}
+
+model City {
+  id         Int       @id @default(autoincrement())
+  Address    Address[]
+  name       String
+  engName    String
+  Province   Province  @relation(fields: [provinceId], references: [id])
+  provinceId Int
 }
 
 model Product {
