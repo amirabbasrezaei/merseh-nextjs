@@ -8,6 +8,7 @@
     "start": "yarn prisma migrate deploy && next start",
     "lint": "next lint"
   },
+  
   "dependencies": {
     "@aws-sdk/client-s3": "^3.569.0",
     "@prisma/client": "^5.13.0",
