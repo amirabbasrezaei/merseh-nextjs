@@ -105,9 +105,10 @@ function handleUpdateActiveOrder() {
 export const shopingCartStateAtom = atom<ShoppingCart>({
   key: "ShopingCart",
   default: {
-    orderitems: JSON.parse(
-      localStorage.getItem("shopCart") || JSON.stringify({ "": "" })
-    ) as ShoppingCart["orderitems"],
+    orderitems:
+      typeof window !== "undefined"
+        ? JSON.parse(localStorage.getItem("shopCart") || "")
+        : false,
     showCart: false,
     updateActiveOrder: false,
   },
@@ -262,109 +263,118 @@ export default function HeaderShoppingCart() {
         <Shop_Cart classname=" " />
       </div>
 
-      {createPortal(
-        <AnimatePresence mode="wait">
-          {shoppingCartState.showCart && (
-            <motion.div
-              key="portal"
-              animate={{ opacity: 1, backdropFilter: "blur(2px)" }}
-              exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-              transition={{ duration: 0.3 }}
-              onClick={(e) => {
-                e.stopPropagation();
-                setShoppingCartState((state) => ({
-                  ...state,
-                  showCart: false,
-                }));
-              }}
-              className="w-full h-full    flex items-center justify-center fixed left-0 right-0  top-0 bottom-0 "
-            >
-              <div className="max-w-[1400px] w-full h-full relative">
+      {process.browser
+        ? createPortal(
+            <AnimatePresence mode="wait">
+              {shoppingCartState.showCart && (
                 <motion.div
-                  variants={cartAnimation}
-                  initial={{
-                    opacity: 0,
-                    translateY: -5,
-                    translateX: -50,
-                    height: 0,
-                    scale: 0,
-                  }}
+                  key="portal"
+                  animate={{ opacity: 1, backdropFilter: "blur(2px)" }}
+                  exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+                  transition={{ duration: 0.3 }}
                   onClick={(e) => {
                     e.stopPropagation();
+                    setShoppingCartState((state) => ({
+                      ...state,
+                      showCart: false,
+                    }));
                   }}
-                  exit={cartAnimation.closed}
-                  animate={cartAnimation.open}
-                  className="absolute border z-10  border-gray-100 flex gap-4 p-4 pt-8 items-center justify-evenly flex-col bg-white left-[20px] top-[60px]  rounded-[17px] shadow-sm w-[360px] h-[300px] shadow-neutral-200"
+                  className="w-full h-full    flex items-center justify-center fixed left-0 right-0  top-0 bottom-0 "
                 >
-                  <div
-                    onClick={() =>
-                      setShoppingCartState((state) => ({
-                        ...state,
-                        showCart: false,
-                      }))
-                    }
-                    className="absolute right-2 top-2 cursor-pointer hover:bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center"
-                  >
-                    <XMark_Svg classname="w-[24px] h-[24px] fill-black1" />
-                  </div>
-                  {shoppingCartState?.orderitems?.length ? (
-                    <>
-                      <div className=" h-[250px]  overflow-y-scroll w-full gap-2 flex flex-col items-center ">
-                        {shoppingCartState?.orderitems.map((prOrder, index) => (
-                          <HeaderShoppingCartItem
-                            name={prOrder.name}
-                            key={index}
-                            price={prOrder.price}
-                            numberOfProduct={prOrder.numberOfProduct}
-                            imageUrl={prOrder.imageUrl || ""}
-                            variationValueName={prOrder.variationValueName}
-                            productId={prOrder.productId}
-                            setShoppingCartState={setShoppingCartState}
-                          />
-                        ))}
-                      </div>
-                      <div className=" h-[50px]  flex flex-row justify-evenly w-full">
-                        <div className="w-full items-center justify-center flex">
-                          <span className="text-[10px]">جمع سبد خرید</span>
-                        </div>
-                        <Link
-                          className="bg-green1 rounded-[10px] w-full items-center justify-center flex "
-                          href={"/cart/checkout"}
-                          onClick={() =>
-                            setShoppingCartState((state) => ({
-                              ...state,
-                              showCart: false,
-                            }))
-                          }
-                        >
-                          <span className="text-center text-white">
-                            مشاهده سبد خرید
-                          </span>
-                        </Link>
-                      </div>
-                    </>
-                  ) : (
+                  <div className="max-w-[1400px] w-full h-full relative">
                     <motion.div
-                      variants={{
-                        closed: { opacity: 0, transition: { duration: 0.2 } },
-                        open: { opacity: 1, transition: { duration: 0.3 } },
+                      variants={cartAnimation}
+                      initial={{
+                        opacity: 0,
+                        translateY: -5,
+                        translateX: -50,
+                        height: 0,
+                        scale: 0,
                       }}
-                      className="h-[200px]  flex flex-col  w-full items-center justify-evenly"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                      exit={cartAnimation.closed}
+                      animate={cartAnimation.open}
+                      className="absolute border z-10  border-gray-100 flex gap-4 p-4 pt-8 items-center justify-evenly flex-col bg-white left-[20px] top-[60px]  rounded-[17px] shadow-sm w-[360px] h-[300px] shadow-neutral-200"
                     >
-                      <Shopping_Cart_Empty classname="h-20 w-auto" />
-                      <span className="text-[#979797]">
-                        سبد خرید شما خالی است
-                      </span>
+                      <div
+                        onClick={() =>
+                          setShoppingCartState((state) => ({
+                            ...state,
+                            showCart: false,
+                          }))
+                        }
+                        className="absolute right-2 top-2 cursor-pointer hover:bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center"
+                      >
+                        <XMark_Svg classname="w-[24px] h-[24px] fill-black1" />
+                      </div>
+                      {shoppingCartState?.orderitems?.length ? (
+                        <>
+                          <div className=" h-[250px]  overflow-y-scroll w-full gap-2 flex flex-col items-center ">
+                            {shoppingCartState?.orderitems.map(
+                              (prOrder, index) => (
+                                <HeaderShoppingCartItem
+                                  name={prOrder.name}
+                                  key={index}
+                                  price={prOrder.price}
+                                  numberOfProduct={prOrder.numberOfProduct}
+                                  imageUrl={prOrder.imageUrl || ""}
+                                  variationValueName={
+                                    prOrder.variationValueName
+                                  }
+                                  productId={prOrder.productId}
+                                  setShoppingCartState={setShoppingCartState}
+                                />
+                              )
+                            )}
+                          </div>
+                          <div className=" h-[50px]  flex flex-row justify-evenly w-full">
+                            <div className="w-full items-center justify-center flex">
+                              <span className="text-[10px]">جمع سبد خرید</span>
+                            </div>
+                            <Link
+                              className="bg-green1 rounded-[10px] w-full items-center justify-center flex "
+                              href={"/cart/checkout"}
+                              onClick={() =>
+                                setShoppingCartState((state) => ({
+                                  ...state,
+                                  showCart: false,
+                                }))
+                              }
+                            >
+                              <span className="text-center text-white">
+                                مشاهده سبد خرید
+                              </span>
+                            </Link>
+                          </div>
+                        </>
+                      ) : (
+                        <motion.div
+                          variants={{
+                            closed: {
+                              opacity: 0,
+                              transition: { duration: 0.2 },
+                            },
+                            open: { opacity: 1, transition: { duration: 0.3 } },
+                          }}
+                          className="h-[200px]  flex flex-col  w-full items-center justify-evenly"
+                        >
+                          <Shopping_Cart_Empty classname="h-20 w-auto" />
+                          <span className="text-[#979797]">
+                            سبد خرید شما خالی است
+                          </span>
+                        </motion.div>
+                      )}
                     </motion.div>
-                  )}
+                  </div>
                 </motion.div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>,
-        // @ts-nocheck
-        document.body
-      )}
+              )}
+            </AnimatePresence>,
+            // @ts-ignore
+            document.body
+          )
+        : null}
     </div>
   );
 }

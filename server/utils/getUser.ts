@@ -20,7 +20,6 @@ async function getUserSession(sessionId: string): Promise<GetUserSession> {
         id: sessionId,
       },
     });
-    console.log(sessionId)
     if (session) {
       const [user] = await prisma.$transaction([
         prisma.user.findUnique({

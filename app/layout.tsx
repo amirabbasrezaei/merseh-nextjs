@@ -11,7 +11,6 @@ export const metadata: Metadata = {
   title: "Merseh",
   description: "محصولات ارگانیک مرسه",
 };
-console.log(process.env.NODE_ENV)
 export default function RootLayout({
   children,
 }: Readonly<{
