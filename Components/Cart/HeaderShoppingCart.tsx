@@ -254,7 +254,7 @@ export default function HeaderShoppingCart() {
       >
         {shoppingCartState?.orderitems?.length ? (
           <div className=" absolute top-0 right-0 ">
-            <svg className="fill-green1 w-4 h-4 flex items justify-center">
+            <svg className="fill-green1 w-4 h-4 flex items justify-center animate-pulse">
               <circle r="3" cx="10" cy="10" className="" />
             </svg>
           </div>
