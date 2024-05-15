@@ -4,11 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "yarn prisma generate && next build",
-    "start": "yarn prisma migrate deploy && next start",
+    "build": "yarn prisma generate && yarn prisma migrate deploy && next build",
+    "start": "=next start",
     "lint": "next lint"
   },
-  
   "dependencies": {
     "@aws-sdk/client-s3": "^3.569.0",
     "@prisma/client": "^5.13.0",
