@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://root:7d7x5LImVtV61F620gPYwU0W@mersehdb:5432/postgres"
+  url      = env("DATABASE_URL")
 }
 
 model Address {
