@@ -14,6 +14,7 @@ interface Props {
 export default function Map({ setCoordinate, coordinate }: Props) {
   const mapContainer = useRef(null);
   const map = useRef(null);
+  
   const [viewState, setViewState] = React.useState({
     longitude: 51.42747209534184,
     latitude: 35.80500946575964,
