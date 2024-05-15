@@ -8,6 +8,7 @@ interface Props {
   text: string;
   type?: "submit" | "reset" | "button" | undefined;
   isLoading?: boolean;
+  isDisabled?: boolean;
 }
 
 export default function Button({
@@ -16,15 +17,21 @@ export default function Button({
   onClick,
   type,
   isLoading,
+  isDisabled,
 }: Props) {
   const classes = `
-  bg-green1 text-white cursor-pointer   rounded-[8px]  flex justify-center items-center ${
-    className ?? "h-[43px] w-full"
+  bg-green1 text-white cursor-pointer h-[43px]  rounded-[8px]  flex justify-center items-center ${
+    className ?? " w-full "
   }`;
   return (
     <>
-      {!isLoading ? (
-        <button type={type} onClick={onClick} className={classes}>
+      {!isLoading && !isDisabled ? (
+        <button
+          disabled={isDisabled || isLoading}
+          type={type}
+          onClick={onClick}
+          className={classes}
+        >
           <span>{text}</span>
         </button>
       ) : (

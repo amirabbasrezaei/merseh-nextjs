@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { atom, useRecoilState, useRecoilValue } from "recoil";
 import { Shop_Cart, Shopping_Cart_Empty, XMark_Svg } from "../SVGS";
@@ -24,6 +26,7 @@ export type ShoppingCart = {
   showCart: boolean;
   updateActiveOrder: boolean;
   price?: { totalPrice: number };
+  activeOrderId?: number;
 };
 
 function handleUpdateActiveOrder() {
@@ -53,7 +56,9 @@ function handleUpdateActiveOrder() {
             updateActiveOrder: true,
             orderitems: temp,
           };
-          localStorage.setItem("shopCart", JSON.stringify(result));
+          if (localStorage !== undefined) {
+            localStorage.setItem("shopCart", JSON.stringify(result));
+          }
           setSelf(result);
           return;
         } else if (
@@ -96,12 +101,12 @@ function handleUpdateActiveOrder() {
     });
   };
 }
-
+// @ts-nocheck
 export const shopingCartStateAtom = atom<ShoppingCart>({
   key: "ShopingCart",
   default: {
     orderitems: JSON.parse(
-      localStorage.getItem("shopCart") || ""
+      localStorage.getItem("shopCart") || JSON.stringify({ "": "" })
     ) as ShoppingCart["orderitems"],
     showCart: false,
     updateActiveOrder: false,
@@ -153,21 +158,22 @@ export default function HeaderShoppingCart() {
 
   useEffect(() => {
     if (shoppingCartState.updateActiveOrder) {
-      mutateActiveOrder(shoppingCartState.orderitems);
+      mutateActiveOrder({ selectedProducts: shoppingCartState.orderitems });
     }
   }, [shoppingCartState]);
 
   useEffect(() => {
     if (shoppingCartState.updateActiveOrder) {
-      mutateActiveOrder(
-        JSON.parse(
+      mutateActiveOrder({
+        selectedProducts: JSON.parse(
           localStorage.getItem("shopCart") || ""
-        ) as ShoppingCart["orderitems"]
-      );
+        ) as ShoppingCart["orderitems"],
+      });
     }
   }, [themeStore]);
 
   useEffect(() => {
+    console.log(activeOrderData?.activeOrder);
     if (activeOrderData?.activeOrder) {
       const activeShoppingCart: ShoppingCart["orderitems"] =
         activeOrderData.activeOrder.ProductForOrder.map((product) => ({
@@ -191,6 +197,7 @@ export default function HeaderShoppingCart() {
         ...state,
         orderitems: activeShoppingCart,
         price: activeOrderData.price,
+        activeOrderId: activeOrderData.activeOrder.id,
       }));
     }
   }, [activeOrderData]);

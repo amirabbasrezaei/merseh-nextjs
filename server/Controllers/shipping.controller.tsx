@@ -4,6 +4,7 @@ import { ArgsStructure } from "./category.controller";
 import CitiesJson from "./../../public/gistfile1.json";
 export const ShippingPricesInputSchema = z.object({
   addressId: z.string(),
+  orderId: z.number(),
 });
 
 type ShippingPricesInput = z.infer<typeof ShippingPricesInputSchema>;
@@ -12,13 +13,13 @@ export async function getShippingPricesController({
   input,
 }: ArgsStructure<ShippingPricesInput>) {
   const { prisma, user } = ctx;
-  const userId = "a6db23d5-b815-4bdd-bc0c-756067eb4ebe";
+
   try {
     const address = await prisma.address.findUnique({
       where: {
         id: input.addressId,
         User: {
-          id: userId,
+          id: user.userId,
         },
       },
     });
@@ -32,6 +33,15 @@ export async function getShippingPricesController({
       };
     }
 
+    await prisma.order.update({
+      where: {
+        id: input.orderId,
+      },
+      data: {
+        addressId: input.addressId,
+      },
+    });
+
     const coordinateBody = {
       origin: {
         latitude: Number(process.env.STORE_LATITUDE) as number,
@@ -44,13 +54,19 @@ export async function getShippingPricesController({
     };
     const miare = await estimate_miare_price(coordinateBody);
 
-    const result = {
-      bike_deliveery: {
-        miare: {
-          price: miare.price,
-        },
+    const result = [
+      {
+        shippingTypeName: "پیک موتوری",
+        shippingPartners: [
+          {
+            name: "میاره",
+            image: "https://merseh.storage.iran.liara.space/main_images/miare-logo.svg",
+            price: miare.price,
+            shippingPartnerId: 1,
+          },
+        ],
       },
-    };
+    ];
 
     return { result };
   } catch (error) {
@@ -63,10 +79,26 @@ export async function userAddressesController({ ctx }: ArgsStructure) {
   try {
     const userAddresses = await prisma.address.findMany({
       where: { userId: user.userId },
+      include: {
+        Province: {
+          select: {
+            name: true,
+          },
+        },
+        city: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
     if (userAddresses) {
+      const updatedUserAddresses = userAddresses.map((e) => ({
+        ...e,
+        postalCode: e.postalCode?.toString(),
+      }));
       return {
-        addresses: userAddresses,
+        addresses: updatedUserAddresses,
         error: null,
         need_to_add_address: false,
       };
@@ -112,19 +144,6 @@ export async function addAddressController({
 }: ArgsStructure<AddAddressInput>) {
   const { prisma, user } = ctx;
   try {
-    console.log({
-      userId: user.userId,
-      addressDetails: input.detailedAddress,
-      title: input.addressTitle || "",
-      cityId: input.cityId,
-      provinceId: input.provinceId,
-      latitude: input.coordinate.latitude,
-      longitude: input.coordinate.longitude,
-      reciverFamilyName: input.reciverInfo.familyName,
-      reciverName: input.reciverInfo.name,
-      reciverPhoneNumber: input.phoneNumber,
-      postalCode: input.postalCode,
-    })
     await prisma.address.create({
       data: {
         userId: user.userId,
@@ -137,13 +156,13 @@ export async function addAddressController({
         reciverFamilyName: input.reciverInfo.familyName,
         reciverName: input.reciverInfo.name,
         reciverPhoneNumber: input.phoneNumber,
-        postalCode: input.postalCode,
+        postalCode: BigInt(input.postalCode),
       },
     });
 
     return { status: "ok", error: null };
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return { status: "failed", error };
   }
 }

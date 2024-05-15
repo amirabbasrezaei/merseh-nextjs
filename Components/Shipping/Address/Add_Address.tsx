@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import Input from "../Input";
+
 import { useForm } from "react-hook-form";
-import TextArea from "../TextArea";
-import Button from "../Button";
-import Map from "../Map/Map";
+
 import { trpc } from "@/utils/trpc";
-import SelectInput from "../SelectInput";
+import Input from "@/Components/Input";
+import Map from "@/Components/Map/Map";
+import SelectInput from "@/Components/SelectInput";
+import TextArea from "@/Components/TextArea";
+import Button from "@/Components/Button";
 
 export type FormTypes = {
   Name: string;
@@ -24,7 +26,11 @@ export type Coordinate = {
   latitude: number;
 };
 
-export default function Add_Address() {
+interface Props {
+  setShowAddAddress: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export default function Add_Address({ setShowAddAddress }: Props) {
   const { handleSubmit, control, watch } = useForm<FormTypes>({
     mode: "all",
     defaultValues: {
@@ -44,7 +50,7 @@ export default function Add_Address() {
     mutate: mutateAddAddress,
     data: addAddressData,
     isPending: isPendingAddAddress,
-    error
+    error,
   } = trpc.shipping.addAddress.useMutation();
 
   const onSubmit = (data: any) => {
@@ -68,9 +74,10 @@ export default function Add_Address() {
   };
 
   useEffect(() => {
-    console.log(addAddressData);
-    console.log(error);
-  }, [addAddressData, error]);
+    if (addAddressData?.status === "ok") {
+      setShowAddAddress(false);
+    }
+  }, [addAddressData]);
 
   return (
     <form
@@ -128,6 +135,7 @@ export default function Add_Address() {
           lableText="استان"
           name="Province"
           rules={{ required: true }}
+          placeholder="استان را انتخاب کنید"
         />
         <SelectInput
           data={getCitiesData?.cities}
@@ -135,6 +143,7 @@ export default function Add_Address() {
           lableText="شهر"
           name="City"
           rules={{ required: true }}
+          placeholder="شهر را انتخاب کنید"
         />
 
         <TextArea

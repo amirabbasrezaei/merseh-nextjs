@@ -49,6 +49,23 @@ model City {
   provinceId Int
 }
 
+model OrderShipping {
+  id                Int             @id @default(autoincrement())
+  price             Int
+  ShippingPartner   ShippingPartner @relation(fields: [shippingPartnerId], references: [id])
+  shippingPartnerId Int
+  Order             Order           @relation(fields: [orderId], references: [id])
+  orderId           Int             @unique
+}
+
+model ShippingPartner {
+  id            Int             @id @default(autoincrement())
+  name          String
+  imageName     String
+  Order         Order[]
+  OrderShipping OrderShipping[]
+}
+
 model Product {
   id               Int                @id @default(autoincrement())
   name             String
@@ -94,15 +111,19 @@ model ProductForOrder {
 }
 
 model Order {
-  id              Int               @id @default(autoincrement())
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @default(now())
-  status          OrderStatus
-  ProductForOrder ProductForOrder[]
-  userId          String
-  user            User              @relation(fields: [userId], references: [id])
-  Address         Address?          @relation(fields: [addressId], references: [id])
-  addressId       String?
+  id                Int               @id @default(autoincrement())
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @default(now())
+  status            OrderStatus
+  ProductForOrder   ProductForOrder[]
+  userId            String
+  user              User              @relation(fields: [userId], references: [id])
+  Address           Address?          @relation(fields: [addressId], references: [id])
+  addressId         String?
+  ShippingPartner   ShippingPartner?  @relation(fields: [shippingPartnerId], references: [id])
+  shippingPartnerId Int?
+  OrderShipping     OrderShipping?
+  finalPrice        Int?
 }
 
 model Category {

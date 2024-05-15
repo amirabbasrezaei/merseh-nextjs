@@ -5,7 +5,7 @@ import {
   addAddressController,
   getCitiesController,
   getShippingPricesController,
-  importCities,
+  // importCities,
   userAddressesController,
 } from "../Controllers/shipping.controller";
 import { publicProcedure, router, userProtectedProcedure } from "../trpc";
@@ -18,7 +18,7 @@ export const shippingRouter = router({
   addAddress: userProtectedProcedure
     .input(AddAddressInputSchema)
     .mutation(addAddressController),
-  importCities: publicProcedure.query(importCities),
+  // importCities: publicProcedure.query(importCities),
   getCities: userProtectedProcedure
     .input(GetCitiesInputSchema)
     .query(getCitiesController),

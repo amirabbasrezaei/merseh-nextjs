@@ -19,7 +19,7 @@ import { useRecoilState } from "recoil";
 import { themeRecoilStateAtom } from "../ThemeController";
 export default function Header() {
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
-  const { data, status, isLoading } = trpc.user.userInfo.useQuery(undefined, {
+  const { data, status, isLoading, error } = trpc.user.userInfo.useQuery(undefined, {
     retry: false,
     networkMode: "online",
     gcTime: 0,
@@ -36,7 +36,11 @@ export default function Header() {
     if (showAuthModal === false) {
       setThemeStore({ openAuthModal: false });
     }
-  }, [showAuthModal]);
+  }, [showAuthModal])
+
+  useEffect(() => {
+    console.log(error)
+  }, [error])
 
   return (
     <header className="h-[116px] px-6 w-full  flex items-center mb-[-70px] flex-none">

@@ -14,13 +14,13 @@ type GetUserSession = {
 
 async function getUserSession(sessionId: string): Promise<GetUserSession> {
   try {
-    
+   
     const session = await prisma.session.findUnique({
       where: {
         id: sessionId,
       },
     });
-
+    console.log(sessionId)
     if (session) {
       const [user] = await prisma.$transaction([
         prisma.user.findUnique({
@@ -40,6 +40,7 @@ async function getUserSession(sessionId: string): Promise<GetUserSession> {
       if (user !== null) {
         return { user, session };
       }
+      return { session: null, user: null };
     }
     return { session: null, user: null };
   } catch (error) {
@@ -53,7 +54,6 @@ async function getUserSession(sessionId: string): Promise<GetUserSession> {
 }
 
 async function checkRefreshToken(): Promise<{ user: User | null }> {
-  
   const refreshToken = cookies().get("refreshToken")?.value;
   
   if (refreshToken) {
@@ -61,10 +61,11 @@ async function checkRefreshToken(): Promise<{ user: User | null }> {
       refreshToken,
       process.env.JWT_PRIVATE_KEY as Secret
     );
-
+    
     // @ts-ignore
     return await getUserSession(verifyRefreshToken.sessionId as string)
       .then(({ user }: any) => {
+        
         return { user };
       })
       .catch((err) => {
@@ -101,6 +102,7 @@ type GetUser = {
 export async function getUser(res: Response): Promise<GetUser> {
   const userWithAccessToken = checkAccessToken();
   if (userWithAccessToken) {
+
     return {
       accessToken: userWithAccessToken,
       refreshToken: null,
@@ -110,7 +112,6 @@ export async function getUser(res: Response): Promise<GetUser> {
   }
   const payload: GetUser = await checkRefreshToken()
     .then(async ({ user }) => {
-      
       if (!user) {
         return { accessToken: null, refreshToken: null };
       }
