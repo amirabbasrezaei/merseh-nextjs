@@ -230,7 +230,7 @@ export async function addProductController({
       },
     });
 
-    await fs.rmSync(imagePathFolder, { recursive: true, force: true });
+    
     console.log("product added succesfully");
     return { status: "ok", result: newproduct };
   } catch (error) {
