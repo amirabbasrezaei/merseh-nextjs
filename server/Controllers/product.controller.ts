@@ -152,8 +152,11 @@ export async function addProductController({
   });
   for (let image of input.images) {
     const decodeImage = Buffer.from(image.base64, "base64");
-
-    await fs.writeFileSync(`${imagePathFolder}/${image.name}`, decodeImage);
+    try {
+      await fs.writeFileSync(`${imagePathFolder}/${image.name}`, decodeImage);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   const handleUpload = async (image: any, imageName: string) => {
@@ -179,11 +182,11 @@ export async function addProductController({
       }
       filenames.forEach((fileName) => {
         try {
-          const image = fs.readFileSync(`${dirname}\\${fileName}`);
+          const image = fs.readFileSync(`${dirname}\/${fileName}`);
 
-          handleUpload(image, fileName);
-
-          return { status: "ok" };
+          handleUpload(image, fileName).then(() => {
+            return { status: "ok" };
+          });
         } catch (error) {
           throw new Error(error as any);
         }
@@ -230,7 +233,6 @@ export async function addProductController({
       },
     });
 
-    
     console.log("product added succesfully");
     return { status: "ok", result: newproduct };
   } catch (error) {
