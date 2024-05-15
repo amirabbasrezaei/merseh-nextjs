@@ -1,7 +1,7 @@
 import React, { HTMLAttributes, HTMLInputTypeAttribute } from "react";
 import { UseControllerProps, useController } from "react-hook-form";
-import { FormTypes } from "./Address/Add_Address";
-import { Province } from "@prisma/client";
+
+import { FormTypes } from "./Shipping/Address/Add_Address";
 
 interface Props extends UseControllerProps<FormTypes> {
   className?: HTMLAttributes<HTMLInputElement>["className"];

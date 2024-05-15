@@ -10,7 +10,8 @@ import {
   UseControllerProps,
   UseFormGetValues,
 } from "react-hook-form";
-import { FormTypes } from "./Address/Add_Address";
+import { FormTypes } from "./Shipping/Address/Add_Address";
+
 
 
 interface Props extends UseControllerProps<FormTypes> {
