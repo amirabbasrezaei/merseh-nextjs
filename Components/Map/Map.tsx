@@ -2,7 +2,8 @@ import React, { useRef, useState } from "react";
 import styleJSON from "@/public/style.json";
 import MapView, { Marker } from "react-map-gl";
 import { Location_Pin, MersehSvg } from "../SVGS";
-import { Coordinate } from "../Address/Add_Address";
+import { Coordinate } from "../Shipping/Address/Add_Address";
+
 
 
 interface Props {
