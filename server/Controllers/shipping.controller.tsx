@@ -53,7 +53,7 @@ export async function getShippingPricesController({
       },
     };
     const miare = await estimate_miare_price(coordinateBody);
-
+    
     const result = [
       {
         shippingTypeName: "پیک موتوری",
