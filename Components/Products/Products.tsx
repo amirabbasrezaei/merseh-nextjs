@@ -39,7 +39,7 @@ export default function Products() {
 
   return (
     <section className="flex flex-row w-full mt-10 px-10 overflow-visible">
-      {/* <Filter filter={filter} setFilter={setFilter} />
+      <Filter filter={filter} setFilter={setFilter} />
       <div className="basis-9/12 flex flex-col gap-4 items-center justify-center">
         <div className="md:grid grid-cols-4 flex-row gap-4">
           <AnimatePresence mode="wait">
@@ -60,7 +60,7 @@ export default function Products() {
                 ))}
           </AnimatePresence>
         </div>
-      </div> */}
+      </div>
     </section>
   );
 }
