@@ -1,11 +1,17 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
-import type {
-  CreateNextContextOptions,
-  NextApiRequest,
-} from "@trpc/server/adapters/next";
 
-export const prisma = new PrismaClient();
+
+export const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url:
+        process.env.NODE_ENV === "production"
+          ? process.env.DATABASE_URL
+          : process.env.DATABASE_URL_LOCAL,
+    },
+  },
+});
 
 export type createContextPayload = {
   prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>;
@@ -26,7 +32,7 @@ export const createContext = async ({
   return {
     prisma,
     req,
-    res
+    res,
   };
 };
 

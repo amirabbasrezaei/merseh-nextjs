@@ -106,9 +106,9 @@ export const shopingCartStateAtom = atom<ShoppingCart>({
   key: "ShopingCart",
   default: {
     orderitems:
-      typeof window !== "undefined"
-        ? JSON.parse(localStorage.getItem("shopCart") || "")
-        : false,
+      typeof window !== undefined
+        ? JSON.parse(localStorage.getItem("shopCart") || JSON.stringify({}))
+        : [],
     showCart: false,
     updateActiveOrder: false,
   },
