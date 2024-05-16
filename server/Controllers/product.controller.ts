@@ -182,7 +182,8 @@ export async function addProductController({
       }
       filenames.forEach((fileName) => {
         try {
-          const image = fs.readFileSync(`${dirname}\/${fileName}`);
+
+          const image = fs.readFileSync(`${dirname}${fileName}`);
 
           handleUpload(image, fileName).then(() => {
             return { status: "ok" };
