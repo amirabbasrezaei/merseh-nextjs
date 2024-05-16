@@ -7,6 +7,11 @@ const nextConfig = {
             hostname: 'static.merseh.ir',
 
           },
+          {
+            protocol: 'https',
+            hostname: 'trustseal.enamad.ir',
+
+          },
         ],
       },
       async headers() {
