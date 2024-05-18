@@ -58,6 +58,7 @@ export async function createPaymentControllerZibal({
 
     const { data } = await axios.post(`${BASE_URL}/v1/request`, body);
     if (data) {
+      console.log(data)
       const updatedPayment = await ctx.prisma.payment.update({
         data: {
           trackId: String(data.trackId),

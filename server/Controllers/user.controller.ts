@@ -58,7 +58,7 @@ export async function createUserController({
   });
 
   if (createdUser) {
-    const generatedCode = Math.random().toString().substring(2, 8);
+    const generatedCode = Math.random().toString().substring(2, 7);
 
     const body = {
       bodyId: 125257,

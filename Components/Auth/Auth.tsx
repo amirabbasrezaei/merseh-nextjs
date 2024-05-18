@@ -1,12 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { YekanBakh } from "@/app/fonts";
-import {
-  Loading_SVG,
-  MersehSvg,
-  Merseh_typography,
-  XMark_Svg,
-} from "../SVGS";
+import { Loading_SVG, MersehSvg, Merseh_typography, XMark_Svg } from "../SVGS";
 import { trpc } from "@/utils/trpc";
 import classnames from "classnames";
 
@@ -97,7 +92,7 @@ export default function Auth({
           phoneNumber={input}
         />
       ) : (
-        <Signup />
+        <Signup setLoginStatus={setLoginStatus} input={input} />
       )}
 
       {/* <Login setAnimationStatus={setAnimationStatus} /> */}

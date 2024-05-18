@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en" dir="rtl">
       <body
-        className={`overflow-x-hidden  bg-[#00bd84] ${IRANYekanXFaNum.className}`}
+        className={`overflow-x-hidden  bg-white ${IRANYekanXFaNum.className}`}
       >
         <RecoilRootProvider>
           <TRPC_Provider>

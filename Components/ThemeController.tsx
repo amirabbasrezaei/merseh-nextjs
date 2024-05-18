@@ -17,9 +17,8 @@ export const themeRecoilStateAtom = atom<ThemeType>({
 });
 
 export default function ThemeController({ children, AuthorizeStatus }: Props) {
-  
   const [themeStore, setThemeStore] = useRecoilState(themeRecoilStateAtom);
-  const {ssrContext} = trpc.useUtils()
+  const { ssrContext } = trpc.useUtils();
 
   // useEffect(() => {
   //   if (AuthorizeStatus === "need_login") {

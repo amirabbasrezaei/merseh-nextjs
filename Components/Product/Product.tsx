@@ -70,13 +70,11 @@ export default function Product({ productId }: Props) {
       productId: productData?.product?.id,
     };
 
-
-
     setShoppingCart((lastShoppingCartState: any) => {
       if (lastShoppingCartState?.orderitems?.length) {
         return {
+          ...lastShoppingCartState,
           updateActiveOrder: lastShoppingCartState.updateActiveOrder,
-          showCart: true,
           orderitems: [
             ...lastShoppingCartState.orderitems,
             newShoppingCartItem,
@@ -84,8 +82,8 @@ export default function Product({ productId }: Props) {
         };
       } else {
         return {
+          ...lastShoppingCartState,
           updateActiveOrder: lastShoppingCartState.updateActiveOrder,
-          showCart: true,
           orderitems: [newShoppingCartItem],
         };
       }

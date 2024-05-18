@@ -42,13 +42,13 @@ export default function Layout({ children }: props) {
   // }
   return (
     <motion.main
-      initial={{ scale: 0.95, borderRadius: "15px" }}
-      animate={{ scale: 1, borderRadius: "0px" }}
-      onAnimationStart={() => setIsAnimating(true)}
-      onAnimationComplete={() => setIsAnimating(false)}
-      transition={{ duration: 0.3 }}
-      // style={{scrollbarWidth: "none"}}
-      style={{ overflow: isAnimating ? "hidden" : "auto" }}
+      // initial={{ scale: 0.95, borderRadius: "15px" }}
+      // animate={{ scale: 1, borderRadius: "0px" }}
+      // onAnimationStart={() => setIsAnimating(true)}
+      // onAnimationComplete={() => setIsAnimating(false)}
+      // transition={{ duration: 0.3 }}
+      // // style={{scrollbarWidth: "none"}}
+      // style={{ overflow: isAnimating ? "hidden" : "auto" }}
       className={`justify-center items-center pb-10 flex  bg-white w-screen overflow-x-hidden    h-screen`}
     >
       <div className="max-w-[1400px]   gap-16 w-full flex-col  items-center flex overflow-y-visible bg-white h-full ">

@@ -151,9 +151,9 @@ export function Loading_SVG({ classname = "" }: Props) {
     >
       <g>
         <circle
-          stroke-dasharray="136.659280431156 47.553093477052"
+          strokeDasharray="136.659280431156 47.553093477052"
           r="29"
-          stroke-width="8"
+          strokeWidth="8"
           stroke="#00bd84"
           fill="none"
           cy="50"

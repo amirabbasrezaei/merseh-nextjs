@@ -7,9 +7,11 @@ import {
 } from "../Controllers/category.controller";
 import {
   AddProductControllerArgSchema,
+  ProductCartInfoInputSchema,
   addProductController,
   getProductController,
   getProductInputSchema,
+  productCartInfoController,
 } from "../Controllers/product.controller";
 import { publicProcedure, router } from "../trpc";
 
@@ -27,4 +29,8 @@ export const productRouter = router({
   createCategory: publicProcedure
     .input(createCategorySchema)
     .mutation(createCategory),
+  // get product image for shopping cart
+  productCartInfo: publicProcedure
+    .input(ProductCartInfoInputSchema)
+    .query(productCartInfoController),
 });

@@ -29,7 +29,7 @@ export default function Verify({
     isPending,
     data,
     error,
-  } = trpc.user.verifyLoginCode.useMutation();
+  } = trpc.user.verifyLoginCode.useMutation({ retry: 2 });
 
   const inputRef = useRef(null);
   const [code, setCode] = useState<string>("");
@@ -42,6 +42,12 @@ export default function Verify({
       }
     }
   }, [data, error]);
+
+  useEffect(() => {
+    if (code.length === 5) {
+      mutateVerifyLoginCode({ code, phoneNumber });
+    }
+  }, [code]);
 
   return (
     <div className=" justify-center items-center  w-full">

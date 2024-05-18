@@ -5,6 +5,7 @@ import fs from "fs";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import path, { dirname } from "path";
 import { TRPCError } from "@trpc/server";
+import { ArgsStructure } from "./category.controller";
 
 const ACCESSKEY = process.env.LIARA_ACCESS_KEY;
 const SECRETKEY = process.env.LIARA_SECRET_KEY;
@@ -182,7 +183,6 @@ export async function addProductController({
       }
       filenames.forEach((fileName) => {
         try {
-
           const image = fs.readFileSync(`${dirname}${fileName}`);
 
           handleUpload(image, fileName).then(() => {
@@ -238,5 +238,35 @@ export async function addProductController({
     return { status: "ok", result: newproduct };
   } catch (error) {
     console.log(error);
+  }
+}
+
+export const ProductCartInfoInputSchema = z.object({
+  productId: z.number(),
+});
+
+export async function productCartInfoController({
+  ctx: { prisma },
+  input,
+}: ArgsStructure<z.infer<typeof ProductCartInfoInputSchema>>) {
+  try {
+    const findProduct = await prisma.product.findUnique({
+      where: { id: input.productId },
+      select: {
+        imageNames: true,
+      },
+    });
+    if (findProduct) {
+      const result = {
+        imageUrls: findProduct.imageNames.map(
+          (imgName) =>
+            `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${imgName}`
+        ),
+      };
+      return { result, error: null };
+    }
+    return { result: null, error: "no product with this id" };
+  } catch (error) {
+    return { result: null, error };
   }
 }

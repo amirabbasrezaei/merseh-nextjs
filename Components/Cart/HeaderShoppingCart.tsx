@@ -9,7 +9,9 @@ import HeaderShoppingCartItem from "./HeaderShoppingCartItem";
 import { useRouter } from "next/navigation";
 import { themeRecoilStateAtom } from "../ThemeController";
 import { createPortal } from "react-dom";
-import Link from "next/link";
+import { userInfoStoreAtom } from "../UserAuth";
+import { browser } from "process";
+import splitNumber from "../utils/splitNumber";
 
 export type ShoppingCart = {
   orderitems:
@@ -40,7 +42,7 @@ function handleUpdateActiveOrder() {
         const findIndex_On_Product = oldValue.orderitems.findIndex(
           (e) => e.productId === newPrOrder?.productId
         );
-        console.log(newPrOrder);
+
         if (findIndex_On_Variation !== -1 && newPrOrder?.variationValueId) {
           const temp: ShoppingCart["orderitems"] = [
             ...oldValue.orderitems.slice(0, findIndex_On_Variation),
@@ -101,17 +103,25 @@ function handleUpdateActiveOrder() {
     });
   };
 }
-// @ts-nocheck
+
+let local_storage: string = "";
+
+if (browser) {
+  local_storage =
+    localStorage.getItem("shopCart") || JSON.stringify({ "": "" });
+
+}
 export const shopingCartStateAtom = atom<ShoppingCart>({
   key: "ShopingCart",
-  default: {
-    orderitems:
-      typeof window !== undefined
-        ? JSON.parse(localStorage.getItem("shopCart") || JSON.stringify({}))
-        : [],
-    showCart: false,
-    updateActiveOrder: false,
-  },
+  default:
+    typeof localStorage !== undefined
+      ? {
+        // @ts-ignore
+          orderitems:  JSON.parse(local_storage) ,
+          showCart: false,
+          updateActiveOrder: false,
+        }
+      : { orderitems: [], showCart: false, updateActiveOrder: false },
   effects: [handleUpdateActiveOrder()],
 });
 
@@ -140,9 +150,10 @@ const cartAnimation = {
 };
 
 export default function HeaderShoppingCart() {
+  const router = useRouter();
   const [themeStore, setThemeStore] = useRecoilState(themeRecoilStateAtom);
-
-  const { data: activeOrderData } = trpc.order.getActiveOrder.useQuery(
+  const [userInfo, setUserInfo] = useRecoilState(userInfoStoreAtom);
+  const { data: activeOrderData, error } = trpc.order.getActiveOrder.useQuery(
     undefined,
     {
       retry: false,
@@ -152,13 +163,17 @@ export default function HeaderShoppingCart() {
     error: updateActiveOrderError,
     mutate: mutateActiveOrder,
     data: updateActiveOrderData,
-  } = trpc.order.updateActiveOrder.useMutation();
+  } = trpc.order.updateActiveOrder.useMutation({ retry: 2 });
 
   const [shoppingCartState, setShoppingCartState] =
     useRecoilState(shopingCartStateAtom);
 
   useEffect(() => {
-    if (shoppingCartState.updateActiveOrder) {
+    if (
+      shoppingCartState.updateActiveOrder &&
+      shoppingCartState.updateActiveOrder &&
+      userInfo
+    ) {
       mutateActiveOrder({ selectedProducts: shoppingCartState.orderitems });
     }
   }, [shoppingCartState]);
@@ -174,7 +189,6 @@ export default function HeaderShoppingCart() {
   }, [themeStore]);
 
   useEffect(() => {
-    console.log(activeOrderData?.activeOrder);
     if (activeOrderData?.activeOrder) {
       const activeShoppingCart: ShoppingCart["orderitems"] =
         activeOrderData.activeOrder.ProductForOrder.map((product) => ({
@@ -204,7 +218,6 @@ export default function HeaderShoppingCart() {
   }, [activeOrderData]);
 
   useEffect(() => {
-    console.log(updateActiveOrderError?.data);
     if (
       JSON.parse(updateActiveOrderError?.message || JSON.stringify({ "": "" }))
         .need_login_now
@@ -232,13 +245,14 @@ export default function HeaderShoppingCart() {
           imageUrl: product.Product.imageUrls[0],
           variationValueName: product.ProductVariationValue?.name,
         }));
-
       setShoppingCartState((state: any) => ({
         ...state,
         orderitems: activeShoppingCart,
         updateActiveOrder: false,
         price: updateActiveOrderData.price,
       }));
+
+
     }
   }, [updateActiveOrderData]);
 
@@ -296,7 +310,7 @@ export default function HeaderShoppingCart() {
                       }}
                       exit={cartAnimation.closed}
                       animate={cartAnimation.open}
-                      className="absolute border z-10  border-gray-100 flex gap-4 p-4 pt-8 items-center justify-evenly flex-col bg-white left-[20px] top-[60px]  rounded-[17px] shadow-sm w-[360px] h-[300px] shadow-neutral-200"
+                      className="absolute border z-10  border-gray-100 flex gap-4 p-4 pt-8 items-center justify-evenly flex-col bg-white left-[20px] top-[60px]  rounded-[17px] shadow-sm w-fit h-[300px] shadow-neutral-200"
                     >
                       <div
                         onClick={() =>
@@ -329,24 +343,29 @@ export default function HeaderShoppingCart() {
                               )
                             )}
                           </div>
-                          <div className=" h-[50px]  flex flex-row justify-evenly w-full">
-                            <div className="w-full items-center justify-center flex">
-                              <span className="text-[10px]">جمع سبد خرید</span>
+                          <div className=" h-[50px]  flex flex-row justify-evenly w-full gap-5">
+                            <div className="w-full items-center justify-evenly flex ">
+                              <span className="text-[12px] text-lightBlack">جمع سبد خرید</span>
+                              <span className="text-green1 text-[16px]">{splitNumber(shoppingCartState.price?.totalPrice)}</span>
                             </div>
-                            <Link
-                              className="bg-green1 rounded-[10px] w-full items-center justify-center flex "
-                              href={"/cart/checkout"}
-                              onClick={() =>
-                                setShoppingCartState((state) => ({
-                                  ...state,
-                                  showCart: false,
-                                }))
-                              }
+                            <div
+                              className="bg-green1 cursor-pointer rounded-[10px] w-full items-center justify-center flex "
+                              onClick={() => {
+                                if (userInfo) {
+                                  setShoppingCartState((state) => ({
+                                    ...state,
+                                    showCart: false,
+                                  }));
+                                  router.push("/cart/checkout");
+                                } else {
+                                  setThemeStore({ openAuthModal: true });
+                                }
+                              }}
                             >
                               <span className="text-center text-white">
                                 مشاهده سبد خرید
                               </span>
-                            </Link>
+                            </div>
                           </div>
                         </>
                       ) : (

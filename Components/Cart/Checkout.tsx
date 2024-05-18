@@ -10,7 +10,7 @@ import splitNumber from "../utils/splitNumber";
 
 export default function Checkout() {
   const [shoppingCart, setShoppingCart] = useRecoilState(shopingCartStateAtom);
-  console.log(shoppingCart);
+
   const incrementProductNumber = (
     variationValueId: number | undefined,
     productId: number
@@ -204,7 +204,7 @@ export default function Checkout() {
                 جمع سبد خرید
               </span>
               {shoppingCart?.price ? (
-                <span className="text-green1 font-[600] text-[18px] flex flex-row gap-1 items-center">
+                <span className="text-green1 font-[500] text-[18px] flex flex-row gap-1 items-center">
                   {splitNumber(shoppingCart.price?.totalPrice)}
                   <span className="text-[10px] text-black1 font-[400]">
                     تومان

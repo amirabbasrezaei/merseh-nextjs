@@ -26,6 +26,7 @@ export default function Shipping() {
     mutate: mutateOrder,
     data: activeOrderData,
     isPending: isPendingActiveOrderData,
+    error
   } = trpc.order.updateActiveOrder.useMutation({});
   const {
     data: shippingPricesData,
@@ -63,9 +64,11 @@ export default function Shipping() {
     }
   }, [createPaymentData]);
 
+
+
   return (
-    <section className="flex flex-row p-10 gap-[40px]">
-      <div className="basis-9/12 flex flex-col gap-20">
+    <section className="flex flex-row p-10 gap-[200px]">
+      <div className="basis-7/12 flex flex-col gap-20">
         <Addresses
           selectedAddress={selectedAddress}
           setSelectedAddress={setSelectedAddress}
@@ -75,7 +78,7 @@ export default function Shipping() {
           <h2 className="text-[22px] text-black1 mb-4">حمل و نقل</h2>
 
           <div className="flex flex-col gap-6">
-            <AnimatePresence presenceAffectsLayout mode="wait">
+            <AnimatePresence presenceAffectsLayout mode="sync">
               {isPendingShippingPrices
                 ? Array.from(Array(3)).map((_, i) => (
                     <motion.div
@@ -153,7 +156,7 @@ export default function Shipping() {
                 جمع سبد خرید
               </span>
               {activeOrderData?.price ? (
-                <span className="text-green1 font-[600] text-[18px] flex flex-row gap-1 items-center">
+                <span className="text-green1 font-[500] text-[18px] flex flex-row gap-1 items-center">
                   {splitNumber(cartState.price?.totalPrice)}
                   <span className="text-[10px] text-black1 font-[400]">
                     تومان
@@ -168,7 +171,7 @@ export default function Shipping() {
                 هزینه ارسال
               </span>
               {activeOrderData?.price ? (
-                <span className="text-green1 font-[600] text-[18px] flex flex-row gap-1 items-center">
+                <span className="text-green1 font-[500] text-[18px] flex flex-row gap-1 items-center">
                   {splitNumber(activeOrderData.price?.shippingPrice)}
                   <span className="text-[10px] text-black1 font-[400]">
                     تومان
@@ -186,7 +189,7 @@ export default function Shipping() {
               مبلغ نهایی
             </span>
             {activeOrderData?.price ? (
-              <span className="text-green1 font-[600] text-[18px] flex flex-row gap-1 items-center">
+              <span className="text-green1 font-[500] text-[18px] flex flex-row gap-1 items-center">
                 {splitNumber(activeOrderData.price?.finalPrice)}
                 <span className="text-[10px] text-black1 font-[400]">
                   تومان

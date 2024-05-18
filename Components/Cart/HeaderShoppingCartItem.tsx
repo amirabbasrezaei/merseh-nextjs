@@ -5,6 +5,7 @@ import splitNumber from "../utils/splitNumber";
 import Link from "next/link";
 import { SetterOrUpdater } from "recoil";
 import { ShoppingCart } from "./HeaderShoppingCart";
+import { trpc } from "@/utils/trpc";
 
 interface Props {
   name: string;
@@ -29,7 +30,7 @@ const cartItemAnimation = {
   open: {
     opacity: 1,
     y: 0,
-    height: 70,
+    height: 140,
     transition: {
       y: { stiffness: 1000, velocity: -100 },
     },
@@ -43,8 +44,11 @@ export default function HeaderShoppingCartItem({
   variationValueName,
   productId,
   setShoppingCartState,
-  numberOfProduct
+  numberOfProduct,
 }: Props) {
+  const { data, isLoading } = trpc.product.productCartInfo.useQuery({
+    productId,
+  });
   return (
     <Link
       onClick={() => {
@@ -57,11 +61,19 @@ export default function HeaderShoppingCartItem({
         initial={{ opacity: 0, y: -50, height: 0 }}
         animate={cartItemAnimation.open}
         exit={cartItemAnimation.closed}
-        className=" w-full h-[70px] rounded-[10px] flex flex-row items-center px-4"
+        className=" w-full h-[120px] rounded-[10px] flex flex-row items-center px-4"
       >
-        <div className="w-full h-[70px] flex flex-row items-center justify-between">
-          <div className="flex flex-row items-center gap-4">
-            <Image alt={imageUrl} src={imageUrl} width={40} height={40} />
+        <div className="w-full h-fit flex flex-row items-center gap-10 justify-between">
+          <div className="flex flex-row items-center gap-4 relative">
+            <Image
+              alt={imageUrl}
+              src={data?.result?.imageUrls[0] || ""}
+              width={140}
+              height={140}
+              quality={100}
+              className="w-fit h-[140px]"
+              style={{ objectFit: "cover" }}
+            />
             <div className="flex flex-row items-center gap-1">
               <span className="text-[14px] text-black1 font-[500]">{name}</span>
               {variationValueName?.length ? (
