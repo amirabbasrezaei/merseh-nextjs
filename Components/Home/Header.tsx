@@ -18,19 +18,19 @@ import HeaderShoppingCart from "../Cart/HeaderShoppingCart";
 import { useRecoilState } from "recoil";
 import { themeRecoilStateAtom } from "../ThemeController";
 import UserAuth from "../UserAuth";
+import HeaderCategory from "../Header/HeaderCategory/HeaderCategory";
+import Link from "next/link";
 export default function Header() {
   return (
     <header className="h-[116px] px-6 w-full  flex items-center mb-[-70px] flex-none">
       <div className="flex items-center gap-12 basis-9/12  h-full ">
-        <MersehSvg classname="max-w-[38px] basis-1/12 flex-none" />
-        <div className=" basis-3/12 flex-none">
-          <div className="flex flex-row justify-center  items-center gap-2 cursor-pointer">
-            <span className="font-[400] text-black1 text-[14px] ">
-              دسته‌بندی کالاها
-            </span>
-            <Chevron_Down classname="w-[11px]  fill-[#303030]" />
-          </div>
-        </div>
+        <Link
+          className="max-w-[38px] basis-1/12 flex-none flex items-center justify-center"
+          href={"/"}
+        >
+          <MersehSvg />
+        </Link>
+        <HeaderCategory />
 
         <div className=" grow h-[50px] relative">
           <input

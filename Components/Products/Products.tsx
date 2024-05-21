@@ -8,6 +8,7 @@ import Filter from "./Filter";
 
 import ProductCardSkeleton from "../Product/ProductCardSkeleton";
 import { AnimatePresence } from "framer-motion";
+import { useSearchParams } from "next/navigation";
 
 export type filterTypeArgs = {
   categoryId?: number;
@@ -17,7 +18,8 @@ export type filterTypeArgs = {
 
 export default function Products() {
   const [filter, setFilter] = useState<filterTypeArgs>({});
-
+  const params = useSearchParams();
+  console.log(params);
   const {
     mutate: mutate,
     data,
@@ -27,15 +29,14 @@ export default function Products() {
   useEffect(() => {
     const timeOut = setTimeout(() => {
       mutate({
-        categoryId: filter.categoryId,
+        categoryId: filter.categoryId || Number(params.get("catId")),
         searchTerm: filter.searchTerm,
       });
     }, 500);
     return () => {
       clearTimeout(timeOut);
     };
-  }, [filter]);
-
+  }, [filter, params]);
 
   return (
     <section className="flex flex-row w-full mt-10 px-10 overflow-visible">

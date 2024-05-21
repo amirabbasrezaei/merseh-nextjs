@@ -270,3 +270,14 @@ export async function productCartInfoController({
     return { result: null, error };
   }
 }
+
+export async function productCarouselController({
+  ctx: { prisma },
+}: ArgsStructure) {
+  try {
+    const products = await prisma.product.findMany();
+    return { products, status: "ok", error: null };
+  } catch (error) {
+    return { products: [], status: "failed", error };
+  }
+}

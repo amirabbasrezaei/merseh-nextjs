@@ -1,14 +1,14 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 
-
 export const prisma = new PrismaClient({
   datasources: {
     db: {
       url:
-        process.env.NODE_ENV === "production"
-          ? process.env.DATABASE_URL
-          : process.env.DATABASE_URL_LOCAL,
+        // process.env.NODE_ENV === "production"
+        // ?
+        process.env.DATABASE_URL,
+      // : process.env.DATABASE_URL_LOCAL,
     },
   },
 });

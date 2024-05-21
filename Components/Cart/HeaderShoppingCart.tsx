@@ -109,15 +109,14 @@ let local_storage: string = "";
 if (browser) {
   local_storage =
     localStorage.getItem("shopCart") || JSON.stringify({ "": "" });
-
 }
 export const shopingCartStateAtom = atom<ShoppingCart>({
   key: "ShopingCart",
   default:
     typeof localStorage !== undefined
       ? {
-        // @ts-ignore
-          orderitems:  JSON.parse(local_storage) ,
+          // @ts-ignore
+          orderitems: JSON.parse(local_storage),
           showCart: false,
           updateActiveOrder: false,
         }
@@ -251,8 +250,6 @@ export default function HeaderShoppingCart() {
         updateActiveOrder: false,
         price: updateActiveOrderData.price,
       }));
-
-
     }
   }, [updateActiveOrderData]);
 
@@ -345,8 +342,18 @@ export default function HeaderShoppingCart() {
                           </div>
                           <div className=" h-[50px]  flex flex-row justify-evenly w-full gap-5">
                             <div className="w-full items-center justify-evenly flex ">
-                              <span className="text-[12px] text-lightBlack">جمع سبد خرید</span>
-                              <span className="text-green1 text-[16px]">{splitNumber(shoppingCartState.price?.totalPrice)}</span>
+                              {shoppingCartState.price?.totalPrice ? (
+                                <>
+                                  <span className="text-[12px] text-lightBlack">
+                                    جمع سبد خرید
+                                  </span>
+                                  <span className="text-green1 text-[16px]">
+                                    {splitNumber(
+                                      shoppingCartState.price?.totalPrice
+                                    )}
+                                  </span>
+                                </>
+                              ) : null}
                             </div>
                             <div
                               className="bg-green1 cursor-pointer rounded-[10px] w-full items-center justify-center flex "

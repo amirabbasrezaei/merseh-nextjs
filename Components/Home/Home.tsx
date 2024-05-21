@@ -9,22 +9,20 @@ import Footer from "../Footer";
 
 export default function Home() {
   return (
-    <>
-      
-        <Slider />
-        <Main_Categories />
-        <ProductCarousel
-          key={"popular_products"}
-          title="محبوب ترین محصولات"
-          sliderStartDelay={5000}
-        />
-        <div className="h-[221px] w-full rounded-[10px] px-4 bg-gray-100"></div>
-        <ProductCarousel
-          key={"off_products"}
-          title="تخفیف دار ها"
-          sliderStartDelay={8000}
-        />
-     
-    </>
+    <div className="flex flex-col gap-16">
+      <Slider />
+      <Main_Categories />
+      <ProductCarousel
+        key={"popular_products"}
+        title="محبوب ترین محصولات"
+        sliderStartDelay={5000}
+      />
+      <div className="h-[221px] w-full rounded-[10px] px-4 bg-gray-100"></div>
+      <ProductCarousel
+        key={"off_products"}
+        title="تخفیف دار ها"
+        sliderStartDelay={8000}
+      />
+    </div>
   );
 }
