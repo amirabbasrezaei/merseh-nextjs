@@ -26,7 +26,7 @@ export default function Shipping() {
     mutate: mutateOrder,
     data: activeOrderData,
     isPending: isPendingActiveOrderData,
-    error
+    error,
   } = trpc.order.updateActiveOrder.useMutation({});
   const {
     data: shippingPricesData,
@@ -51,7 +51,7 @@ export default function Shipping() {
 
   useEffect(() => {
     mutateOrder({
-      selectedProducts: [],
+      selectedProducts: cartState.orderitems,
       shippingInfo: {
         shippingPartnerId: selectedShipping.shippingPartnerId,
       },
@@ -60,11 +60,11 @@ export default function Shipping() {
 
   useEffect(() => {
     if (createPaymentData?.pay_link) {
+      console.log("ready");
       router.push(createPaymentData.pay_link);
     }
+    console.log(createPaymentData);
   }, [createPaymentData]);
-
-
 
   return (
     <section className="flex flex-row p-10 gap-[200px]">

@@ -1,9 +1,9 @@
 import {
-  FilterProductArgsSchema,
+
   categoriesController,
   createCategory,
   createCategorySchema,
-  filterProductController,
+
 } from "../Controllers/category.controller";
 import {
   AddProductControllerArgSchema,
@@ -21,9 +21,7 @@ export const productRouter = router({
     .input(getProductInputSchema)
     .query(getProductController),
   categories: publicProcedure.query(categoriesController),
-  filterProduct: publicProcedure
-    .input(FilterProductArgsSchema)
-    .mutation(filterProductController),
+
   addProduct: publicProcedure
     .input(AddProductControllerArgSchema)
     .mutation(addProductController),
@@ -34,5 +32,5 @@ export const productRouter = router({
   productCartInfo: publicProcedure
     .input(ProductCartInfoInputSchema)
     .query(productCartInfoController),
-    productCarousel: publicProcedure.query(productCarouselController)
+  productCarousel: publicProcedure.query(productCarouselController),
 });

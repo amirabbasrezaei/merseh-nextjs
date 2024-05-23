@@ -24,7 +24,7 @@ export default function Products() {
     mutate: mutate,
     data,
     isPending,
-  } = trpc.product.filterProduct.useMutation({});
+  } = trpc.filter.filterProduct.useMutation({});
 
   useEffect(() => {
     const timeOut = setTimeout(() => {

@@ -24,7 +24,6 @@ export async function sendSMSCodeController({
     `https://console.melipayamak.com/api/send/shared/67798f12b16441749c66f2a10ae881af`,
     body
   );
-  console.log(response)
   return { recId: response.data.recId, status: response.data.status };
 }
 

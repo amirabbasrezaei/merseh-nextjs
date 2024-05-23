@@ -21,7 +21,7 @@ export const userInfoStoreAtom = atom<UserInfo>({
 
 export default function UserAuth() {
   const [userInfo, setUserInfo] = useRecoilState(userInfoStoreAtom);
-  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+
   const { data, status, isLoading, error } = trpc.user.userInfo.useQuery(
     undefined,
     {
@@ -31,17 +31,6 @@ export default function UserAuth() {
     }
   );
   const [themeStore, setThemeStore] = useRecoilState(themeRecoilStateAtom);
-  useEffect(() => {
-    if (themeStore.openAuthModal) {
-      setShowAuthModal(true);
-    }
-  }, [themeStore]);
-
-  useEffect(() => {
-    if (showAuthModal === false) {
-      setThemeStore({ openAuthModal: false });
-    }
-  }, [showAuthModal]);
 
   useEffect(() => {
     if (data) {
@@ -52,6 +41,7 @@ export default function UserAuth() {
       });
     }
   }, [data]);
+
   return (
     <>
       {isLoading ? (
@@ -68,12 +58,16 @@ export default function UserAuth() {
       ) : data?.isVerified ? (
         <div className="flex flex-row items-center gap-4 w-[130px] justify-center">
           <Profile_Svg classname="w-[17px] h-auto fill-[#303030]" />
-          <span className="text-[#303030] font-[300] text-[13px]">{`${data?.name} ${data?.familyName ?? ""}`}</span>
+          <span className="text-[#303030] font-[300] text-[13px]">{`${
+            data?.name
+          } ${data?.familyName ?? ""}`}</span>
         </div>
       ) : (
         <>
           <div
-            onClick={() => setShowAuthModal(true)}
+            onClick={() =>
+              setThemeStore((state) => ({ ...state, openAuthModal: true }))
+            }
             className="flex flex-row justify-center items-center gap-2 hover:bg-hover1  px-4 py-2 rounded-[10px] cursor-pointer w-[130px]"
           >
             <span className="text-[13px] text-black1 font-[400]">
@@ -83,20 +77,23 @@ export default function UserAuth() {
           </div>
 
           {createPortal(
-            <AnimatePresence mode="wait">
-              {showAuthModal && (
+            <AnimatePresence mode="sync">
+              {themeStore.openAuthModal && (
                 <motion.div
                   key="portal"
                   animate={{ opacity: 1, backdropFilter: "blur(2px)" }}
                   exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
                   transition={{ duration: 0.3 }}
                   onClick={(e) => {
-                    setShowAuthModal(false);
+                    setThemeStore((state) => ({
+                      ...state,
+                      openAuthModal: true,
+                    }));
                     e.stopPropagation();
                   }}
-                  className="w-full h-full   flex items-center justify-center fixed left-0 right-0  top-0 bottom-0 "
+                  className="w-full h-full z-20  flex items-center justify-center fixed left-0 right-0  top-0 bottom-0 "
                 >
-                  <Auth setShowAuthModal={setShowAuthModal} isModal={true} />
+                  <Auth setShowAuthModal={setThemeStore} isModal={true} />
                 </motion.div>
               )}
             </AnimatePresence>,

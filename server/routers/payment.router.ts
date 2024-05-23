@@ -10,13 +10,13 @@ import {
   inquiryPaymentControllerZibal,
   inquiryPaymentSchemaZibal,
 } from "../Controllers/payment(v1)/payment.zibal.controller";
-import { router, userProtectedProcedure } from "../trpc";
+import { publicProcedure, router, userProtectedProcedure } from "../trpc";
 
 export const paymentRouter = router({
   createPayment: userProtectedProcedure
     .input(createPaymentSchemaZibal)
     .mutation(createPaymentControllerZibal),
-  inquiryPayment: userProtectedProcedure
+  inquiryPayment: publicProcedure
     .input(inquiryPaymentSchemaZibal)
     .mutation(inquiryPaymentControllerZibal),
 });

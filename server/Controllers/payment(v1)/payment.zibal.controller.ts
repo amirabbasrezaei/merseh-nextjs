@@ -38,36 +38,37 @@ export async function createPaymentControllerZibal({
         id: input.orderId,
       },
     });
-    const payment = await ctx.prisma.payment.create({
-      data: {
-        userId: user.userId,
-        value: findOrder?.finalPrice || 0,
-      },
-    });
 
     const body = {
       merchant: process.env.ZIBAL_MERCHANT_CODE as string,
       amount: (findOrder?.finalPrice || 0) * 10,
-      callbackUrl: "https://merseh.com/payment",
+      callbackUrl:
+        process.env.NODE_ENV === "production"
+          ? "https://merseh.com/payment"
+          : "http://localhost:3000/payment",
       mobile: user.phoneNumber,
       description: "",
-      orderId: String(payment.id),
       feeMode: 2,
       linkToPay: true,
+      orderId: String(input.orderId),
     };
 
     const { data } = await axios.post(`${BASE_URL}/v1/request`, body);
+
     if (data) {
-      console.log(data)
-      const updatedPayment = await ctx.prisma.payment.update({
-        data: {
-          trackId: String(data.trackId),
-        },
-        where: {
-          id: payment.id,
-        },
-      });
-      console.log(updatedPayment);
+      try {
+        const updatedPayment = await ctx.prisma.payment.create({
+          data: {
+            userId: user.userId,
+            value: findOrder?.finalPrice || 0,
+            orderId: input.orderId,
+            trackId: String(data.trackId),
+          },
+        });
+        return { pay_link: `${BASE_URL}/start/${data.trackId}`, error: null };
+      } catch (error) {
+        return { pay_link: null, error };
+      }
     }
 
     return { pay_link: `${BASE_URL}/start/${data.trackId}`, error: null };
@@ -82,9 +83,11 @@ export const inquiryPaymentSchemaZibal = z.object({
   servicePaymentId: z.string().optional(),
 });
 
-type InquiryPaymentPayloadZibal =
-  | { paymentStatus: "PAYED" | "FAILED" | "WAITING"; message: string | null }
-  | TRPCError;
+type InquiryPaymentPayloadZibal = {
+  paymentStatus: "PAYED" | "FAILED" | "WAITING" | "UNKNOWN";
+  message: string | null;
+  error: any;
+};
 
 export type InquiryPayment = z.infer<typeof inquiryPaymentSchemaZibal>;
 export async function inquiryPaymentControllerZibal({
@@ -93,151 +96,188 @@ export async function inquiryPaymentControllerZibal({
 }: PaymentRouterArgsController<InquiryPayment>): Promise<InquiryPaymentPayloadZibal> {
   const { user, prisma } = ctx;
 
-  const findUser = await prisma.user.findUnique({
-    where: {
-      id: user.userId,
-    },
-  });
-  if (!findUser) {
-    return new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
-      message: "کاربر وجود ندارد",
-    });
-  }
-
   const verifyBody = {
     merchant: process.env.ZIBAL_MERCHANT_CODE as string,
     trackId: Number(input.track_id),
   };
-  console.log(0);
+
   try {
     const verifyTransaction = await axios.post(
       `${BASE_URL}/v1/verify`,
       verifyBody
     );
     console.log(verifyTransaction.data);
-    if (verifyTransaction.data.result == 100) {
-      await prisma.$transaction([
-        prisma.payment.update({
+    const findOrder = await prisma.order.findFirst({
+      where: {
+        Payment: {
+          some: {
+            trackId: input.track_id,
+          },
+        },
+
+      },
+      include:{
+        ProductForOrder: true
+      }
+    });
+
+    if (findOrder) {
+      if (verifyTransaction.data.result == 100) {
+        try {
+          console.log(findOrder.ProductForOrder);
+          await prisma.$transaction([
+            prisma.payment.update({
+              where: {
+                trackId: input.track_id,
+              },
+              data: {
+                cardNumber: verifyTransaction.data.cardNumber || "",
+                isPayed: true,
+                payment_success_date: new Date(verifyTransaction.data.paidAt),
+                paymentDescription: "با موفقیت تایید شد.",
+                status: verifyTransaction.data.status,
+              },
+            }),
+            prisma.order.update({
+              where: {
+                id: findOrder.id,
+              },
+              data: { status: "PAYED" },
+            }),
+          ]);
+        } catch (error) {
+          console.log(error);
+        }
+
+        return {
+          paymentStatus: "PAYED",
+          message: "پرداخت موفقیت آمیز بود.",
+          error: null,
+        };
+      }
+
+      if (verifyTransaction.data.result == 102) {
+        await prisma.payment.update({
           where: {
             trackId: input.track_id,
           },
           data: {
             cardNumber: verifyTransaction.data.cardNumber,
-            isPayed: true,
-            payment_success_date: new Date(verifyTransaction.data.paidAt),
-            paymentDescription: "با موفقیت تایید شد.",
+            isPayed: false,
+            paymentDescription: "merchantیافت نشد.",
             status: verifyTransaction.data.status,
           },
-        }),
-        prisma.user.update({
+        });
+        return {
+          paymentStatus: "FAILED",
+          message: "پرداخت موفقیت آمیز نبود",
+          error: null,
+        };
+      }
+
+      if (verifyTransaction.data.result == 103) {
+        await prisma.payment.update({
           where: {
-            id: findUser.id,
+            trackId: input.track_id,
           },
           data: {
-            credit: { increment: verifyTransaction.data.amount },
+            cardNumber: verifyTransaction.data.cardNumber,
+            isPayed: false,
+            paymentDescription: "merchantغیرفعال",
+            status: verifyTransaction.data.status,
           },
-        }),
-      ]);
+        });
+        return {
+          paymentStatus: "FAILED",
+          message: "پرداخت موفقیت آمیز نبود",
+          error: null,
+        };
+      }
 
-      return { paymentStatus: "PAYED", message: "پرداخت موفقیت آمیز بود." };
-    }
+      if (verifyTransaction.data.result == 104) {
+        await prisma.payment.update({
+          where: {
+            trackId: input.track_id,
+          },
+          data: {
+            cardNumber: verifyTransaction.data.cardNumber,
+            isPayed: false,
+            paymentDescription: "merchantنامعتبر",
+            status: verifyTransaction.data.status,
+          },
+        });
+        return {
+          paymentStatus: "FAILED",
+          message: "پرداخت موفقیت آمیز نبود",
+          error: null,
+        };
+      }
+      if (verifyTransaction.data.result == 201) {
+        await prisma.payment.update({
+          where: {
+            trackId: input.track_id,
+          },
+          data: {
+            cardNumber: verifyTransaction.data.cardNumber,
+            paymentDescription: "قبلا تایید شده",
+            status: verifyTransaction.data.status,
+          },
+        });
+        return {
+          paymentStatus: "PAYED",
+          message: "قبلا پرداخت انجام شده است.",
+          error: null,
+        };
+      }
+      if (verifyTransaction.data.result == 202) {
+        await prisma.payment.update({
+          where: {
+            trackId: input.track_id,
+          },
+          data: {
+            cardNumber: verifyTransaction.data.cardNumber,
+            isPayed: false,
+            paymentDescription: "سفارش پرداخت نشده یا ناموفق بوده است.",
+            status: verifyTransaction.data.status,
+          },
+        });
+        return {
+          paymentStatus: "FAILED",
+          message: "پرداخت موفقیت آمیز نبود",
+          error: null,
+        };
+      }
+      if (verifyTransaction.data.result == 203) {
+        const res = await prisma.payment.update({
+          where: {
+            trackId: input.track_id,
+          },
+          data: {
+            cardNumber: verifyTransaction.data.cardNumber,
+            isPayed: false,
+            paymentDescription: "trackIdنامعتبر می‌باشد.",
+            status: verifyTransaction.data.status,
+          },
+        });
 
-    if (verifyTransaction.data.result == 102) {
-      await prisma.payment.update({
-        where: {
-          trackId: input.track_id,
-        },
-        data: {
-          cardNumber: verifyTransaction.data.cardNumber,
-          isPayed: false,
-          paymentDescription: "merchantیافت نشد.",
-          status: verifyTransaction.data.status,
-        },
-      });
-      return { paymentStatus: "FAILED", message: "پرداخت موفقیت آمیز نبود" };
-    }
-
-    if (verifyTransaction.data.result == 103) {
-      await prisma.payment.update({
-        where: {
-          trackId: input.track_id,
-        },
-        data: {
-          cardNumber: verifyTransaction.data.cardNumber,
-          isPayed: false,
-          paymentDescription: "merchantغیرفعال",
-          status: verifyTransaction.data.status,
-        },
-      });
-      return { paymentStatus: "FAILED", message: "پرداخت موفقیت آمیز نبود" };
-    }
-
-    if (verifyTransaction.data.result == 104) {
-      await prisma.payment.update({
-        where: {
-          trackId: input.track_id,
-        },
-        data: {
-          cardNumber: verifyTransaction.data.cardNumber,
-          isPayed: false,
-          paymentDescription: "merchantنامعتبر",
-          status: verifyTransaction.data.status,
-        },
-      });
-      return { paymentStatus: "FAILED", message: "پرداخت موفقیت آمیز نبود" };
-    }
-    if (verifyTransaction.data.result == 201) {
-      await prisma.payment.update({
-        where: {
-          trackId: input.track_id,
-        },
-        data: {
-          cardNumber: verifyTransaction.data.cardNumber,
-          isPayed: false,
-          paymentDescription: "قبلا تایید شده",
-          status: verifyTransaction.data.status,
-        },
-      });
-      return { paymentStatus: "PAYED", message: "قبلا پرداخت انجام شده است." };
-    }
-    if (verifyTransaction.data.result == 202) {
-      await prisma.payment.update({
-        where: {
-          trackId: input.track_id,
-        },
-        data: {
-          cardNumber: verifyTransaction.data.cardNumber,
-          isPayed: false,
-          paymentDescription: "سفارش پرداخت نشده یا ناموفق بوده است.",
-          status: verifyTransaction.data.status,
-        },
-      });
-      return { paymentStatus: "FAILED", message: "پرداخت موفقیت آمیز نبود" };
-    }
-    if (verifyTransaction.data.result == 203) {
-      await prisma.payment.update({
-        where: {
-          trackId: input.track_id,
-        },
-        data: {
-          cardNumber: verifyTransaction.data.cardNumber,
-          isPayed: false,
-          paymentDescription: "trackIdنامعتبر می‌باشد.",
-          status: verifyTransaction.data.status,
-        },
-      });
-      return { paymentStatus: "FAILED", message: "پرداخت موفقیت آمیز نبود" };
+        return {
+          paymentStatus: "FAILED",
+          message: "پرداخت موفقیت آمیز نبود",
+          error: null,
+        };
+      }
     }
 
     return {
-      paymentStatus: "FAILED",
-      message: "تراکنش ناموفق بوده است.",
+      paymentStatus: "UNKNOWN",
+      message: "نتیجه تراکنش نامشخص است",
+      error: null,
     };
   } catch (error) {
-    return new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
-      cause: "paymentService inquiry problem",
-    });
+    return {
+      paymentStatus: "FAILED",
+      message: "پرداخت موفقیت آمیز نبود",
+      error,
+    };
   }
 }

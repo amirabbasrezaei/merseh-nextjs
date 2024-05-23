@@ -8,7 +8,7 @@ interface Props {
   AuthorizeStatus: any;
 }
 
-type ThemeType = {
+export type ThemeType = {
   openAuthModal: boolean;
 };
 export const themeRecoilStateAtom = atom<ThemeType>({

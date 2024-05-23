@@ -19,7 +19,7 @@ export default function CategoryContext({
         <span className="text-green2">{`همه محصولات ${category.title}`}</span>
       </Link> */}
       {category.subCategories?.map((subCategory: categoryType, index) => (
-        <>
+        <div key={index}>
           <Link
             onClick={(e) => {
               e.stopPropagation();
@@ -27,7 +27,6 @@ export default function CategoryContext({
             }}
             className=""
             href={`/products?catId=${subCategory.id}`}
-            key={index}
           >
             <div>
               <span className="text-[#4E4E4E] font-[400] text-[19px]">
@@ -38,7 +37,15 @@ export default function CategoryContext({
           <div className="mb-3 flex flex-col">
             {subCategory.subCategories?.length
               ? subCategory.subCategories.map((subCat: categoryType) => (
-                  <Link href={`/products?catId=${subCat.id}`} className="mb-1">
+                  <Link
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowCategories(false);
+                    }}
+                    key={subCat.id}
+                    href={`/products?catId=${subCat.id}`}
+                    className="mb-1"
+                  >
                     <span className="text-[#4E4E4E] font-[300] text-[15px]">
                       {subCat.title}
                     </span>
@@ -46,7 +53,7 @@ export default function CategoryContext({
                 ))
               : null}
           </div>
-        </>
+        </div>
       ))}
     </motion.div>
   );

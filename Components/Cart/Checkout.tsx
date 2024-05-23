@@ -7,9 +7,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { Minus_Svg, Plus_Svg } from "../SVGS";
 import splitNumber from "../utils/splitNumber";
+import { trpc } from "@/utils/trpc";
+import { themeRecoilStateAtom } from "../ThemeController";
 
 export default function Checkout() {
+  const [themeStore, setThemeStore] = useRecoilState(themeRecoilStateAtom);
   const [shoppingCart, setShoppingCart] = useRecoilState(shopingCartStateAtom);
+  const { data, error, refetch } = trpc.order.getActiveOrder.useQuery();
 
   const incrementProductNumber = (
     variationValueId: number | undefined,
@@ -113,6 +117,14 @@ export default function Checkout() {
       }));
     }
   };
+
+  useEffect(() => {
+    if (error?.message && JSON.parse(error.message).text === "please log in") {
+      setThemeStore({ openAuthModal: true });
+    }
+  }, [error]);
+
+  
 
   return (
     <section className="flex flex-row w-full gap-[40px] p-10">

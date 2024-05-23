@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL_LOCAL")
 }
 
 model Address {
@@ -124,6 +124,7 @@ model Order {
   shippingPartnerId Int?
   OrderShipping     OrderShipping?
   finalPrice        Int?
+  Payment           Payment[]
 }
 
 model Category {
@@ -168,7 +169,7 @@ model Payment {
   payment_create_date  DateTime  @default(now())
   payment_success_date DateTime?
   userId               String
-  trackId              String?   @unique
+  trackId              String    @unique
   status               Int?
   isPayed              Boolean   @default(false)
   servicePaymentId     String?   @unique
@@ -177,6 +178,8 @@ model Payment {
   user                 User      @relation(fields: [userId], references: [id])
   cardNumber           String?
   paymentDescription   String?
+  orderId              Int
+  Order                Order     @relation(fields: [orderId], references: [id])
 }
 
 enum role {

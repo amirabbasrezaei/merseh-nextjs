@@ -37,7 +37,6 @@ export default function Verify({
   useEffect(() => {
     if (data?.accessToken) {
       if (isModal) {
-        console.log("refresh");
         utils.user.userInfo.refetch();
       }
     }
@@ -60,7 +59,7 @@ export default function Verify({
           onChange={(e) => setCode(e.currentTarget.value)}
           key={"hiddenTextInput"}
           autoComplete="sms-otp"
-          maxLength={6}
+          maxLength={5}
           dir="ltr"
         />
         <div className="w-full px-3 z-10 h-full justify-evenly items-center flex flex-row-reverse gap-2">

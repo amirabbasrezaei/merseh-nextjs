@@ -22,12 +22,12 @@ const HEADERS = {
 type EstimateMirarePriceInput = z.infer<typeof EstimateMirarePriceInputSchema>;
 export async function estimate_miare_price(input: EstimateMirarePriceInput) {
   const { origin, destination } = input;
-  
-  const response = await axios.get(
-    `${BASE_URL}accounting/estimate/price?source=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}`,
-    HEADERS
-  );
-
-
-  return response.data;
+  if (origin) {
+    const response = await axios.get(
+      `${BASE_URL}accounting/estimate/price?source=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}`,
+      HEADERS
+    );
+    return response.data;
+  }
+  throw new Error("no coordinate")
 }

@@ -43,7 +43,7 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
       // add plugins here
     ]
   );
-
+  console.log(productCarouselData)
   return (
     <section className="w-full  flex flex-col items-center gap-5 ">
       <span className="text-[25px] text-black1 font-normal">{title}</span>
@@ -56,8 +56,9 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
           ref={sliderRef}
         >
           {productCarouselData?.products.length
-            ? productCarouselData.products.map((product) => (
+            ? productCarouselData.products.map((product, index) => (
                 <Link
+                key={index}
                   href={`/product/${product.id}`}
                   className="keen-slider__slide   h-full flex justify-center"
                 >
@@ -67,7 +68,6 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
                       style={{ objectFit: "contain" }}
                       src={`${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${product.imageNames[0]}`}
                       alt={product.name}
-
                       width={130}
                       height={130}
                     />

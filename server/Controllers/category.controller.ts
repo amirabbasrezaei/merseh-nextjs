@@ -94,36 +94,7 @@ export async function categoriesController({ ctx }: ArgsStructure) {
   return perpareCategories(categories as unknown as categoryFinalType[]);
 }
 
-export const FilterProductArgsSchema = z.object({
-  categoryId: z.number().optional(),
-  searchTerm: z.string().optional(),
-});
 
-type FilterProductArgs = z.infer<typeof FilterProductArgsSchema>;
-
-export async function filterProductController({
-  ctx,
-  input,
-}: ArgsStructure<FilterProductArgs>) {
-  const { prisma } = ctx;
-  const { categoryId, searchTerm } = input;
-
-  const filterProducts = await prisma.product.findMany({
-    where: {
-      name: { contains: searchTerm },
-      category: categoryId
-        ? {
-            some: {
-              id: categoryId,
-            },
-          }
-        : {},
-    },
-  });
-
-  // console.log(filterProducts)
-  return filterProducts;
-}
 
 export const createCategorySchema = z.object({
   title: z.string(),

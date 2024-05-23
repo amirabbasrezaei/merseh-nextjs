@@ -7,9 +7,11 @@ import classnames from "classnames";
 
 import Signup from "./Signup";
 import Verify from "./Verify";
+import { SetterOrUpdater } from "recoil";
+import { ThemeType } from "../ThemeController";
 type Props = {
   isModal?: boolean;
-  setShowAuthModal?: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowAuthModal?: SetterOrUpdater<ThemeType>;
 };
 export default function Auth({
   isModal = false,
@@ -35,7 +37,12 @@ export default function Auth({
       className="h-[280px] relative bg-white w-[320px] flex flex-col  px-6 items-center  border borer-[#DCDCDC] rounded-[8px]"
     >
       {isModal ? (
-        <div className="cursor-pointer" onClick={() => setShowAuthModal(false)}>
+        <div
+          className="cursor-pointer"
+          onClick={() =>
+            setShowAuthModal((state) => ({ ...state, openAuthModal: false }))
+          }
+        >
           <XMark_Svg classname="absolute w-4 h-auto right-2 top-2 fill-[#777777]" />
         </div>
       ) : null}

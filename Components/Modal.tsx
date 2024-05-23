@@ -14,25 +14,26 @@ export default function Modal({ children, showPortal, setClose }: Props) {
   return (
     <>
       {createPortal(
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="sync">
           {showPortal ? (
             <motion.div
               key="portal"
-              initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
-              animate={{ opacity: 1, backdropFilter: "blur(2px)" }}
+              initial={{ opacity: 0, backdropFilter: "blur(0px)", zIndex: 20 }}
+              animate={{ opacity: 1, backdropFilter: "blur(2px)", zIndex: 20 }}
               exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
               transition={{ duration: 0.3 }}
               onClick={(e) => {
                 e.stopPropagation();
                 setClose(false);
               }}
-              className="w-full h-full z-10    flex items-center justify-center fixed left-0 right-0  top-0 bottom-0 "
+              style={{ zIndex: 20 }}
+              className="w-full h-full  z-20   flex items-center justify-center fixed left-0 right-0  top-0 bottom-0 "
             >
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="max-w-[1400px] w-full h-full flex items-center justify-center p-4 "
+                className="max-w-[1400px]  w-full h-full flex items-center justify-center p-4 "
               >
                 <motion.div
                   onClick={(e) => {
@@ -41,7 +42,7 @@ export default function Modal({ children, showPortal, setClose }: Props) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="h-fit w-fit relative border border-[#dadada] rounded-[12px] p-1 flex flex-col gap-1 bg-white"
+                  className="h-fit z-20 w-fit relative border border-[#dadada] rounded-[12px] p-1 flex flex-col gap-1 bg-white"
                 >
                   <div
                     onClick={() => setClose(false)}

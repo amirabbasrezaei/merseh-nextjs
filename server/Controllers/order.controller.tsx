@@ -13,12 +13,14 @@ type ArgsStructure<T = null> = T extends null
 
 export const activeOrderInputSchema = z.object({
   selectedProducts: z.array(
-    z.object({
-      productId: z.number(),
-      variationId: z.number().optional(),
-      variationValueId: z.number().optional(),
-      numberOfProduct: z.number(),
-    })
+    z
+      .object({
+        productId: z.number(),
+        variationId: z.number().optional(),
+        variationValueId: z.number().optional(),
+        numberOfProduct: z.number(),
+      })
+      .optional()
   ),
   shippingInfo: z
     .object({
@@ -57,6 +59,103 @@ export async function updateActiveOrderController({
       },
     });
 
+    if (!input.shippingInfo) {
+      let activeOrder = await prisma.order.upsert({
+        where: {
+          id: findActiveOrder?.id || -1,
+        },
+        create: {
+          status: "ACTIVE",
+          user: {
+            connect: {
+              id: user.userId,
+            },
+          },
+          ProductForOrder: {
+            create: input.selectedProducts.map((prOrder) =>
+              prOrder?.variationId && prOrder?.variationValueId
+                ? {
+                    productId: prOrder.productId,
+                    productVariationId: prOrder.variationId,
+                    productVariationValueId: prOrder.variationValueId,
+                    numberOfproduct: prOrder.numberOfProduct,
+                  }
+                : {
+                    productId: prOrder.productId,
+                    numberOfproduct: prOrder.numberOfProduct,
+                  }
+            ),
+          },
+        },
+        update: {
+          ProductForOrder: {
+            deleteMany: { orderId: findActiveOrder?.id },
+            create: input.selectedProducts.map((prOrder) =>
+              prOrder?.variationId && prOrder?.variationValueId
+                ? {
+                    productId: prOrder.productId,
+                    productVariationId: prOrder.variationId,
+                    productVariationValueId: prOrder.variationValueId,
+                    numberOfproduct: prOrder.numberOfProduct,
+                  }
+                : {
+                    productId: prOrder.productId,
+                    numberOfproduct: prOrder.numberOfProduct,
+                  }
+            ),
+          },
+        },
+        include: {
+          ProductForOrder: {
+            include: {
+              Product: {
+                select: {
+                  imageNames: true,
+                  name: true,
+                  price: true,
+                  id: true,
+                },
+              },
+              ProductVariationValue: {
+                select: {
+                  name: true,
+                  price: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      const addProductImages = {
+        ...activeOrder,
+        ProductForOrder: activeOrder.ProductForOrder.map((e) => ({
+          ...e,
+          Product: {
+            ...e.Product,
+            imageUrls: e.Product.imageNames.map(
+              (imgName) =>
+                `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${imgName}`
+            ),
+          },
+        })),
+      };
+      let totalPrice: number = 0;
+      for (let pr of activeOrder.ProductForOrder) {
+        if (pr.ProductVariationValue?.price) {
+          totalPrice += pr.ProductVariationValue.price * pr.numberOfproduct;
+        } else if (!pr.ProductVariationValue?.price) {
+          totalPrice += pr.Product.price * pr.numberOfproduct;
+        }
+      }
+      return {
+        result: "ok",
+        activeOrder: addProductImages,
+        price: { totalPrice, shippingPrice: 0, finalPrice: null },
+        error: null,
+      };
+    }
+
     if (input.shippingInfo?.shippingPartnerId && findActiveOrder) {
       let totalPrice: number = 0;
       for (let pr of findActiveOrder.ProductForOrder) {
@@ -66,15 +165,18 @@ export async function updateActiveOrderController({
           totalPrice += pr.Product.price * pr.numberOfproduct;
         }
       }
-      if (input.shippingInfo?.shippingPartnerId === 1) {
+      if (
+        input.shippingInfo?.shippingPartnerId === 1 &&
+        findActiveOrder?.Address?.latitude
+      ) {
         const coordinateBody = {
           origin: {
             latitude: Number(process.env.STORE_LATITUDE) as number,
             longitude: Number(process.env.STORE_LONGITUDE) as number,
           },
           destination: {
-            latitude: findActiveOrder?.Address?.latitude || 0,
-            longitude: findActiveOrder?.Address?.longitude || 0,
+            latitude: findActiveOrder?.Address?.latitude,
+            longitude: findActiveOrder?.Address?.longitude,
           },
         };
         const miare = await estimate_miare_price(coordinateBody);
@@ -129,7 +231,6 @@ export async function updateActiveOrderController({
             },
           });
 
-
           const addProductImages = {
             ...updateOrderShipping,
             ProductForOrder: updateOrderShipping.ProductForOrder.map((e) => ({
@@ -165,101 +266,6 @@ export async function updateActiveOrderController({
         }
       }
     }
-
-    let activeOrder = await prisma.order.upsert({
-      where: {
-        id: findActiveOrder?.id || -1,
-      },
-      create: {
-        status: "ACTIVE",
-        user: {
-          connect: {
-            id: user.userId,
-          },
-        },
-        ProductForOrder: {
-          create: input.selectedProducts.map((prOrder) =>
-            prOrder?.variationId && prOrder?.variationValueId
-              ? {
-                  productId: prOrder.productId,
-                  productVariationId: prOrder.variationId,
-                  productVariationValueId: prOrder.variationValueId,
-                  numberOfproduct: prOrder.numberOfProduct,
-                }
-              : {
-                  productId: prOrder.productId,
-                  numberOfproduct: prOrder.numberOfProduct,
-                }
-          ),
-        },
-      },
-      update: {
-        ProductForOrder: {
-          deleteMany: { orderId: findActiveOrder?.id },
-          create: input.selectedProducts.map((prOrder) =>
-            prOrder?.variationId && prOrder?.variationValueId
-              ? {
-                  productId: prOrder.productId,
-                  productVariationId: prOrder.variationId,
-                  productVariationValueId: prOrder.variationValueId,
-                  numberOfproduct: prOrder.numberOfProduct,
-                }
-              : {
-                  productId: prOrder.productId,
-                  numberOfproduct: prOrder.numberOfProduct,
-                }
-          ),
-        },
-      },
-      include: {
-        ProductForOrder: {
-          include: {
-            Product: {
-              select: {
-                imageNames: true,
-                name: true,
-                price: true,
-                id: true,
-              },
-            },
-            ProductVariationValue: {
-              select: {
-                name: true,
-                price: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    const addProductImages = {
-      ...activeOrder,
-      ProductForOrder: activeOrder.ProductForOrder.map((e) => ({
-        ...e,
-        Product: {
-          ...e.Product,
-          imageUrls: e.Product.imageNames.map(
-            (imgName) =>
-              `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${imgName}`
-          ),
-        },
-      })),
-    };
-    let totalPrice: number = 0;
-    for (let pr of activeOrder.ProductForOrder) {
-      if (pr.ProductVariationValue?.price) {
-        totalPrice += pr.ProductVariationValue.price * pr.numberOfproduct;
-      } else if (!pr.ProductVariationValue?.price) {
-        totalPrice += pr.Product.price * pr.numberOfproduct;
-      }
-    }
-    return {
-      result: "ok",
-      activeOrder: addProductImages,
-      price: { totalPrice, shippingPrice: 0, finalPrice: null },
-      error: null,
-    };
   } catch (error) {
     return {
       result: "failed",

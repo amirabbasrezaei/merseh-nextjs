@@ -20,6 +20,7 @@ import { themeRecoilStateAtom } from "../ThemeController";
 import UserAuth from "../UserAuth";
 import HeaderCategory from "../Header/HeaderCategory/HeaderCategory";
 import Link from "next/link";
+import HeaderSearch from "../Header/Search/HeaderSearch";
 export default function Header() {
   return (
     <header className="h-[116px] px-6 w-full  flex items-center mb-[-70px] flex-none">
@@ -32,13 +33,7 @@ export default function Header() {
         </Link>
         <HeaderCategory />
 
-        <div className=" grow h-[50px] relative">
-          <input
-            placeholder="جستجو در میان محصولات"
-            className="bg-[#F6F6F6] w-full h-full placeholder:text-[15px] text-black1 placeholder:text-[#8b8b8b] px-5 pr-[50px] grow rounded-[10px] appearance-none outline-none"
-          />
-          <Magnifier classname="absolute top-[15px] right-[15px] w-[20px] h-auto" />
-        </div>
+        <HeaderSearch />
       </div>
       <div className="basis-3/12 flex flex-row justify-end gap-10 items-center">
         <UserAuth />
