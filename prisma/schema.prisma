@@ -76,6 +76,7 @@ model Product {
   ProductVariation ProductVariation[]
   category         Category[]
   ProductForOrder  ProductForOrder[]
+  content          String
 }
 
 model ProductVariationValue {

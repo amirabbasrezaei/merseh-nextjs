@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import 'contenido/dist/styles.css';
 import TRPC_Provider from "@/Components/TRPC_Provider";
 import { IRANYekanXFaNum } from "./fonts";
 import RecoilRootProvider from "@/Components/StateManager/RecoilRootProvider";
 import { cookies } from "next/headers";
 import ThemeController from "@/Components/ThemeController";
-
 
 export const metadata: Metadata = {
   title: "Merseh",
@@ -17,15 +17,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const AuthorizeStatus = cookies().get("AuthorizeStatus")?.value;
-  console.log(AuthorizeStatus)
+  console.log(AuthorizeStatus);
   return (
     <html lang="en" dir="rtl">
+      <head>
+        <meta charSet="utf-8" />
+      </head>
       <body
         className={`overflow-x-hidden  bg-white ${IRANYekanXFaNum.className}`}
       >
         <RecoilRootProvider>
           <TRPC_Provider>
-            <ThemeController AuthorizeStatus={AuthorizeStatus}>{children}</ThemeController>
+            <ThemeController AuthorizeStatus={AuthorizeStatus}>
+              {children}
+            </ThemeController>
           </TRPC_Provider>
         </RecoilRootProvider>
         {/* <Footer /> */}

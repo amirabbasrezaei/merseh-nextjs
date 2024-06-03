@@ -12,16 +12,16 @@ type ArgsStructure<T = null> = T extends null
     };
 
 export const activeOrderInputSchema = z.object({
-  selectedProducts: z.array(
-    z
-      .object({
+  selectedProducts: z
+    .array(
+      z.object({
         productId: z.number(),
         variationId: z.number().optional(),
         variationValueId: z.number().optional(),
         numberOfProduct: z.number(),
       })
-      .optional()
-  ),
+    )
+    .optional(),
   shippingInfo: z
     .object({
       shippingPartnerId: z.number(),
@@ -59,7 +59,7 @@ export async function updateActiveOrderController({
       },
     });
 
-    if (!input.shippingInfo) {
+    if (!input.shippingInfo && input.selectedProducts?.length) {
       let activeOrder = await prisma.order.upsert({
         where: {
           id: findActiveOrder?.id || -1,
@@ -156,7 +156,7 @@ export async function updateActiveOrderController({
       };
     }
 
-    if (input.shippingInfo?.shippingPartnerId && findActiveOrder) {
+    if (findActiveOrder) {
       let totalPrice: number = 0;
       for (let pr of findActiveOrder.ProductForOrder) {
         if (pr.ProductVariationValue?.price) {

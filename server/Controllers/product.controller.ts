@@ -4,7 +4,6 @@ import { z } from "zod";
 import fs from "fs";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import path, { dirname } from "path";
-import { TRPCError } from "@trpc/server";
 import { ArgsStructure } from "./category.controller";
 
 const ACCESSKEY = process.env.LIARA_ACCESS_KEY;
@@ -34,6 +33,11 @@ const productVariation = z.object({
   ),
 });
 
+const content = z.object({
+  content: z.string().or(z.object({ src: z.string(), name: z.string() })),
+  type: z.enum(["image", "text", "title", "break"]),
+});
+
 const productVariationForPayload = z.object({
   id: z.number(),
   variationName: z.string(),
@@ -54,6 +58,7 @@ export const getProductPayloadSchema = z.object({
       imageUrls: z.array(z.string()),
       price: z.number(),
       variations: z.array(productVariationForPayload),
+      content: z.array(content),
     })
     .optional(),
 
@@ -78,6 +83,7 @@ export async function getProductController({
         name: true,
         imageNames: true,
         price: true,
+        content: true,
         ProductVariation: {
           select: {
             values: true,
@@ -108,6 +114,18 @@ export async function getProductController({
           id: variationValue.id,
         })),
       })),
+      content: JSON.parse(product.content).map((e: any) => {
+        if (e.type === "image") {
+          return {
+            content: {
+              src: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${e.content}`,
+              name: e.content,
+            },
+            type: "image",
+          };
+        }
+        return e;
+      }),
     };
     return { product: result, message: "ok" };
   } catch (error) {
@@ -127,6 +145,7 @@ export const AddProductControllerArgSchema = z.object({
   categoryId: z.string(),
   parentCategories: z.array(z.number()).optional(),
   productVariations: z.array(productVariation).optional(),
+  productContent: z.array(content),
 });
 
 type AddProductControllerArg = z.infer<typeof AddProductControllerArgSchema>;
@@ -145,12 +164,8 @@ export async function addProductController({
   });
 
   const imagePathFolder = path.join("./public/Images/" + "addProductImages/");
-  const dir = fs.mkdir(imagePathFolder, () => {
-    // if (err) {
-    //   console.error(err);
-    // }
-    console.log("Directory created successfully!");
-  });
+  const dir = fs.mkdir(imagePathFolder, () => {});
+  // write product images
   for (let image of input.images) {
     const decodeImage = Buffer.from(image.base64, "base64");
     try {
@@ -159,6 +174,33 @@ export async function addProductController({
       console.log(error);
     }
   }
+
+  // write product content images
+  for (let image of input.productContent.filter((e) => e.type === "image")) {
+    // @ts-ignore
+    const decodeImage = Buffer.from(image.content.src as string, "base64");
+    try {
+      await fs.writeFileSync(
+        // @ts-ignore
+        `${imagePathFolder}/${image.content.name}`,
+        decodeImage
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  // change base64 string with image url for product content
+  const withImageUrl = input.productContent.map((e) => {
+    if (e.type === "image") {
+      return {
+        type: "image",
+        // @ts-ignore
+        content: e.content.name,
+      };
+    }
+    return e;
+  });
 
   const handleUpload = async (image: any, imageName: string) => {
     const params = {
@@ -176,7 +218,7 @@ export async function addProductController({
     });
   };
 
-  function readFiles(dirname: any) {
+  function readProductImageFiles(dirname: any) {
     fs.readdir(dirname, (err, filenames) => {
       if (err) {
         throw new Error(err as any);
@@ -196,13 +238,14 @@ export async function addProductController({
   }
 
   try {
-    readFiles(imagePathFolder);
-    console.log(input.categoryId, input?.parentCategories);
+    readProductImageFiles(imagePathFolder);
+
     const newproduct = await prisma.product.create({
       data: {
         imageNames: input.images.map((img) => img.name),
         name: input.name,
         price: Number(input.price),
+
         category: {
           connect: input?.parentCategories?.length
             ? [
@@ -228,6 +271,7 @@ export async function addProductController({
               })),
             }
           : {},
+        content: JSON.stringify(withImageUrl),
       },
       include: {
         category: true,

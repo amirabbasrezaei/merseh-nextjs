@@ -1,12 +1,17 @@
 "use client";
 import { trpc } from "@/utils/trpc";
-import { btoa } from "buffer";
 import React, { useEffect, useState } from "react";
 import Categories from "../Products/Categories";
 import { filterTypeArgs } from "../Products/Products";
 import { Plus_Svg } from "../SVGS";
-import GetCategories from "../Products/GetCategories";
-
+import "react-quill/dist/quill.snow.css";
+import { EditorState, convertToRaw } from "draft-js";
+import {
+  createDecorator, // Import this utility
+  findEntitiesOf,
+} from "contenido";
+import Image from "./ImageContainer";
+import QuillEditor, { contentType } from "./QuillEditor";
 type imageType = { base64: string; name: string };
 type variation = {
   variationName: string;
@@ -23,6 +28,8 @@ export default function AddProduct() {
   const [flag, setFlag] = useState(false);
   const [filter, setFilter] = useState<filterTypeArgs>({});
   const [variations, setVariations] = useState<variation[]>([]);
+  const [content, setContent] = useState<contentType[]>([]);
+
   useEffect(() => {
     if ((files as any)?.length && !flag) {
       setFlag(true);
@@ -66,9 +73,6 @@ export default function AddProduct() {
     }
   }, [currentImageIndex, files]);
 
-  useEffect(() => {
-    console.log(images);
-  }, [images]);
 
   const handleVariationInput = (
     variationIndex: number,
@@ -107,21 +111,24 @@ export default function AddProduct() {
     setVariations((state) => [...state]);
   };
 
-  useEffect(() => {
-    console.log(variations);
-  }, [variations]);
+
 
   return (
     <form
-      className="w-full max-w-lg flex flex-col gap-10"
+      className="w-full max-w-[1400px] flex flex-col gap-10 px-20"
       onSubmit={(e) => {
         e.preventDefault();
         console.log({
           images: images,
           name: name,
           price: price,
-        });
+          categoryId: String(filter.categoryId),
+          parentCategories: filter.parentCategories,
+          productVariations: variations.length ? variations : [],
+          productContent: content,
+        })
         if (filter.categoryId) {
+          
           mutateAsync({
             images: images,
             name: name,
@@ -129,6 +136,7 @@ export default function AddProduct() {
             categoryId: String(filter.categoryId),
             parentCategories: filter.parentCategories,
             productVariations: variations.length ? variations : [],
+            productContent: content,
           }).then((res) => console.log(res));
         }
       }}
@@ -274,9 +282,11 @@ export default function AddProduct() {
           <Plus_Svg classname="w-4 h-4 fill-green2" />
         </div>
       </div>
-      
 
       <Categories isAddProductPage={true} setFilter={setFilter} />
+
+      <QuillEditor setContent={setContent} content={content} />
+
       <button className="bg-green2 h-10 text-white w-[300px] rounded-[13px]">
         افزودن محصول
       </button>
