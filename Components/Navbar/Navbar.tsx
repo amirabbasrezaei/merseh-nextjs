@@ -28,7 +28,7 @@ export default function Navbar() {
       >
         <Home_Svg
           classname={classNames(
-            "h-[35px] w-auto flex items-center my-[-5px] justify-center",
+            "h-[35px] w-auto flex items-center my-[-3px] justify-center",
             path === "/" ||
               path.includes("products") ||
               path.includes("product")
