@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { z } from "zod";
 import { Context } from "../../context";
 import axios from "axios";
@@ -56,6 +57,7 @@ export async function createPaymentController({
       data: {
         userId: user.userId,
         value: input.amount * 10,
+
       },
     });
     const body = {

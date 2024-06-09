@@ -30,7 +30,7 @@ export default function CategoryItem({
       <div
         onMouseOver={() => setSelectedCategoryIndex(categoryIndex)}
         className={classNames(
-          "cursor-pointer   gap-1   grow flex flex-row items-center justify-start px-8  first:rounded-tr-[8px] last:rounded-br-[8px] h-[55px] w-full",
+          "cursor-pointer   gap-1   grow flex flex-row items-center justify-start px-8  rounded-[8px]  h-[55px] w-full",
           isSelected
             ? "bg-gray-50 fill-green1 text-green1"
             : "bg-transparent text-[#4E4E4E]"

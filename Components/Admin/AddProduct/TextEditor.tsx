@@ -10,8 +10,8 @@ import {
   toggleBold,
 } from "contenido";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import Image from "./ImageContainer";
-import { Image_Svg } from "../SVGS";
+import { Image_Svg } from "@/Components/SVGS";
+
 
 interface Props {
   editorState: EditorState;

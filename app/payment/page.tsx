@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import Link from "next/link";
 import Success from "@/Components/Payment/Success";
@@ -9,6 +9,7 @@ import { trpc } from "@/utils/trpc";
 type Props = {};
 
 export default function Payment({}: Props) {
+  const router = useRouter();
   const { data, mutate: mutateInquiry } =
     trpc.payment.inquiryPayment.useMutation();
   const PaymentStatusComponents = {
@@ -29,7 +30,7 @@ export default function Payment({}: Props) {
         map[x] = array[i + 1];
       }
     });
-  console.log(map);
+
   useEffect(() => {
     if (map.trackId) {
       mutateInquiry({ track_id: map.trackId });
@@ -37,24 +38,23 @@ export default function Payment({}: Props) {
   }, []);
 
   useEffect(() => {
-    console.log(data)
+    console.log(data);
     if (data?.paymentStatus === "PAYED") {
       localStorage.setItem("shopCart", "");
     }
   }, [data]);
 
   return (
-    <div className="h-full">
+    <div className="h-screen w-full gap-5 flex flex-col items-center justify-center">
       {["1", "2"].filter((item) => item === queries.get("status")).length ? (
         <Success />
       ) : null}
-      <Link
-        href={`Zipway://account?status=${map.status}&track_id=${map.trackId}&order_id=${map.orderId}`}
+      <button
+        onClick={() => router.push("/")}
+        className="w-fit  px-4 py-2 bg-green1 rounded-lg"
       >
-        <button className="w-fit  px-4 py-2 bg-blue-500 rounded-lg">
-          <span className="text-white">بازگشت به برنامه</span>
-        </button>
-      </Link>
+        <span className="text-white">بازگشت به سایت</span>
+      </button>
     </div>
   );
 }

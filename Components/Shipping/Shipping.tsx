@@ -67,8 +67,8 @@ export default function Shipping() {
   }, [createPaymentData]);
 
   return (
-    <section className="flex flex-row p-10 gap-[200px]">
-      <div className="basis-7/12 flex flex-col gap-20">
+    <section className="flex flex-col sm:flex-row sm:p-10 gap-12 sm:gap-[200px]">
+      <div className="sm:basis-7/12 flex flex-col gap-20">
         <Addresses
           selectedAddress={selectedAddress}
           setSelectedAddress={setSelectedAddress}
@@ -148,7 +148,7 @@ export default function Shipping() {
           </div>
         </div>
       </div>
-      <div className="h-full gap-4 flex flex-col items-center justify-center w-full basis-3/12">
+      <div className="sm:basis-3/12 h-full gap-4 flex flex-col items-center justify-center w-full ">
         <div className="w-full py-6 gap-5 border border-[#EAEAEA] rounded-[8px] flex flex-col items-center justify-center ">
           <div className="flex flex-col items-center justify-center gap-4 w-[80%]">
             <div className="flex flex-row gap-2 items-center justify-between w-full">

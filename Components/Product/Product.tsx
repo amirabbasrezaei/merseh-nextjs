@@ -92,17 +92,16 @@ export default function Product({ productId }: Props) {
     });
   };
 
-
   return (
-    <section className="flex px-20 flex-col gap-20 w-full">
-      <div className="h-[450px] w-full flex flex-row mt-[85px]">
-        <div className="h-full w-full basis-4/12 ">
+    <section className="flex sm:px-20 flex-col gap-20 w-full">
+      <div className="sm:h-[450px] h-fit w-full flex flex-col sm:flex-row sm:mt-[85px]">
+        <div className="h-full w-full sm:basis-4/12 ">
           {productData?.product ? (
             <ProductImages imageUrls={productData.product.imageUrls} />
           ) : null}
         </div>
 
-        <div className="h-full  w-full basis-5/12 p-4 flex flex-col gap-10">
+        <div className="h-full  w-full sm:basis-5/12 p-4 flex flex-col gap-10">
           <h3 className="text-[26px] text-black1">
             {productData?.product?.name}
           </h3>
@@ -162,7 +161,7 @@ export default function Product({ productId }: Props) {
             </div>
           ))}
         </div>
-        <div className="h-full flex flex-col items-center gap-4 justify-center w-full basis-3/12 ">
+        <div className="h-full flex flex-col items-center gap-4 justify-center w-full sm:basis-3/12 ">
           <div className="w-full py-6 gap-5 border border-[#EAEAEA] rounded-[8px] flex flex-col items-center justify-center ">
             <div className="flex flex-row items-center justify-center gap-1 w-[80%]">
               {isLoading ? (
@@ -196,24 +195,47 @@ export default function Product({ productId }: Props) {
           />
         </div>
       </div>
-      <div className="px-20 flex flex-col gap-4">
-        <h3 className="text-[22px] font-[500] text-black1">معرفی محصول</h3>
-        {productData?.product?.content.map((p) => {
+      <div className="sm:px-20 flex flex-col gap-4">
+        <h3 className="text-[22px] font-[500] text-lightBlack">معرفی محصول</h3>
+        {productData?.product?.content.map((p, index) => {
           if (p.type === "text") {
             return (
-              <p className="font-[300] text-[#4a4a4a] leading-9">{p.content as string}</p>
+              <p key={index} className="font-[300] text-[#4a4a4a] leading-9">
+                {p.content as string}
+              </p>
+            );
+          }
+          if (p.type === "title") {
+            return (
+              <h3
+                key={index}
+                className="font-[500] text-[#5a5a5a] text-[18px] mb-[-10px]"
+              >
+                {p.content as string}
+              </h3>
             );
           }
           if (p.type === "image") {
-            // @ts-ignore
-            return <img src={p.content.src as string} alt={p.content.name} className="w-full h-auto" />;
+            return (
+              <img
+                key={index}
+                // @ts-ignore
+                src={p.content.src as string}
+                // @ts-ignore
+                alt={p.content.name}
+                className="w-full h-auto"
+              />
+            );
+          }
+          if (p.type === "break") {
+            return <br />;
           }
         })}
       </div>
 
       <div className="w-full flex flex-col gap-5">
         <h3 className="text-[22px] font-[500] text-black1">نظرات</h3>
-        <textarea className="appearance-none p-4 w-[500px] h-[100px] outline-none rounded-[10px] border border-[#ECECEC] bg-[#F9F9F9] " />
+        <textarea className="appearance-none p-4 w-full sm:w-[500px] h-[100px] outline-none rounded-[10px] border border-[#ECECEC] bg-[#F9F9F9] " />
         <Button className="w-[170px] h-[40px]" text="ارسال نظر" />
       </div>
       <ProductCarousel title="دیگران هم خریده اند" sliderStartDelay={0} />

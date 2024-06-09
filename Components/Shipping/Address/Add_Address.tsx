@@ -82,44 +82,27 @@ export default function Add_Address({ setShowAddAddress }: Props) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col items-center justify-center w-[470px] h-fit bg-white gap-8 p-2 z-10"
+      className="  flex flex-col items-center  sm:justify-center   overflow-y-scroll-scroll w-full sm:w-[470px] h-fit bg-white gap-8 sm:p-2"
     >
-      <div className="w-full flex flex-col items-center gap-4 h-[500px] p-3">
+      <div className="w-full  flex flex-col items-center gap-4 h-[400px] sm:h-[500px] ">
         <Map coordinate={coordinate} setCoordinate={setCoordinate} />
         {!coordinate?.latitude ? (
-          <span className="text-black1 text-[16px]">
+          <span className="text-red-700 text-[16px]">
             لطفا موقعیت آدرس را روی نقشه مشخص کنید
             <span className="text-red-700">*</span>
           </span>
         ) : null}
       </div>
-      <h3 className="text-[16px] text-black1 w-full">
-        اطلاعات شخصی تحویل گیرنده
-      </h3>
-      <div className="grid grid-cols-2  w-full gap-4">
-        <Input
-          control={control}
-          type="text"
-          lableText="نام"
-          name="Name"
-          rules={{ min: 3, required: true }}
-        />
-        <Input
-          control={control}
-          type="text"
-          lableText="نام خانوادگی"
-          name="FamilyName"
-          rules={{ min: 3, required: true }}
-        />
-      </div>
-      <h3 className="text-[16px] text-black1 w-full">اطلاعات ارسال</h3>
-      <div className="grid grid-cols-2  w-full gap-4">
+
+      <h3 className="text-[16px] text-black1 w-full ">اطلاعات ارسال</h3>
+      <div className="sm:grid grid-cols-2 flex flex-col  h-fit w-full gap-5">
         <Input
           control={control}
           type="text"
           lableText="عنوان آدرس"
           name="AddressTitle"
           rules={{ min: 3, required: false }}
+          className="w-full"
         />
         <Input
           control={control}
@@ -127,6 +110,7 @@ export default function Add_Address({ setShowAddAddress }: Props) {
           lableText="شماره تلفن همراه"
           name="PhoneNumber"
           rules={{ min: 3, required: true }}
+          className="w-full"
         />
 
         <SelectInput
@@ -136,6 +120,7 @@ export default function Add_Address({ setShowAddAddress }: Props) {
           name="Province"
           rules={{ required: true }}
           placeholder="استان را انتخاب کنید"
+          className="w-full"
         />
         <SelectInput
           data={getCitiesData?.cities}
@@ -144,6 +129,7 @@ export default function Add_Address({ setShowAddAddress }: Props) {
           name="City"
           rules={{ required: true }}
           placeholder="شهر را انتخاب کنید"
+          className="w-full"
         />
 
         <TextArea
@@ -151,7 +137,7 @@ export default function Add_Address({ setShowAddAddress }: Props) {
           name="Details"
           control={control}
           rules={{ required: true }}
-          className="row-span-3"
+          className="row-span-3 w-full "
         />
 
         <Input
@@ -160,14 +146,51 @@ export default function Add_Address({ setShowAddAddress }: Props) {
           lableText="کد پستی"
           name="PostalCode"
           rules={{ min: 3, required: true, minLength: 10, maxLength: 10 }}
+          className="w-full"
         />
       </div>
-      <Button
-        isLoading={isPendingAddAddress}
-        text="ثبت آدرس"
-        type="submit"
-        className="h-[43px] w-full"
-      />
+      <div>
+        <h3 className="text-[16px] text-black1 w-full ">
+          اطلاعات شخصی تحویل گیرنده
+        </h3>
+
+        <span className="text-[12px] text-lightBlack">
+          در صورتی که اطلاعات این بخش وارد نشود، از اطلاعات حساب کاربری شما
+          استفاده می‌شود.
+        </span>
+      </div>
+      <div className="sm:grid grid-cols-2 flex h-fit flex-col w-full  gap-7 sm:gap-4">
+        <Input
+          control={control}
+          type="text"
+          lableText="نام"
+          name="Name"
+          rules={{ min: 3 }}
+          className="w-full"
+        />
+        <Input
+          control={control}
+          type="text"
+          lableText="نام خانوادگی"
+          name="FamilyName"
+          rules={{ min: 3 }}
+          className="w-full"
+        />
+      </div>
+      <div className="w-full flex flex-col gap-3">
+        <Button
+          isLoading={isPendingAddAddress}
+          text="ثبت آدرس"
+          type="submit"
+          className="h-[43px] w-full bg-green1 text-white"
+        />
+        <Button
+          onClick={() => setShowAddAddress(false)}
+          text="بستن"
+          type="button"
+          className="h-[43px] w-full bg-[#f1f1f1] text-[#323232] "
+        />
+      </div>
     </form>
   );
 }

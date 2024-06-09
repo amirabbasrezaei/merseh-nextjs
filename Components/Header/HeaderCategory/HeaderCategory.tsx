@@ -13,28 +13,30 @@ export default function HeaderCategory() {
   const animation = {
     open: {
       translateY: 0,
-      zIndex: 10,
+      zIndex: 20,
     },
     hidden: {
       translateY: 50,
-      zIndex: 20,
+      zIndex: -10,
     },
   };
 
   const categoryitemAnimation = {
     open: {
       translateY: 0,
-      zIndex: 10,
+
     },
     hidden: {
-      translateY: 100,
-      zIndex: 20,
+      translateY: 20,
+
     },
   };
+
+  
   return (
-    <div className=" basis-3/12 flex-none relative h-full flex items-center justify-center">
+    <div className=" basis-2/12 hidden sm:flex flex-none relative h-full  items-center justify-center">
       <div
-        className="h-[50px] flex items-center justify-center"
+        className="h-[70px] flex items-center justify-center"
         onMouseEnter={() => {
           setShowCategories(true);
         }}
@@ -47,11 +49,12 @@ export default function HeaderCategory() {
           <span className="font-[400] text-[#303030] text-[15px] ">
             دسته‌بندی کالاها
           </span>
+        </div>
           <motion.div
             transition={{ bounce: 0.3, duration: 0.7, type: "spring" }}
             animate={showCategories ? "open" : "hidden"}
             variants={animation}
-            className=" w-[800px] top-20 right-0 flex flex-row  border-[#ededed] rounded-[8px] shadow-sm absolute bg-white"
+            className=" w-[600px] p-5 top-[90px] right-0 flex flex-row border  border-[#ededed] rounded-[8px] shadow-md absolute bg-white"
           >
             <motion.div
               variants={categoryitemAnimation}
@@ -71,8 +74,8 @@ export default function HeaderCategory() {
                   ))
                 : null}
             </motion.div>
-            {/* {showCategories ? (
-              <div className="w-full p-6 h-fit z-10 flex flex-col">
+            {showCategories ? (
+              <div className="w-full px-6 py-2 h-fit z-10 flex flex-col">
                 {data?.length &&
                 data[0].subCategories?.length &&
                 data[0].subCategories[selectedCategoryIndex] ? (
@@ -83,9 +86,8 @@ export default function HeaderCategory() {
                   />
                 ) : null}
               </div>
-            ) : null} */}
+            ) : null}
           </motion.div>
-        </div>
       </div>
     </div>
   );

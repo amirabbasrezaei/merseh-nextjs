@@ -3,11 +3,7 @@ import axios from "axios";
 
 //// send sms
 export const sendSMSSchema = z.object({
-  body: z.object({
-    bodyId: z.number(),
-    to: z.string(),
-    args: z.any().array(),
-  }),
+  body: z.any(),
 });
 
 interface SendSMSPayload {

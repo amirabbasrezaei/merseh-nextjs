@@ -5,6 +5,7 @@ import {
   Login_icon,
   Magnifier,
   MersehSvg,
+  Merseh_typography,
   Profile_Svg,
   Shop_Cart,
 } from "../SVGS";
@@ -23,22 +24,27 @@ import Link from "next/link";
 import HeaderSearch from "../Header/Search/HeaderSearch";
 export default function Header() {
   return (
-    <header className="h-[116px] px-6 w-full  flex items-center mb-[-70px] flex-none">
-      <div className="flex items-center gap-12 basis-9/12  h-full ">
+    <header className="h-[70px] sm:h-[116px] sm:px-6 w-full sm:gap-10 flex flex-row items-center mb-[-70px] flex-none justify-between">
+      <div className="sm:basis-1/12 hidden sm:flex flex-row justify-between gap-5 items-center">
+        <HeaderShoppingCart />
+        <UserAuth />
+      </div>
+      <div className="flex items-center justify-between gap-10 sm:basis-11/12  w-full h-full ">
+
+      <HeaderCategory />
+      <HeaderSearch />
         <Link
-          className="max-w-[38px] basis-1/12 flex-none flex items-center justify-center"
+          className="basis-1/12 flex-none flex  flex-row gap-2 items-center"
           href={"/"}
         >
-          <MersehSvg />
+          <Merseh_typography classname="sm:h-[25px] h-[20px] fill-[#363636]" />
+          <MersehSvg classname="h-[20px] w-auto"/>
         </Link>
-        <HeaderCategory />
+        
 
-        <HeaderSearch />
+        
       </div>
-      <div className="basis-3/12 flex flex-row justify-end gap-10 items-center">
-        <UserAuth />
-        <HeaderShoppingCart />
-      </div>
+      
     </header>
   );
 }

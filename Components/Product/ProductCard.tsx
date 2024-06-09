@@ -19,19 +19,18 @@ export default function ProductCard({
   pathname,
   isLoading,
 }: ProductCardProps) {
-
   return (
     <motion.div
       transition={{ duration: 0.3 }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex justify-center "
+      className="flex justify-center w-full"
     >
-      <Link href={{ pathname }}>
-        <div className="border h-[350px] w-[200px] py-1 gap-3 flex flex-col items-center justify-center relative   border-[#EDEDED] rounded-[12px]">
+      <Link className="w-full" href={{ pathname }}>
+        <div className="border h-[130px] sm:h-[350px] w-full sm:w-[200px] justify-between py-1 gap-3 flex sm:flex-col flex-row items-center sm:justify-center relative   border-[#EDEDED] rounded-[12px] px-5 sm:px-0">
           <Image
-            className="h-[70%] w-auto "
+            className="sm:h-[70%] h-full w-auto basis-1/4"
             style={{ objectFit: "contain" }}
             src={`${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${imageNames[0]}`}
             alt={title}
@@ -39,9 +38,11 @@ export default function ProductCard({
             width={150}
             height={190}
           />
-          <span className="font-[300] text-[16px] text-black1">{title}</span>
-          <span className="font-normal  text-[16px] text-green1">
-            {splitNumber(price)} تومان
+          <span className="font-[400] basis-2/4 text-[14px] sm:text-[16px] text-black1 w-full sm:w-fit">
+            {title}
+          </span>
+          <span className="font-normal text-[14px] sm:text-[16px] basis-1/4 text-green1 w-full sm:w-fit">
+            {splitNumber(price)} <span className="text-[11px]">تومان</span>
           </span>
         </div>
       </Link>

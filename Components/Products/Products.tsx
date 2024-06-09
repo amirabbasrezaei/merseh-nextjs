@@ -19,7 +19,7 @@ export type filterTypeArgs = {
 export default function Products() {
   const [filter, setFilter] = useState<filterTypeArgs>({});
   const params = useSearchParams();
-  console.log(params);
+
   const {
     mutate: mutate,
     data,
@@ -27,23 +27,31 @@ export default function Products() {
   } = trpc.filter.filterProduct.useMutation({});
 
   useEffect(() => {
+    console.log({
+      categoryId: Number(params.get("catId")),
+      searchTerm: params.get("searchTerm") || "",
+    });
     const timeOut = setTimeout(() => {
       mutate({
-        categoryId: filter.categoryId || Number(params.get("catId")),
-        searchTerm: filter.searchTerm,
+        categoryId: Number(params.get("catId")),
+        searchTerm: params.get("searchTerm") || "",
       });
     }, 500);
     return () => {
       clearTimeout(timeOut);
     };
-  }, [filter, params]);
+  }, [params]);
+
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
 
   return (
-    <section className="flex flex-row w-full mt-10 px-10 overflow-visible">
+    <section className="flex sm:gap-0 gap-5 flex-col sm:flex-row w-full mt-4 sm:mt-10 sm:px-10 overflow-visible">
       <Filter filter={filter} setFilter={setFilter} />
-      <div className="basis-9/12 flex flex-col gap-4 items-center justify-center">
-        <div className="md:grid grid-cols-4 flex-row gap-4">
-          <AnimatePresence mode="wait">
+      <div className="sm:basis-9/12 flex flex-col gap-4 items-center justify-center">
+        <div className="sm:grid grid-cols-4 flex flex-col gap-4 w-full ">
+          <AnimatePresence mode="sync">
             {data?.length && !isPending
               ? // @ts-ignore
                 data.map((pr, index) => (

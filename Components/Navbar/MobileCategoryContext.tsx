@@ -1,38 +1,32 @@
-import { categoryType } from "@/Components/Products/Filter";
-import Link from "next/link";
 import React from "react";
-import { motion } from "framer-motion";
+import { categoryType } from "../Products/Filter";
+import Link from "next/link";
+import { Chevron_Down } from "../SVGS";
+
 interface Props {
   category: categoryType;
   categoryId: number;
-  setShowCategories: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function CategoryContext({
-  category,
-  categoryId,
-  setShowCategories,
-}: Props) {
-
-  console.log(category)
-  
+export default function MobileCategoryContext({ category, categoryId }: Props) {
   return (
-    <motion.div className="flex flex-col ">
+    <div>
       {category.subCategories?.map((subCategory: categoryType, index) => (
         <div key={index}>
           <Link
             onClick={(e) => {
               e.stopPropagation();
-              setShowCategories(false);
             }}
             className=""
             href={`/products?catId=${subCategory.id}`}
           >
-            <div>
-              <span className="text-[#4E4E4E] font-[400] text-[15px]">
+
+            
+              <span className="text-[#4E4E4E] font-[400] text-[17px]">
                 {subCategory.title}
               </span>
-            </div>
+              
+
           </Link>
           <div className="mb-3 flex flex-col">
             {subCategory.subCategories?.length
@@ -40,13 +34,12 @@ export default function CategoryContext({
                   <Link
                     onClick={(e) => {
                       e.stopPropagation();
-                      setShowCategories(false);
                     }}
                     key={subCat.id}
                     href={`/products?catId=${subCat.id}`}
                     className="mb-1"
                   >
-                    <span className="text-[#4E4E4E] font-[300] text-[13px]">
+                    <span className="text-[#4E4E4E] font-[300] text-[15px]">
                       {subCat.title}
                     </span>
                   </Link>
@@ -55,6 +48,6 @@ export default function CategoryContext({
           </div>
         </div>
       ))}
-    </motion.div>
+    </div>
   );
 }

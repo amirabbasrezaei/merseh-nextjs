@@ -1,18 +1,19 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
-import { Check, Chevron_Down, Plus_Svg } from "../SVGS";
-import { categoryType } from "./Filter";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+
 import { AnimatePresence, motion } from "framer-motion";
 import classNames from "classnames";
-import { filterTypeArgs } from "./Products";
+
 import { trpc } from "@/utils/trpc";
-import GetCategories from "./GetCategories";
-import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
+import GetCategories from "./GetCategories.add_product";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { categoryType } from "@/Components/Products/Filter";
+import { filterTypeArgs } from "./AddProduct";
+import { Check, Chevron_Down, Plus_Svg } from "@/Components/SVGS";
 interface Props {
   name: string;
   subCategory?: categoryType[];
   setFilter: Dispatch<SetStateAction<filterTypeArgs>>;
   catId: number;
-
 }
 
 export default function Category({
@@ -20,20 +21,9 @@ export default function Category({
   subCategory = [],
   setFilter,
   catId,
-
 }: Props) {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const path = usePathname();
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set(name, value);
-
-      return params.toString();
-    },
-    [searchParams]
-  );
+  const params = useSearchParams();
   const [showCategory, setShowCategory] = useState(false);
   const [newCategoryTitle, setNewCategoryTitle] = useState("");
   const [showCreateCategory, setShowCreateCategory] = useState<{
@@ -52,7 +42,7 @@ export default function Category({
     <>
       <div
         onClick={() => {
-          router.push(`products?${createQueryString("catId", String(catId))}`);
+          setFilter({ categoryId: catId })
           setShowCategory(state => !state)
         }}
         className="flex flex-row items-center gap-1  w-fit  mb-3"
@@ -75,6 +65,23 @@ export default function Category({
           {name}
         </span>
 
+        <div
+          onClick={() =>
+            setShowCreateCategory((state) => ({
+              state: !state.state,
+              key: catId,
+            }))
+          }
+        >
+          <Plus_Svg
+            classname={classNames(
+              "w-[14px] h-auto fill-black1 ",
+              showCreateCategory.state && showCreateCategory.key == catId
+                ? "rotate-[45deg]"
+                : "rotate-0"
+            )}
+          />
+        </div>
       </div>
       {showCreateCategory.state && showCreateCategory.key == catId ? (
         <div className="flex flex-row gap-2">
@@ -96,7 +103,7 @@ export default function Category({
       ) : null}
 
       <motion.div
-        initial={{ scale: 0, height: 0 }}
+        initial={false}
         animate={{
           scale: showCategory ? 1 : 0,
           opacity: showCategory ? 1 : 0,
@@ -112,7 +119,6 @@ export default function Category({
             parentAnimation={showCategory}
             catId={[catId]}
             setFilter={setFilter}
-
           />
         ) : null}
       </motion.div>

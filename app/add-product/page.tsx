@@ -1,4 +1,4 @@
-import AddProduct from "@/Components/Admin/AddProduct";
+import AddProduct from "@/Components/Admin/AddProduct/AddProduct";
 import Layout_Empty from "@/Components/Layout/Layout_Empty";
 import React from "react";
 

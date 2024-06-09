@@ -35,7 +35,7 @@ export type ShoppingCart = {
 function handleUpdateActiveOrder() {
   return ({ setSelf, onSet }: any) => {
     onSet((newValue: ShoppingCart, oldValue: ShoppingCart) => {
-      console.log(newValue.orderitems.length, oldValue.orderitems.length);
+      // console.log(oldValue, oldValue);
       if (newValue.orderitems.length > oldValue.orderitems.length) {
         const newPrOrder = newValue.orderitems.at(-1);
         const findIndex_On_Variation = oldValue.orderitems.findIndex(
@@ -84,46 +84,46 @@ function handleUpdateActiveOrder() {
             updateActiveOrder: true,
             orderitems: temp,
           };
-          localStorage.setItem("shopCart", JSON.stringify(result.orderitems));
+          localStorage.setItem("shopCart", JSON.stringify(result));
           setSelf(result);
           return;
         } else {
           const result = { ...newValue, updateActiveOrder: true };
-          localStorage.setItem("shopCart", JSON.stringify(result.orderitems));
+          localStorage.setItem("shopCart", JSON.stringify(result));
           setSelf(result);
 
           return;
         }
       } else if (newValue.orderitems.length < oldValue.orderitems.length) {
-        localStorage.setItem("shopCart", JSON.stringify(newValue.orderitems));
-        setSelf({ ...newValue, updateActiveOrder: false });
+        localStorage.setItem("shopCart", JSON.stringify(newValue));
+        setSelf({ ...newValue, updateActiveOrder: true });
         return;
       } else {
-        localStorage.setItem("shopCart", JSON.stringify(newValue.orderitems));
+        localStorage.setItem("shopCart", JSON.stringify(newValue));
         setSelf({ ...newValue, updateActiveOrder: false });
       }
     });
   };
 }
 
-let local_storage: string = "";
+let local_storage: string = JSON.stringify({
+  orderitems: [],
+  showCart: false,
+  updateActiveOrder: false,
+});
 
 if (browser) {
-  local_storage =
-    localStorage.getItem("shopCart") || JSON.stringify({ "": "" });
+  local_storage = localStorage.getItem("shopCart") || local_storage;
 }
+
 export const shopingCartStateAtom = atom<ShoppingCart>({
   key: "ShopingCart",
   default:
     typeof localStorage !== undefined
-      ? {
-          // @ts-ignore
-          orderitems: JSON.parse(local_storage).length
-            ? JSON.parse(local_storage)
-            : [],
-          showCart: false,
-          updateActiveOrder: false,
-        }
+      ? // @ts-ignore
+        JSON.parse(local_storage)
+        ? JSON.parse(local_storage)
+        : { orderitems: [], showCart: false, updateActiveOrder: false }
       : { orderitems: [], showCart: false, updateActiveOrder: false },
   effects: [handleUpdateActiveOrder()],
 });
@@ -139,12 +139,11 @@ const cartAnimation = {
       staggerChildren: 0.03,
       damping: 0,
     },
-    transformOrigin: ["0%", "top"],
   },
   open: {
     opacity: 1,
     transition: { staggerChildren: 0.1, delayChildren: 0.2, damping: 0 },
-    transformOrigin: ["0%", "top"],
+
     translateY: 0,
     height: 300,
     scale: 1,
@@ -153,7 +152,6 @@ const cartAnimation = {
 };
 
 export default function HeaderShoppingCart() {
-  const router = useRouter();
   const [themeStore, setThemeStore] = useRecoilState(themeRecoilStateAtom);
   const [userInfo, setUserInfo] = useRecoilState(userInfoStoreAtom);
   const {
@@ -173,20 +171,15 @@ export default function HeaderShoppingCart() {
     useRecoilState(shopingCartStateAtom);
 
   useEffect(() => {
-    console.log(shoppingCartState);
-    refetch();
-    if (shoppingCartState.updateActiveOrder && userInfo) {
-      mutateActiveOrder({
-        selectedProducts: JSON.parse(
-          localStorage.getItem("shopCart") || "[]"
-        ) as ShoppingCart["orderitems"],
-      });
-    }
+    refetch().then(() => {
+      if (userInfo && shoppingCartState.updateActiveOrder) {
+        mutateActiveOrder({
+          selectedProducts: JSON.parse(localStorage.getItem("shopCart") || "{}")
+            .orderitems as ShoppingCart["orderitems"],
+        });
+      }
+    });
   }, [shoppingCartState, userInfo]);
-
-  // useEffect(() => {
-  //   refetch();
-  // }, [userInfo]);
 
   useEffect(() => {
     if (activeOrderData?.activeOrder) {
@@ -227,6 +220,7 @@ export default function HeaderShoppingCart() {
   }, [updateActiveOrderError]);
 
   useEffect(() => {
+    // console.log(updateActiveOrderData);
     if (updateActiveOrderData?.activeOrder) {
       const activeShoppingCart: ShoppingCart["orderitems"] =
         updateActiveOrderData.activeOrder.ProductForOrder.map((product) => ({
@@ -255,7 +249,7 @@ export default function HeaderShoppingCart() {
   }, [updateActiveOrderData]);
 
   return (
-    <div className="relative">
+    <div className="relative hidden sm:flex">
       <div
         onClick={() =>
           setShoppingCartState((state) => ({
@@ -263,7 +257,7 @@ export default function HeaderShoppingCart() {
             showCart: !state.showCart,
           }))
         }
-        className="p-3 hover:bg-hover1 cursor-pointer rounded-[15px] relative"
+        className=" hover:bg-hover1 hover:fill-green1 cursor-pointer rounded-[15px] relative"
       >
         {shoppingCartState?.orderitems?.length ? (
           <div className=" absolute top-0 right-0 ">
@@ -272,7 +266,7 @@ export default function HeaderShoppingCart() {
             </svg>
           </div>
         ) : null}
-        <Shop_Cart classname=" " />
+        <Shop_Cart classname="hover:fill-inherit fill-[#363636] w-[53px] p-3" />
       </div>
 
       {process.browser
@@ -308,7 +302,7 @@ export default function HeaderShoppingCart() {
                       }}
                       exit={cartAnimation.closed}
                       animate={cartAnimation.open}
-                      className="absolute border z-10  border-gray-100 flex gap-4 p-4 pt-8 items-center justify-evenly flex-col bg-white left-[20px] top-[60px]  rounded-[17px] shadow-sm w-fit h-[300px] shadow-neutral-200"
+                      className="absolute border w-[300px] z-10 origin-top-right border-gray-100 flex gap-4 p-4 pt-8 items-center justify-evenly flex-col bg-white right-[20px] top-[60px]  rounded-[17px] shadow-sm  h-[300px] shadow-neutral-200"
                     >
                       <div
                         onClick={() =>

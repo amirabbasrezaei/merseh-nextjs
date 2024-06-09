@@ -22,7 +22,7 @@ export const userInfoStoreAtom = atom<UserInfo>({
 export default function UserAuth() {
   const [userInfo, setUserInfo] = useRecoilState(userInfoStoreAtom);
 
-  const { data, status, isLoading, error } = trpc.user.userInfo.useQuery(
+  const { data,  isLoading } = trpc.user.userInfo.useQuery(
     undefined,
     {
       retry: false,
@@ -43,7 +43,7 @@ export default function UserAuth() {
   }, [data]);
 
   return (
-    <>
+    <div className="hidden sm:flex">
       {isLoading ? (
         <div className="w-[130px] h-7 text-[#e9e9e9]">
           <Skeleton
@@ -56,9 +56,9 @@ export default function UserAuth() {
           />
         </div>
       ) : data?.isVerified ? (
-        <div className="flex flex-row items-center gap-4 w-[130px] justify-center">
-          <Profile_Svg classname="w-[17px] h-auto fill-[#303030]" />
-          <span className="text-[#303030] font-[300] text-[13px]">{`${
+        <div className="flex cursor-pointer hover:bg-hover1 px-4 py-2 rounded-[10px] flex-row items-center gap-2 w-fit justify-center">
+          <Profile_Svg classname="w-[24px] h-auto stroke-[#303030]" />
+          <span className="text-[#303030] font-[400] text-[13px]">{`${
             data?.name
           } ${data?.familyName ?? ""}`}</span>
         </div>
@@ -68,12 +68,12 @@ export default function UserAuth() {
             onClick={() =>
               setThemeStore((state) => ({ ...state, openAuthModal: true }))
             }
-            className="flex flex-row justify-center items-center gap-2 hover:bg-hover1  px-4 py-2 rounded-[10px] cursor-pointer w-[130px]"
+            className="flex flex-row justify-center items-center gap-2 hover:bg-hover1  px-4 py-2 rounded-[10px] cursor-pointer w-[160px]"
           >
             <span className="text-[13px] text-black1 font-[400]">
               ورود | عضویت
             </span>
-            <Login_icon classname="w-[15px] mt-[2px] fill-[#303030]" />
+            <Login_icon classname="w-[15px] h-auto mt-[2px] fill-[#303030]" />
           </div>
 
           {createPortal(
@@ -101,6 +101,6 @@ export default function UserAuth() {
           )}
         </>
       )}
-    </>
+    </div>
   );
 }

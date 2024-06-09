@@ -38,11 +38,11 @@ export default function Addresses({
     <div className="w-full justify-center items-center ">
       <h2 className="text-[22px] text-black1 mb-4">آدرس ها</h2>
       <div className="w-full flex flex-col gap-4">
-        <AnimatePresence  mode="wait">
+        <AnimatePresence mode="wait">
           {isLoading
-            ? Array.from(Array(3)).map((_,i) => (
+            ? Array.from(Array(3)).map((_, i) => (
                 <motion.div
-                key={i}
+                  key={i}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0, transition: { duration: 0.3 } }}
@@ -79,7 +79,7 @@ export default function Addresses({
         <Plus_Svg classname="w-4 h-auto fill-green2" />
       </div>
 
-      <Modal showPortal={showAddAddress} setClose={setShowAddAddress}>
+      <Modal showPortal={showAddAddress}>
         <Add_Address setShowAddAddress={setShowAddAddress} />
       </Modal>
     </div>

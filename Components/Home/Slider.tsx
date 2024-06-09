@@ -18,7 +18,7 @@ export default function Slider() {
       loop: true,
       //   mode: "snap",
       renderMode: "precision",
-      defaultAnimation: {easing: (t: any) => t, duration: 500 },
+      defaultAnimation: { easing: (t: any) => t, duration: 500 },
 
       created(s) {
         setTimeout(() => {
@@ -88,8 +88,8 @@ export default function Slider() {
     };
   }, [sliderControl1]);
   return (
-    <section className="flex flex-row gap-10 w-full h-[430px] p-6 pl-10 items-center justify-evenly">
-      <div className="basis-2/3 h-full fader  relative" ref={sliderRef}>
+    <section className="flex flex-row sm:gap-4 w-full h-[350px] sm:h-[430px] sm:p-6  items-center justify-evenly">
+      <div className="sm:basis-2/3 h-full fader  relative" ref={sliderRef}>
         <div className="fader__slide w-full h-full bg-transparent absolute">
           <Image
             className="bg-transparent w-full h-full absolute rounded-[10px]"
@@ -108,20 +108,21 @@ export default function Slider() {
         </div>
       </div>
 
-      <div className="basis-1/3 h-full fader  relative" ref={sliderRef1}>
-        <div className="fader__slide bg-transparent w-full absolute h-full rounded-[10px]">
-          <Image
-            className="absolute h-full w-full rounded-[10px]"
-            src={image1}
-            alt=""
-            style={{ objectFit: "cover", opacity: opacities1[0] }}
-          />
+      <div
+        className="w-full sm:basis-1/3 h-full fader  relative"
+        ref={sliderRef1}
+      >
+        <div
+          style={{ objectFit: "cover", opacity: opacities1[0] }}
+          className="fader__slide h-full w-full bg-gray-100 rounded-[10px] absolute"
+        >
+          
         </div>
         <div
           style={{ objectFit: "cover", opacity: opacities1[1] }}
-          className="fader__slide h-full w-full bg-black rounded-[10px] absolute"
+          className="fader__slide h-full w-full bg-gray-200 rounded-[10px] absolute"
         >
-          2
+          
         </div>
       </div>
     </section>

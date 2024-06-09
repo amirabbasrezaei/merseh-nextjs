@@ -126,14 +126,16 @@ export default function Checkout() {
 
   
 
+  
+
   return (
-    <section className="flex flex-row w-full gap-[40px] p-10">
+    <section className="flex flex-col sm:flex-row w-full gap-[40px]  sm:p-10">
       <table className="table-auto basis-9/12 ">
         <thead className="bg-[#F5F5F5] rounded-lg ">
-          <tr className="font-[300]  h-10 rounded-lg">
+          <tr className="font-[300] text-[12px] sm:text-[14px] h-10 rounded-lg">
             <th className="font-[400] text-black1"> </th>
 
-            <th className="font-[400] text-black1">قیمت واحد</th>
+            <th className="font-[400]  text-black1">قیمت واحد</th>
             <th className="font-[400] text-black1">تعداد</th>
             <th className="font-[400] text-black1">قیمت نهایی</th>
           </tr>
@@ -144,7 +146,7 @@ export default function Checkout() {
                 <tr key={index} className="pb-6">
                   <td className=" ">
                     <Link
-                      className="flex flex-row items-center"
+                      className="flex flex-row items-center gap-2"
                       href={`/product/${prOrder.productId}`}
                     >
                       <Image
@@ -152,22 +154,23 @@ export default function Checkout() {
                         width={160}
                         height={160}
                         src={prOrder.imageUrl || ""}
+                        className="w-[50px] sm:w-[100px]"
                       />
                       <div className="flex flex-row gap-2 items-center">
-                        <span className="text-[#323232]">{prOrder.name}</span>
+                        <span className="text-[#323232] text-[12px]">{prOrder.name}</span>
                         {prOrder.variationValueName?.length ? (
-                          <span className="text-[14px] text-[#616161] font-[500]">
+                          <span className="text-[10px] sm:text-[14px] text-[#616161] font-[500]">
                             {`- ${prOrder.variationValueName} `}
                           </span>
                         ) : null}
                       </div>
                     </Link>
                   </td>
-                  <td className="text-center text-[#444444]">
+                  <td className="text-center text-[12px] text-[#444444]">
                     {splitNumber(prOrder.price)}
                   </td>
                   <td className="text-center ">
-                    <div className="text-center flex flex-row items-center justify-center gap-6">
+                    <div className="text-center flex flex-row items-center justify-center gap-2 sm:gap-6">
                       <div
                         onClick={() => {
                           incrementProductNumber(
@@ -179,7 +182,7 @@ export default function Checkout() {
                       >
                         <Plus_Svg classname="w-5 h-5 fill-[#444444]" />
                       </div>
-                      <span className="text-center text-[18px] text-[#444444]">
+                      <span className="text-center text-[15px] sm:text-[18px] text-[#444444]">
                         {prOrder.numberOfProduct}
                       </span>
                       <div
@@ -200,7 +203,7 @@ export default function Checkout() {
                       </div>
                     </div>
                   </td>
-                  <td className="text-center text-[#444444]">
+                  <td className="text-center text-[12px] text-[#444444]">
                     {splitNumber(prOrder.price * prOrder.numberOfProduct)}
                   </td>
                 </tr>

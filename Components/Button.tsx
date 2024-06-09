@@ -20,8 +20,8 @@ export default function Button({
   isDisabled,
 }: Props) {
   const classes = `
-  bg-green1 text-white cursor-pointer h-[43px]  rounded-[8px]  flex justify-center items-center ${
-    className ?? " w-full "
+   cursor-pointer sm:h-[43px] h-[50px] rounded-[8px]  flex justify-center items-center ${
+    className ?? " w-full bg-green1 text-white"
   }`;
   return (
     <>

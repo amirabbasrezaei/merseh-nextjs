@@ -1,21 +1,22 @@
 "use client";
+
 import { trpc } from "@/utils/trpc";
 import React, { useEffect, useState } from "react";
-import Categories from "../Products/Categories";
-import { filterTypeArgs } from "../Products/Products";
-import { Plus_Svg } from "../SVGS";
 import "react-quill/dist/quill.snow.css";
-import { EditorState, convertToRaw } from "draft-js";
-import {
-  createDecorator, // Import this utility
-  findEntitiesOf,
-} from "contenido";
-import Image from "./ImageContainer";
 import QuillEditor, { contentType } from "./QuillEditor";
+import { Plus_Svg } from "@/Components/SVGS";
+import Categories from "./Categories.add_product";
+
 type imageType = { base64: string; name: string };
 type variation = {
   variationName: string;
   variations: { name: string; price: number }[];
+};
+
+export type filterTypeArgs = {
+  categoryId?: number;
+  searchTerm?: string;
+  parentCategories?: number[];
 };
 
 export default function AddProduct() {

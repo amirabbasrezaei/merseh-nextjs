@@ -2,6 +2,7 @@ import { z } from "zod";
 import { Context } from "../../context";
 import axios from "axios";
 import { TRPCError } from "@trpc/server";
+import { sendSMSCodeController } from "../sms.controller";
 
 const BASE_URL = "https://gateway.zibal.ir";
 
@@ -114,15 +115,24 @@ export async function inquiryPaymentControllerZibal({
             trackId: input.track_id,
           },
         },
-
       },
-      include:{
-        ProductForOrder: true
-      }
+      include: {
+        ProductForOrder: true,
+      },
     });
 
     if (findOrder) {
       if (verifyTransaction.data.result == 100) {
+        const body = {
+          from: "50004001338886",
+          to: "09038338886",
+          text:"یک خرید انجام شد",
+        };
+        const { data } = await axios.post(
+          "https://console.melipayamak.com/api/send/simple/67798f12b16441749c66f2a10ae881af",
+          body
+        );
+        console.log(data);
         try {
           console.log(findOrder.ProductForOrder);
           await prisma.$transaction([

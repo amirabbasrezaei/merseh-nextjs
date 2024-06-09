@@ -228,6 +228,9 @@ export async function addProductController({
           const image = fs.readFileSync(`${dirname}${fileName}`);
 
           handleUpload(image, fileName).then(() => {
+            fs.rmdir(imagePathFolder, (res) => {
+              console.log(res);
+            });
             return { status: "ok" };
           });
         } catch (error) {

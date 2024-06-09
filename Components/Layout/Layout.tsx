@@ -4,11 +4,21 @@ import Header from "../Home/Header";
 import { IRANYekanXFaNum } from "@/app/fonts";
 import Footer from "../Footer";
 import { motion } from "framer-motion";
+import Navbar from "../Navbar/Navbar";
+import classNames from "classnames";
 interface props {
   children: React.ReactNode;
+  header?: boolean;
+  footer?: boolean;
+  fullWidth?: boolean;
 }
 
-export default function Layout({ children }: props) {
+export default function Layout({
+  children,
+  header = true,
+  footer = true,
+  fullWidth = false,
+}: props) {
   const [isAnimating, setIsAnimating] = useState(false);
   // function useWindowSize() {
   //   // Initialize state with undefined width/height so server and client renders match
@@ -17,7 +27,7 @@ export default function Layout({ children }: props) {
   //     width: 0,
   //     height: 0,
   //   });
-  
+
   //   useEffect(() => {
   //     // only execute all the code below in client side
   //     // Handler to call on window resize
@@ -28,13 +38,13 @@ export default function Layout({ children }: props) {
   //         height: window.innerHeight,
   //       });
   //     }
-      
+
   //     // Add event listener
   //     window.addEventListener("resize", handleResize);
-       
+
   //     // Call handler right away so state gets updated with initial window size
   //     handleResize();
-      
+
   //     // Remove event listener on cleanup
   //     return () => window.removeEventListener("resize", handleResize);
   //   }, []); // Empty array ensures that effect is only run on mount
@@ -42,24 +52,23 @@ export default function Layout({ children }: props) {
   // }
   return (
     <motion.main
-      // initial={{ scale: 0.95, borderRadius: "15px" }}
-      // animate={{ scale: 1, borderRadius: "0px" }}
-      // onAnimationStart={() => setIsAnimating(true)}
-      // onAnimationComplete={() => setIsAnimating(false)}
-      // transition={{ duration: 0.3 }}
-      // // style={{scrollbarWidth: "none"}}
-      // style={{ overflow: isAnimating ? "hidden" : "auto" }}
-      className={`justify-center items-center pb-10 flex  bg-white w-screen overflow-x-hidden    h-screen`}
+      className={`justify-center items-center  flex  bg-white w-screen overflow-x-hidden  sm:mb-0 mb-[100px]  h-screen`}
     >
-      <div className="max-w-[1400px]   gap-16 w-full flex-col  items-center flex overflow-y-visible bg-white h-full ">
-        <Header />
+      <div
+        className={classNames(
+          "max-w-[1400px]    gap-16 sm:w-full flex-col  items-center flex overflow-y-visible bg-white h-full ",
+          fullWidth ? "w-full" : "w-[90%]"
+        )}
+      >
+        {header ? <Header /> : null}
+        <Navbar />
         <div className=" w-full grow  flex flex-col gap-16">
-          <div 
-
-          className=" grow">{children}</div>
-          <div className="h-[253px]">
-            <Footer />
-          </div>
+          <div className=" grow">{children}</div>
+          {footer ? (
+            <div className="h-[253px]">
+              <Footer />
+            </div>
+          ) : null}
         </div>
       </div>
     </motion.main>

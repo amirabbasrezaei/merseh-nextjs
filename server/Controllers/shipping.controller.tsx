@@ -53,14 +53,15 @@ export async function getShippingPricesController({
       },
     };
     const miare = await estimate_miare_price(coordinateBody);
-    
+
     const result = [
       {
         shippingTypeName: "پیک موتوری",
         shippingPartners: [
           {
             name: "میاره",
-            image: "https://merseh.storage.iran.liara.space/main_images/miare-logo.svg",
+            image:
+              "https://merseh.storage.iran.liara.space/main_images/miare-logo.svg",
             price: miare.price,
             shippingPartnerId: 1,
           },
@@ -126,8 +127,8 @@ export const AddAddressInputSchema = z.object({
   }),
   addressTitle: z.string().optional(),
   reciverInfo: z.object({
-    name: z.string(),
-    familyName: z.string(),
+    name: z.string().optional(),
+    familyName: z.string().optional(),
   }),
   phoneNumber: z.string(),
   provinceId: z.number(),
@@ -144,6 +145,32 @@ export async function addAddressController({
 }: ArgsStructure<AddAddressInput>) {
   const { prisma, user } = ctx;
   try {
+    if (!input?.reciverInfo?.familyName || !input?.reciverInfo?.name) {
+      const userInfo = await prisma.user.findUnique({
+        where: {
+          id: user.userId,
+        },
+      });
+      if (userInfo) {
+        await prisma.address.create({
+          data: {
+            userId: user.userId,
+            addressDetails: input.detailedAddress,
+            title: input.addressTitle || "",
+            cityId: input.cityId,
+            provinceId: input.provinceId,
+            latitude: input.coordinate.latitude,
+            longitude: input.coordinate.longitude,
+            reciverFamilyName: userInfo?.familyName || "",
+            reciverName: userInfo.name,
+            reciverPhoneNumber: input.phoneNumber,
+            postalCode: BigInt(input.postalCode),
+          },
+        });
+        return { status: "ok", error: null };
+      }
+      return { status: "ok", error: "cannot find user" };
+    }
     await prisma.address.create({
       data: {
         userId: user.userId,

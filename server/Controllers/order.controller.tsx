@@ -59,7 +59,7 @@ export async function updateActiveOrderController({
       },
     });
 
-    if (!input.shippingInfo && input.selectedProducts?.length) {
+    if (!input.shippingInfo) {
       let activeOrder = await prisma.order.upsert({
         where: {
           id: findActiveOrder?.id || -1,
@@ -72,37 +72,41 @@ export async function updateActiveOrderController({
             },
           },
           ProductForOrder: {
-            create: input.selectedProducts.map((prOrder) =>
-              prOrder?.variationId && prOrder?.variationValueId
-                ? {
-                    productId: prOrder.productId,
-                    productVariationId: prOrder.variationId,
-                    productVariationValueId: prOrder.variationValueId,
-                    numberOfproduct: prOrder.numberOfProduct,
-                  }
-                : {
-                    productId: prOrder.productId,
-                    numberOfproduct: prOrder.numberOfProduct,
-                  }
-            ),
+            create: input.selectedProducts?.length
+              ? input.selectedProducts.map((prOrder) =>
+                  prOrder?.variationId && prOrder?.variationValueId
+                    ? {
+                        productId: prOrder.productId,
+                        productVariationId: prOrder.variationId,
+                        productVariationValueId: prOrder.variationValueId,
+                        numberOfproduct: prOrder.numberOfProduct,
+                      }
+                    : {
+                        productId: prOrder.productId,
+                        numberOfproduct: prOrder.numberOfProduct,
+                      }
+                )
+              : [],
           },
         },
         update: {
           ProductForOrder: {
             deleteMany: { orderId: findActiveOrder?.id },
-            create: input.selectedProducts.map((prOrder) =>
-              prOrder?.variationId && prOrder?.variationValueId
-                ? {
-                    productId: prOrder.productId,
-                    productVariationId: prOrder.variationId,
-                    productVariationValueId: prOrder.variationValueId,
-                    numberOfproduct: prOrder.numberOfProduct,
-                  }
-                : {
-                    productId: prOrder.productId,
-                    numberOfproduct: prOrder.numberOfProduct,
-                  }
-            ),
+            create: input.selectedProducts?.length
+              ? input.selectedProducts.map((prOrder) =>
+                  prOrder?.variationId && prOrder?.variationValueId
+                    ? {
+                        productId: prOrder.productId,
+                        productVariationId: prOrder.variationId,
+                        productVariationValueId: prOrder.variationValueId,
+                        numberOfproduct: prOrder.numberOfProduct,
+                      }
+                    : {
+                        productId: prOrder.productId,
+                        numberOfproduct: prOrder.numberOfProduct,
+                      }
+                )
+              : [],
           },
         },
         include: {

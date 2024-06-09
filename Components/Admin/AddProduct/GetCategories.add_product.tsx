@@ -1,18 +1,14 @@
 import classNames from "classnames";
-import { categoryType } from "./Filter";
+
 import { motion } from "framer-motion";
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
-import { filterTypeArgs } from "./Products";
-import { Check, Chevron_Down, Plus_Svg } from "../SVGS";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+
 import { trpc } from "@/utils/trpc";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
+import { filterTypeArgs } from "./AddProduct";
+import { categoryType } from "@/Components/Products/Filter";
+import { Check, Chevron_Down, Plus_Svg } from "@/Components/SVGS";
 
 interface Props {
   data: categoryType[];
@@ -27,17 +23,8 @@ export default function GetCategories({
   parentAnimation = false,
   setFilter,
 }: Props) {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set(name, value);
-
-      return params.toString();
-    },
-    [searchParams]
-  );
+  const params = useSearchParams();
   /* eslint-disable */
   const [showSubCategory, setShowSubCategory] = useState<number>(0);
   const [showCreateCategory, setShowCreateCategory] = useState<{
@@ -53,16 +40,13 @@ export default function GetCategories({
     refetch();
   }, [createCategoryData]);
   /* eslint-enable */
-
   if (data.length < 1) {
     return;
   }
-
   return data.map((cat: categoryType) => (
     <motion.div key={cat.id}>
       <div
         onClick={(e) => {
-          console.log(cat.id);
           setShowSubCategory((state) => (state === cat.id ? 0 : cat.id));
           e.stopPropagation();
         }}
@@ -79,15 +63,11 @@ export default function GetCategories({
         ) : null}
         <span
           onClick={() => {
-            // setFilter((state) => ({
-            //   ...state,
-            //   categoryId: cat.id,
-            //   parentCategories: catId,
-            // }));
-
-            router.push(
-              `products?${createQueryString("catId", String(cat.id))}`
-            );
+            setFilter((state) => ({
+              ...state,
+              categoryId: cat.id,
+              parentCategories: catId,
+            }));
           }}
           style={{ cursor: "pointer" }} // it doesn't work with taiwlind
           className={classNames(
@@ -97,6 +77,24 @@ export default function GetCategories({
         >
           {cat.title}
         </span>
+
+        <div
+          onClick={() =>
+            setShowCreateCategory((state) => ({
+              state: !state.state,
+              key: cat.id,
+            }))
+          }
+        >
+          <Plus_Svg
+            classname={classNames(
+              "w-[14px] h-auto fill-black1 ",
+              showCreateCategory.state && showCreateCategory.key == cat.id
+                ? "rotate-[45deg]"
+                : "rotate-0"
+            )}
+          />
+        </div>
       </div>
       {showCreateCategory.state && showCreateCategory.key == cat.id ? (
         <div className="flex flex-row gap-2">

@@ -2,7 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import styles from "./MyComponent.module.css";
-import { Image_Svg } from "../SVGS";
+
+import { IRANYekanXFaNum } from "@/app/fonts";
+import { Image_Svg } from "@/Components/SVGS";
 
 export type contentType = {
   type: "image" | "text" | "title" | "break";
@@ -94,60 +96,63 @@ export default function QuillEditor({ setContent }: Props) {
   };
 
   return (
-    <div className="[&_.ql-editor]:text-right [&_.ql-editor]:min-h-[360px]">
+    <div className="">
       <header className="mb-5">
         <div onClick={() => imageHandler()}>
           <Image_Svg classname="w-6 h-6 fill-lightBlack hover:fill-green1" />
         </div>
       </header>
-      <ReactQuill
-        ref={(element) => {
-          if (element != null) {
-            QuillRef.current = element;
-          }
-        }}
-        modules={{
-          toolbar: {
-            container: [
-              [{ header: "1" }, { header: "2" }, { font: [] }],
-              [{ size: [12, 15] }],
-              ["bold", "italic", "underline", "strike", "blockquote"],
-              [
-                { list: "ordered" },
-                { list: "bullet" },
-                { indent: "-1" },
-                { indent: "+1" },
+      <div className={`[&_.ql-editor]:text-right [&_.ql-editor]:min-h-[360px] [&_img]:w-3/4  [&_p]:text-lg [&_.ql-container]:font-normal`}>
+        <ReactQuill
+          ref={(element) => {
+            if (element != null) {
+              QuillRef.current = element;
+            }
+          }}
+          style={{fontFamily: "inherit"}}
+          modules={{
+            toolbar: {
+              container: [
+                [{ header: "1" }, { header: "2" }, { font: [IRANYekanXFaNum.className] }],
+                [{ size: [12, 15] }],
+                ["bold", "italic", "underline", "strike", "blockquote"],
+                [
+                  { list: "ordered" },
+                  { list: "bullet" },
+                  { indent: "-1" },
+                  { indent: "+1" },
+                ],
+                ["link", "image", "video"],
+                ["code-block"],
+                ["clean"],
               ],
-              ["link", "image", "video"],
-              ["code-block"],
-              ["clean"],
-            ],
-          },
-          clipboard: {
-            matchVisual: false,
-          },
-        }}
-        formats={[
-          "header",
-          "font",
-          "size",
-          "bold",
-          "italic",
-          "underline",
-          "strike",
-          "blockquote",
-          "list",
-          "bullet",
-          "indent",
-          "link",
-          "image",
-          "video",
-          "code-block",
-        ]}
-        theme="snow"
-        value={value}
-        onChange={setValue}
-      />
+            },
+            clipboard: {
+              matchVisual: false,
+            },
+          }}
+          formats={[
+            "header",
+            "font",
+            "size",
+            "bold",
+            "italic",
+            "underline",
+            "strike",
+            "blockquote",
+            "list",
+            "bullet",
+            "indent",
+            "link",
+            "image",
+            "video",
+            "code-block",
+          ]}
+          theme="snow"
+          value={value}
+          onChange={setValue}
+        />
+      </div>
     </div>
   );
 }
