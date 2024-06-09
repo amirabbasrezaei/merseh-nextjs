@@ -182,13 +182,14 @@ export default function Add_Address({ setShowAddAddress }: Props) {
           isLoading={isPendingAddAddress}
           text="ثبت آدرس"
           type="submit"
-          className="h-[43px] w-full bg-green1 text-white"
+          className=" w-full bg-green1 text-white"
         />
         <Button
           onClick={() => setShowAddAddress(false)}
           text="بستن"
           type="button"
-          className="h-[43px] w-full bg-[#f1f1f1] text-[#323232] "
+          className=" w-full bg-[#f1f1f1]  "
+          style={{color:"#323232"}}
         />
       </div>
     </form>

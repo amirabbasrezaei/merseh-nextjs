@@ -9,6 +9,7 @@ interface Props {
   type?: "submit" | "reset" | "button" | undefined;
   isLoading?: boolean;
   isDisabled?: boolean;
+  style?: React.CSSProperties | undefined;
 }
 
 export default function Button({
@@ -18,11 +19,12 @@ export default function Button({
   type,
   isLoading,
   isDisabled,
+  style,
 }: Props) {
   const classes = `
-   cursor-pointer sm:h-[43px] h-[50px] rounded-[8px]  flex justify-center items-center ${
-    className ?? " w-full bg-green1 text-white"
-  }`;
+   cursor-pointer bg-green1 text-white sm:h-[43px] h-[50px] rounded-[8px]  flex justify-center items-center ${
+     className ?? " w-full "
+   }`;
   return (
     <>
       {!isLoading && !isDisabled ? (
@@ -31,6 +33,7 @@ export default function Button({
           type={type}
           onClick={onClick}
           className={classes}
+          style={{ ...style }}
         >
           <span>{text}</span>
         </button>
