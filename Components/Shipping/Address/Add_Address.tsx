@@ -188,8 +188,8 @@ export default function Add_Address({ setShowAddAddress }: Props) {
           onClick={() => setShowAddAddress(false)}
           text="بستن"
           type="button"
-          className=" w-full bg-[#f1f1f1]  "
-          style={{color:"#323232"}}
+          className=" w-full   "
+          style={{color:"#323232", backgroundColor: "#f1f1f1"}}
         />
       </div>
     </form>
