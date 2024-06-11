@@ -11,7 +11,7 @@ export default function Footer() {
         <div className="flex flex-row gap-2">
           <span className="text-[14px] ">تلفن پشتیبانی:</span>
           <span className="text-[14px]">
-            <a href="tel:+4733378901">021-26856389</a>
+            <a href="tel:+4733378901">021-91694827</a>
           </span>
         </div>
         <p className="text-[14px]">

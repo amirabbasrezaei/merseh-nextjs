@@ -9,7 +9,7 @@ import Footer from "../Footer";
 
 export default function Home() {
   return (
-    <div className="flex flex-col gap-10 sm:gap-16">
+    <div className="flex flex-col gap-10 ">
       <Slider />
       <Main_Categories />
       <ProductCarousel

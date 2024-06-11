@@ -1,11 +1,5 @@
 import React from "react";
 import Image from "next/image";
-import oil from "@/public/Images/oilCat.png";
-import peanut_butter from "@/public/Images/peanut-butter.png";
-import dried_parsley from "@/public/Images/dried_parsley.png";
-import roseWater from "@/public/Images/roseWater.png";
-import arde from "@/public/Images/arde.png";
-import tea from "@/public/Images/tea.png";
 import Link from "next/link";
 import { trpc } from "@/utils/trpc";
 export default function Main_Categories() {
@@ -13,7 +7,9 @@ export default function Main_Categories() {
   return (
     <section className="flex flex-col w-full gap-5">
       <div className="flex flex-row justify-between max-w-full">
-        <h3 className="text-[18px] font-[500] text-black1 ">دسته‌بندی</h3>
+        <h3 className="text-[18px] visible sm:hidden font-[500] text-black1 ">
+          دسته‌بندی
+        </h3>
         <Link href={"/mcategory"}>
           <span className="text-green1 block sm:hidden">سایر دسته‌بندی‌ها</span>
         </Link>
