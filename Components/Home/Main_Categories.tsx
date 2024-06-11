@@ -25,7 +25,7 @@ export default function Main_Categories() {
                 className="flex w-full h-full flex-col items-center  max-w-none gap-3"
               >
                 <Image
-                  className="sm:w-[160px] h-auto w-[120px]  max-w-none rounded-[10px] sm:rounded-[50px]"
+                  className="sm:w-[160px] sm:h-[160px]  w-[120px]  h-[120px] max-w-none rounded-[10px] sm:rounded-[50px]"
                   src={category.imageUrl}
                   alt={category.imageUrl.split("/").at(-1) || ""}
                   quality={100}
