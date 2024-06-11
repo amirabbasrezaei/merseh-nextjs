@@ -12,12 +12,17 @@ export type ArgsStructure<T = null> = T extends null
 
 export async function categoriesController({ ctx }: ArgsStructure) {
   const { prisma } = ctx;
-  const categories = await prisma.category.findMany();
+  let categories = await prisma.category.findMany();
+  categories = categories.map((e) => ({
+    ...e,
+    imageUrl: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/category/${e.imageName}`,
+  }));
 
   interface categoryRawType {
     id: number;
     title: string;
     parentCategoryId: number | null;
+    imageUrl: string;
   }
 
   interface categoryFinalType extends categoryRawType {
@@ -93,8 +98,6 @@ export async function categoriesController({ ctx }: ArgsStructure) {
 
   return perpareCategories(categories as unknown as categoryFinalType[]);
 }
-
-
 
 export const createCategorySchema = z.object({
   title: z.string(),
