@@ -43,6 +43,7 @@
     "react-dom": "^18",
     "react-draft-wysiwyg": "^1.15.0",
     "react-hook-form": "^7.51.4",
+    "react-hot-toast": "^2.4.1",
     "react-loading-skeleton": "^3.4.0",
     "react-map-gl": "^7.1.7",
     "react-quill": "^2.0.0",

@@ -6,6 +6,7 @@ import { Chevron_Down_sharp_light } from "../SVGS";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 import splitNumber from "../utils/splitNumber";
+import ProductCard from "../Product/ProductCard";
 interface props {
   title: string;
   sliderStartDelay: number;
@@ -64,12 +65,13 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
     };
     func();
   }, []);
-  const { data: productCarouselData } = trpc.product.productCarousel.useQuery();
+  const { data: productCarouselData, isLoading } =
+    trpc.product.productCarousel.useQuery();
 
   return (
     <section className="w-full  flex flex-col items-center gap-5 ">
       <span className="text-[25px] text-black1 font-normal">{title}</span>
-      <div className="flex flex-row  h-[274px] w-full">
+      <div className="flex flex-row justify-center items-center h-full w-full">
         <div className="basis-1/12 h-full w-12 hidden sm:flex justify-center items-center ">
           <Chevron_Down_sharp_light classname="rotate-[-90deg] w-6 fill-[#CCCCCC]" />
         </div>
@@ -80,32 +82,13 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
         >
           {productCarouselData?.products.length
             ? productCarouselData.products.map((product, index) => (
-                <Link
-                  key={index}
-                  href={`/product/${product.id}`}
-                  className=" w-fit overflow-visible!  h-full flex justify-center"
-                >
-                  <div className="border w-[180px] flex flex-col items-center justify-evenly relative   h-full border-[#EDEDED] rounded-[12px]">
-                    <Image
-                      className=" w-[130px] h-[170px]  "
-                      style={{ objectFit: "contain" }}
-                      src={`${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${product.imageNames[0]}`}
-                      alt={product.name}
-                      width={130}
-                      height={130}
-                    />
-                    <span className="font-[400]  text-[17px] text-black1">
-                      {product.name}
-                    </span>
-                    <span className="font-normal  text-[16px] text-green1 text-center flex justify-center items-center gap-1">
-                      {splitNumber(product.price)}
-                      <span className="text-[13px] text-lightBlack">
-                        {" "}
-                        تومان
-                      </span>
-                    </span>
-                  </div>
-                </Link>
+                <ProductCard
+                  price={product.price}
+                  imageNames={product.imageNames}
+                  isLoading={isLoading}
+                  title={product.name}
+                  pathname={`/product/${product.id}`}
+                />
               ))
             : null}
         </div>
