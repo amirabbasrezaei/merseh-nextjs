@@ -154,68 +154,90 @@ export default function Product({ productId }: Props) {
           <div className="h-full w-full sm:basis-4/12 ">
             {productData?.product ? (
               <ProductImages imageUrls={productData.product.imageUrls} />
-            ) : null}
+            ) : (
+              <div className="sm:w-[400px] w-full h-[400px] bg-gray-100 animate-pulse rounded-[8px]"></div>
+            )}
           </div>
 
           <div className="h-full  w-full sm:basis-5/12 p-4 flex flex-col gap-10">
-            <h3 className="text-[26px] text-black1">
-              {productData?.product?.name}
-            </h3>
+            {productData?.product ? (
+              <h3 className="text-[26px] text-black1">
+                {productData?.product?.name}
+              </h3>
+            ) : (
+              <div className="w-[200px] h-[30px] bg-gray-100 animate-pulse rounded-[4px]"></div>
+            )}
 
-            {productData?.product?.variations.map((variation) => (
-              <div
-                key={variation.id}
-                className="flex flex-row items-center gap-2"
-              >
-                <span className="ml-4 text-[18px] text-[#252525]">
-                  {variation.variationName}
-                </span>
-                <div className="flex flex-col gap-5">
-                  <div className="flex items-center gap-4">
-                    {variation.variations.map(
-                      (variationType, variationTypeIndex) => (
-                        <div
-                          key={variationType.id}
-                          className="flex items-center gap-2"
-                        >
-                          <div className="w-[21px]  h-[21px] flex items-center justify-center border-2 border-[#DFDFDF] rounded-full">
-                            <input
-                              checked={
-                                selectedProductVariation?.variationId ===
-                                  variation.id &&
-                                selectedProductVariation.variationValueid ===
-                                  variationType.id
-                              }
-                              onChange={(e) =>
-                                e.target.checked &&
-                                setSelectedProductVariation({
-                                  price: variationType.price,
-                                  variationId: variation.id,
-                                  variationValueid: variationType.id,
-                                })
-                              }
-                              className={classNames(
-                                "appearance-none text-center center w-[15px]  h-[15px] rounded-full",
-                                selectedProductVariation?.variationId ===
-                                  variation.id &&
+            {!isLoading && productData?.product ? (
+              productData?.product?.variations.map((variation) => (
+                <div
+                  key={variation.id}
+                  className="flex flex-row items-center gap-2"
+                >
+                  <span className="ml-4 text-[18px] text-[#252525]">
+                    {variation.variationName}
+                  </span>
+                  <div className="flex flex-col gap-5">
+                    <div className="flex items-center gap-4">
+                      {variation.variations.map(
+                        (variationType, variationTypeIndex) => (
+                          <div
+                            key={variationType.id}
+                            className="flex items-center gap-2"
+                          >
+                            <div className="w-[21px]  h-[21px] flex items-center justify-center border-2 border-[#DFDFDF] rounded-full">
+                              <input
+                                checked={
+                                  selectedProductVariation?.variationId ===
+                                    variation.id &&
                                   selectedProductVariation.variationValueid ===
                                     variationType.id
-                                  ? "checked:bg-green1"
-                                  : ""
-                              )}
-                              type="radio"
-                            />
+                                }
+                                onChange={(e) =>
+                                  e.target.checked &&
+                                  setSelectedProductVariation({
+                                    price: variationType.price,
+                                    variationId: variation.id,
+                                    variationValueid: variationType.id,
+                                  })
+                                }
+                                className={classNames(
+                                  "appearance-none text-center center w-[15px]  h-[15px] rounded-full",
+                                  selectedProductVariation?.variationId ===
+                                    variation.id &&
+                                    selectedProductVariation.variationValueid ===
+                                      variationType.id
+                                    ? "checked:bg-green1"
+                                    : ""
+                                )}
+                                type="radio"
+                              />
+                            </div>
+                            <span className="text-[14px] text-[#535353]">
+                              {variationType.name}
+                            </span>
                           </div>
-                          <span className="text-[14px] text-[#535353]">
-                            {variationType.name}
-                          </span>
-                        </div>
-                      )
-                    )}
+                        )
+                      )}
+                    </div>
                   </div>
                 </div>
+              ))
+            ) : (
+              <div className="flex flex-row gap-5">
+                <div className="flex flex-row gap-2 items-center">
+                  <div className="w-[70px] h-6 bg-gray-100 animate-pulse rounded-[4px]"></div>
+                </div>
+                <div className="flex flex-row gap-2 items-center">
+                  <div className="w-6 h-6 rounded-full bg-gray-100 animate-pulse"></div>
+                  <div className="w-[60px] h-6 bg-gray-100 animate-pulse rounded-[4px]"></div>
+                </div>
+                <div className="flex flex-row gap-2 items-center">
+                  <div className="w-6 h-6 rounded-full bg-gray-100 animate-pulse"></div>
+                  <div className="w-[60px] h-6 bg-gray-100 animate-pulse rounded-[4px]"></div>
+                </div>
               </div>
-            ))}
+            )}
           </div>
           <div className="h-full flex flex-col items-center gap-4 justify-center w-full sm:basis-3/12 ">
             <div className="w-full py-6 gap-5 border border-[#EAEAEA] rounded-[8px] flex flex-col items-center justify-center ">
@@ -237,6 +259,7 @@ export default function Product({ productId }: Props) {
             <Button
               text="افزودن به سبد خرید"
               className="w-full"
+              isLoading={isLoading}
               onClick={() =>
                 updateShoppingCart(
                   selectedProductVariation?.price
@@ -255,40 +278,52 @@ export default function Product({ productId }: Props) {
           <h3 className="text-[22px] font-[500] text-lightBlack">
             معرفی محصول
           </h3>
-          {productData?.product?.content.map((p, index) => {
-            if (p.type === "text") {
-              return (
-                <p key={index} className="font-[300] text-[#4a4a4a] leading-9">
-                  {p.content as string}
-                </p>
-              );
-            }
-            if (p.type === "title") {
-              return (
-                <h3
-                  key={index}
-                  className="font-[500] text-[#5a5a5a] text-[18px] mb-[-10px]"
-                >
-                  {p.content as string}
-                </h3>
-              );
-            }
-            if (p.type === "image") {
-              return (
-                <img
-                  key={index}
-                  // @ts-ignore
-                  src={p.content.src as string}
-                  // @ts-ignore
-                  alt={p.content.name}
-                  className="w-full h-auto"
-                />
-              );
-            }
-            if (p.type === "break") {
-              return <br />;
-            }
-          })}
+          {!isLoading && productData?.product
+            ? productData?.product?.content.map((p, index) => {
+                if (p.type === "text") {
+                  return (
+                    <p
+                      key={index}
+                      className="font-[300] text-[#4a4a4a] leading-9"
+                    >
+                      {p.content as string}
+                    </p>
+                  );
+                }
+                if (p.type === "title") {
+                  return (
+                    <h3
+                      key={index}
+                      className="font-[500] text-[#5a5a5a] text-[18px] mb-[-10px]"
+                    >
+                      {p.content as string}
+                    </h3>
+                  );
+                }
+                if (p.type === "image") {
+                  return (
+                    <img
+                      key={index}
+                      // @ts-ignore
+                      src={p.content.src as string}
+                      // @ts-ignore
+                      alt={p.content.name}
+                      className="w-full h-auto"
+                    />
+                  );
+                }
+                if (p.type === "break") {
+                  return <br />;
+                }
+              })
+            : Array.from(Array(2)).map((_, i) => (
+                <div className="flex flex-col gap-3 my-5" key={i}>
+                  <div className="bg-gray-100 w-[150px] h-[26px] rounded-[7px]"></div>
+                  <div className="bg-gray-100 w-full h-[20px] rounded-[4px]"></div>
+                  <div className="bg-gray-100 w-full h-[20px] rounded-[4px]"></div>
+                  <div className="bg-gray-100 w-full h-[20px] rounded-[4px]"></div>
+                </div>
+              ))}
         </div>
 
         <div className="w-full flex flex-col gap-5">

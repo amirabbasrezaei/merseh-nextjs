@@ -357,3 +357,37 @@ export async function getActiveOrderController({ ctx }: ArgsStructure) {
     };
   }
 }
+
+export async function ordersController({ ctx }: ArgsStructure) {
+  const { prisma, user } = ctx;
+  try {
+    const orders = await prisma.order.findMany({
+      where: {
+        userId: user.userId,
+      },
+      include: {
+        ProductForOrder: {
+          select: {
+            Product: true,
+            numberOfproduct: true,
+            ProductVariationValue: true,
+          },
+        },
+      },
+    });
+    const ordersWithImageUrl = orders.map((order) => ({
+      ...order,
+      ProductForOrder: order.ProductForOrder.map((prForOrder) => ({
+        ...prForOrder,
+        Product: {
+          ...prForOrder.Product,
+          imageUrl: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${prForOrder.Product.imageNames[0]}`,
+        },
+      })),
+    }));
+
+    return { orders: ordersWithImageUrl, error: null };
+  } catch (error) {
+    return { orders: [], error: "error fiding user orders" };
+  }
+}

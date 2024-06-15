@@ -3,13 +3,10 @@ import Layout from "@/Components/Layout/Layout";
 
 import React from "react";
 
-export default function page(props:any) {
-
+export default function page(props: any) {
   return (
-    <Layout>
+    <Layout footer={false}>
       <Checkout />
     </Layout>
   );
 }
-
-

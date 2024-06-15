@@ -83,13 +83,6 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
         >
           {productCarouselData?.products.length
             ? productCarouselData.products.map((product, index) => (
-                // <ProductCard
-                //   price={product.price}
-                //   imageNames={product.imageNames}
-                //   isLoading={isLoading}
-                //   title={product.name}
-                //   pathname={`/product/${product.id}`}
-                // />
                 <motion.div
                   transition={{ duration: 0.3 }}
                   initial={{ opacity: 0 }}

@@ -1,6 +1,7 @@
 import {
   activeOrderInputSchema,
   getActiveOrderController,
+  ordersController,
   updateActiveOrderController,
 } from "../Controllers/order.controller";
 import { router, userProtectedProcedure } from "../trpc";
@@ -10,4 +11,5 @@ export const orderRouter = router({
     .input(activeOrderInputSchema)
     .mutation(updateActiveOrderController),
   getActiveOrder: userProtectedProcedure.query(getActiveOrderController),
+  orders: userProtectedProcedure.query(ordersController),
 });

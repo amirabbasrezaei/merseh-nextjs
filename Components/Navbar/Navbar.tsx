@@ -16,6 +16,8 @@ import { shopingCartStateAtom } from "../Cart/HeaderShoppingCart";
 export default function Navbar() {
   const path = usePathname();
 
+  console.log(path.split("/"));
+
   const [shoppngCart] = useRecoilState(shopingCartStateAtom);
   return (
     <div
@@ -101,12 +103,16 @@ export default function Navbar() {
         <Profile_Svg
           classname={classNames(
             "h-[26px] w-auto ",
-            path === "/profile" ? "stroke-green1" : "stroke-[#363636]"
+            path.split("/")[1] === "profile"
+              ? "stroke-green1"
+              : "stroke-[#363636]"
           )}
         />
         <span
           className={classNames(
-            path === "/profile" ? " text-green1" : " text-[#363636]",
+            path.split("/")[1] === "profile"
+              ? " text-green1"
+              : " text-[#363636]",
             "text-[10px]"
           )}
         >

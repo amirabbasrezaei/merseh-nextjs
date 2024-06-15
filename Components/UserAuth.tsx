@@ -7,6 +7,7 @@ import { Login_icon, Profile_Svg } from "./SVGS";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import Auth from "./Auth/Auth";
+import { useRouter } from "next/navigation";
 
 type UserInfo = {
   name: string;
@@ -19,17 +20,55 @@ export const userInfoStoreAtom = atom<UserInfo>({
   default: null,
 });
 
+const animation = {
+  open: {
+    height: 120,
+    transition: {
+      type: "spring",
+      bounce: 0,
+      duration: 0.3,
+      delayChildren: 0.2,
+      staggerChildren: 0.05,
+    },
+    zIndex: 20,
+  },
+  hidden: {
+    height: 15,
+    type: "spring",
+    bounce: 0,
+    duration: 0.3,
+    zIndex: 0,
+  },
+};
+
+const ItemsAnimation = {
+  open: {
+    opacity: 1,
+    y: 0,
+    visibility: "visible",
+    transition: { type: "spring", stiffness: 300, damping: 24 },
+  },
+  hidden: {
+    opacity: 0,
+    y: 20,
+    transition: { duration: 0.2 },
+    visibility: "hidden",
+  },
+};
+
 export default function UserAuth() {
   const [userInfo, setUserInfo] = useRecoilState(userInfoStoreAtom);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const router = useRouter();
+  const { data, isLoading, error } = trpc.user.userInfo.useQuery(undefined, {
+    retry: false,
+    networkMode: "online",
+    gcTime: 0,
+  });
 
-  const { data,  isLoading } = trpc.user.userInfo.useQuery(
-    undefined,
-    {
-      retry: false,
-      networkMode: "online",
-      gcTime: 0,
-    }
-  );
+  const { user } = trpc.useUtils();
+  const { mutate: mutateLogout, data: logoutData } =
+    trpc.user.logout.useMutation();
   const [themeStore, setThemeStore] = useRecoilState(themeRecoilStateAtom);
 
   useEffect(() => {
@@ -42,8 +81,17 @@ export default function UserAuth() {
     }
   }, [data]);
 
+  useEffect(() => {
+    if (logoutData?.isUserLoggedout) {
+      (async () => {
+        await user.userInfo.invalidate();
+        await user.userInfo.refetch();
+      })();
+    }
+  }, [logoutData]);
+
   return (
-    <div className="hidden sm:flex">
+    <div className="hidden sm:flex relative">
       {isLoading ? (
         <div className="w-[130px] h-7 text-[#e9e9e9]">
           <Skeleton
@@ -55,12 +103,39 @@ export default function UserAuth() {
             className="h-full "
           />
         </div>
-      ) : data?.isVerified ? (
-        <div className="flex cursor-pointer hover:bg-hover1 px-4 py-2 rounded-[10px] flex-row items-center gap-2 w-fit justify-center">
-          <Profile_Svg classname="w-[24px] h-auto stroke-[#303030]" />
-          <span className="text-[#303030] font-[400] text-[13px]">{`${
-            data?.name
-          } ${data?.familyName ?? ""}`}</span>
+      ) : data?.isVerified && !error?.data ? (
+        <div className="w-[100px] h-[36px] relative flex justify-center items-center">
+          <motion.div
+            initial={false}
+            onMouseEnter={() => setShowUserMenu(true)}
+            onMouseLeave={() => setShowUserMenu(false)}
+            variants={animation}
+            animate={showUserMenu ? "open" : "hidden"}
+            className="flex absolute bg-white flex-col cursor-pointer top-0  origin-top hover:border border-gray-100 px-4 py-2 rounded-[10px]  items-center gap-3 w-fit "
+          >
+            <motion.div className="flex flex-row items-center gap-1">
+              <Profile_Svg classname="w-[24px] h-auto stroke-[#303030]" />
+              <span className="text-[#303030] font-[400] text-[13px]">{`${
+                data?.name
+              } ${data?.familyName ?? ""}`}</span>
+            </motion.div>
+            <motion.div
+              variants={ItemsAnimation}
+              onClick={() => router.push("/profile/orders")}
+              className="  w-fit gap-5  h-fit flex flex-col"
+            >
+              <motion.span className="text-[14px]">سفارش‌ها</motion.span>
+            </motion.div>
+            <motion.div
+              variants={ItemsAnimation}
+              className="  w-fit gap-5  h-fit flex flex-col"
+              onClick={() => mutateLogout()}
+            >
+              <motion.span className="text-[14px] text-nowrap">
+                خروج از حساب
+              </motion.span>
+            </motion.div>
+          </motion.div>
         </div>
       ) : (
         <>
