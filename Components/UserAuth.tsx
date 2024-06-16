@@ -8,6 +8,7 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import Auth from "./Auth/Auth";
 import { useRouter } from "next/navigation";
+import classNames from "classnames";
 
 type UserInfo = {
   name: string;
@@ -30,14 +31,12 @@ const animation = {
       delayChildren: 0.2,
       staggerChildren: 0.05,
     },
-    zIndex: 20,
   },
   hidden: {
     height: 15,
     type: "spring",
     bounce: 0,
     duration: 0.3,
-    zIndex: 0,
   },
 };
 
@@ -45,14 +44,13 @@ const ItemsAnimation = {
   open: {
     opacity: 1,
     y: 0,
-    visibility: "visible",
+
     transition: { type: "spring", stiffness: 300, damping: 24 },
   },
   hidden: {
     opacity: 0,
     y: 20,
     transition: { duration: 0.2 },
-    visibility: "hidden",
   },
 };
 
@@ -111,7 +109,10 @@ export default function UserAuth() {
             onMouseLeave={() => setShowUserMenu(false)}
             variants={animation}
             animate={showUserMenu ? "open" : "hidden"}
-            className="flex absolute bg-white flex-col cursor-pointer top-0  origin-top hover:border border-gray-100 px-4 py-2 rounded-[10px]  items-center gap-3 w-fit "
+            className={classNames(
+              "flex absolute bg-white  flex-col cursor-pointer top-0  origin-top hover:border border-gray-100 px-4 py-2 rounded-[10px]  items-center gap-3 w-fit ",
+              showUserMenu ? "z-10" : "z-0"
+            )}
           >
             <motion.div className="flex flex-row items-center gap-1">
               <Profile_Svg classname="w-[24px] h-auto stroke-[#303030]" />
@@ -122,13 +123,19 @@ export default function UserAuth() {
             <motion.div
               variants={ItemsAnimation}
               onClick={() => router.push("/profile/orders")}
-              className="  w-fit gap-5  h-fit flex flex-col"
+              className={classNames(
+                " w-fit  gap-5  h-fit flex flex-col",
+                showUserMenu ? "visible" : "hidden"
+              )}
             >
               <motion.span className="text-[14px]">سفارش‌ها</motion.span>
             </motion.div>
             <motion.div
               variants={ItemsAnimation}
-              className="  w-fit gap-5  h-fit flex flex-col"
+              className={classNames(
+                " w-fit  gap-5  h-fit flex flex-col",
+                showUserMenu ? "visible" : "hidden"
+              )}
               onClick={() => mutateLogout()}
             >
               <motion.span className="text-[14px] text-nowrap">
