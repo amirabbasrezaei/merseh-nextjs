@@ -22,7 +22,7 @@ export default function Map({ setCoordinate, coordinate }: Props) {
   });
 
   return (
-    <div className="w-full h-full relative rounded-lg [&_canvas]:rounded-lg">
+    <div className="w-full h-full  rounded-lg [&_canvas]:rounded-lg">
       <MapView
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_PUBLIC_TOKEN}
         {...viewState}

@@ -373,10 +373,26 @@ export async function ordersController({ ctx }: ArgsStructure) {
             ProductVariationValue: true,
           },
         },
+        Address: {
+          select: {
+            addressDetails: true,
+            city: true,
+            title: true,
+            Province: true,
+            reciverName: true,
+            reciverFamilyName: true,
+            reciverPhoneNumber: true,
+            postalCode: true,
+          },
+        },
       },
     });
     const ordersWithImageUrl = orders.map((order) => ({
       ...order,
+      Address: {
+        ...order.Address,
+        postalCode: order.Address?.postalCode?.toString(),
+      },
       ProductForOrder: order.ProductForOrder.map((prForOrder) => ({
         ...prForOrder,
         Product: {

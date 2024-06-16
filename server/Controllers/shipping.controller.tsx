@@ -130,7 +130,7 @@ export const AddAddressInputSchema = z.object({
     name: z.string().optional(),
     familyName: z.string().optional(),
   }),
-  phoneNumber: z.string(),
+  phoneNumber: z.string().optional(),
   provinceId: z.number(),
   cityId: z.number(),
   detailedAddress: z.string(),
@@ -145,7 +145,11 @@ export async function addAddressController({
 }: ArgsStructure<AddAddressInput>) {
   const { prisma, user } = ctx;
   try {
-    if (!input?.reciverInfo?.familyName || !input?.reciverInfo?.name) {
+    if (
+      !input?.reciverInfo?.familyName ||
+      !input?.reciverInfo?.name ||
+      !input.phoneNumber
+    ) {
       const userInfo = await prisma.user.findUnique({
         where: {
           id: user.userId,
@@ -163,7 +167,7 @@ export async function addAddressController({
             longitude: input.coordinate.longitude,
             reciverFamilyName: userInfo?.familyName || "",
             reciverName: userInfo.name,
-            reciverPhoneNumber: input.phoneNumber,
+            reciverPhoneNumber: userInfo.phoneNumber,
             postalCode: BigInt(input.postalCode),
           },
         });

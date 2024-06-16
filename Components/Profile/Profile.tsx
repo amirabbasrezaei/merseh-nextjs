@@ -11,24 +11,25 @@ export default function Profile() {
   const router = useRouter();
   const [] = useState();
   return (
-    <section className="w-full flex flex-col sm:flex-row px-6 h-full gap-6">
+    <section className="w-full flex flex-col  sm:flex-row sm:px-5 h-full gap-6">
       <div className="sm:basis-1/6 gap-5 grid grid-cols-2 sm:flex flex-col items-center   h-[100px]">
         <div
           onClick={() => router.push("/profile")}
           className={classNames(
-            "h-[30px] w-full cursor-pointer flex flex-row items-center justify-center gap-1 py-7 rounded-[10px]",
+            "h-[30px] w-full cursor-pointer flex flex-row items-center justify-start pr-5 gap-1 py-7 rounded-[10px]",
             path === "/profile" ? "bg-gray-50" : "bg-white"
           )}
         >
           <User_Svg
             classname={classNames(
               " w-8 h-auto",
-              path === "/profile" ? "fill-green1" : "fill-black1"
+              path === "/profile" ? "fill-green1" : "fill-lightBlack"
             )}
           />
           <span
             className={classNames(
-              path === "/profile" ? "text-black1" : "text-lightBlack"
+              path === "/profile" ? "text-black1" : "text-lightBlack",
+              "font-[500]"
             )}
           >
             اطلاعات حساب
@@ -37,7 +38,7 @@ export default function Profile() {
         <div
           onClick={() => router.push("/profile/orders")}
           className={classNames(
-            "h-[30px] cursor-pointer w-full flex flex-row items-center justify-center gap-1 py-7 rounded-[10px]",
+            "h-[30px] cursor-pointer w-full flex flex-row items-center justify-start pr-5 gap-1 py-7 rounded-[10px]",
             path === "/profile/orders" ? "bg-gray-50" : "bg-white"
           )}
         >
@@ -49,7 +50,8 @@ export default function Profile() {
           />
           <span
             className={classNames(
-              path === "/profile/orders" ? "text-black1" : "text-lightBlack"
+              path === "/profile/orders" ? "text-black1" : "text-lightBlack",
+              "font-[500]"
             )}
           >
             سفارش ها

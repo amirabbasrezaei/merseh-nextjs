@@ -79,9 +79,10 @@ export default function Addresses({
         <Plus_Svg classname="w-4 h-auto fill-green2" />
       </div>
 
-      <Modal showPortal={showAddAddress}>
-        <Add_Address setShowAddAddress={setShowAddAddress} />
-      </Modal>
+      <Add_Address
+        showAddAddress={showAddAddress}
+        setShowAddAddress={setShowAddAddress}
+      />
     </div>
   );
 }

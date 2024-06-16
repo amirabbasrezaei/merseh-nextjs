@@ -23,7 +23,7 @@ export const userInfoStoreAtom = atom<UserInfo>({
 
 const animation = {
   open: {
-    height: 120,
+    height: 155,
     transition: {
       type: "spring",
       bounce: 0,
@@ -110,13 +110,16 @@ export default function UserAuth() {
             variants={animation}
             animate={showUserMenu ? "open" : "hidden"}
             className={classNames(
-              "flex absolute bg-white  flex-col cursor-pointer top-0  origin-top hover:border border-gray-100 px-4 py-2 rounded-[10px]  items-center gap-3 w-fit ",
+              "flex absolute bg-white  flex-col cursor-pointer top-[-10px]  origin-top hover:border border-gray-100 px-2 py-2 rounded-[10px]  items-center gap-3 w-fit ",
               showUserMenu ? "z-10" : "z-0"
             )}
           >
-            <motion.div className="flex flex-row items-center gap-1">
+            <motion.div
+              onClick={() => router.push("/profile")}
+              className="flex flex-row items-center gap-1 w-full justify-center py-2 px-3 rounded-[8px] hover:bg-gray-50"
+            >
               <Profile_Svg classname="w-[24px] h-auto stroke-[#303030]" />
-              <span className="text-[#303030] font-[400] text-[13px]">{`${
+              <span className="text-[#303030] font-[400] text-[13px] w-fit">{`${
                 data?.name
               } ${data?.familyName ?? ""}`}</span>
             </motion.div>
@@ -124,16 +127,16 @@ export default function UserAuth() {
               variants={ItemsAnimation}
               onClick={() => router.push("/profile/orders")}
               className={classNames(
-                " w-fit  gap-5  h-fit flex flex-col",
+                "   gap-5  h-fit flex flex-col w-full items-center justify-center py-2 px-3 rounded-[8px] hover:bg-gray-50",
                 showUserMenu ? "visible" : "hidden"
               )}
             >
-              <motion.span className="text-[14px]">سفارش‌ها</motion.span>
+              <motion.span className="text-[14px] w-fit">سفارش‌ها</motion.span>
             </motion.div>
             <motion.div
               variants={ItemsAnimation}
               className={classNames(
-                " w-fit  gap-5  h-fit flex flex-col",
+                " w-full justify-center items-center py-2 px-3 rounded-[8px] hover:bg-gray-50  gap-5  h-fit flex flex-col",
                 showUserMenu ? "visible" : "hidden"
               )}
               onClick={() => mutateLogout()}

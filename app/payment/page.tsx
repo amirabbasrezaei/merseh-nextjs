@@ -40,7 +40,7 @@ export default function Payment({}: Props) {
   useEffect(() => {
     console.log(data);
     if (data?.paymentStatus === "PAYED") {
-      localStorage.setItem("shopCart", "");
+      localStorage.removeItem("shopCart");
     }
   }, [data]);
 
