@@ -19,6 +19,7 @@ import {
 
 // Import Swiper styles
 import "swiper/css";
+import useWindowSize from "../useWindowSize";
 
 interface props {
   title: string;
@@ -53,7 +54,7 @@ export function SlideNextButton() {
         onClick={() => {
           swiper.slideNext();
         }}
-        className="w-10 h-10 cursor-pointer flex items-center justify-center bg-gray-50 rounded-full "
+        className="w-10 h-10 cursor-pointer flex items-center justify-center bg-white border border-[#dfdfdf] rounded-full "
       >
         <Chevron_Down_sharp_light classname="rotate-[90deg] w-6 fill-[#CCCCCC]" />
       </div>
@@ -68,9 +69,9 @@ export function SlidePrevButton() {
     <div className=" absolute z-20 top-0 right-0  h-full  w-12 hidden sm:flex justify-center items-center ">
       <div
         onClick={() => swiper.slidePrev()}
-        className="w-10 cursor-pointer h-10 flex items-center justify-center bg-gray-50 rounded-full "
+        className="w-10 cursor-pointer h-10 flex items-center justify-center bg-white border border-[#dfdfdf] rounded-full "
       >
-        <Chevron_Down_sharp_light classname="rotate-[-90deg] w-6 fill-[#CCCCCC]" />
+        <Chevron_Down_sharp_light classname="rotate-[-90deg] w-6 fill-[#b8b8b8]" />
       </div>
     </div>
   );
@@ -78,7 +79,7 @@ export function SlidePrevButton() {
 
 export default function ProductCarousel({ title, sliderStartDelay }: props) {
   const [swiperRef, setSwiperRef] = useState();
-
+  const { width } = useWindowSize();
   const { data: productCarouselData, isLoading } =
     trpc.product.productCarousel.useQuery();
 
@@ -88,7 +89,7 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
       <Swiper
         onSwiper={swiperRef}
         spaceBetween={50}
-        slidesPerView={5}
+        slidesPerView={width > 639 ? 5 : 2}
         direction="horizontal"
         className="w-full h-full "
         autoplay={{ delay: 5000, disableOnInteraction: false }}
