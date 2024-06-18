@@ -185,7 +185,7 @@ export default function Product({ productId }: Props) {
                             key={variationType.id}
                             className="flex items-center gap-2"
                           >
-                            <div className="w-[21px]  h-[21px] flex items-center justify-center border-2 border-[#DFDFDF] rounded-full">
+                            <div className="w-[21px] cursor-pointer h-[21px] flex items-center justify-center border-2 border-[#DFDFDF] rounded-full">
                               <input
                                 checked={
                                   selectedProductVariation?.variationId ===
