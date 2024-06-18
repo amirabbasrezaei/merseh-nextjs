@@ -141,7 +141,7 @@ export default function Product({ productId }: Props) {
           </motion.div>
         ) : null,
       {
-        position: width > 640 ? "bottom-left" : "top-center",
+        position: width > 640 ? "top-left" : "top-center",
         duration: 6000,
       }
     );
@@ -221,7 +221,7 @@ export default function Product({ productId }: Props) {
                                   variationValueid: variationType.id,
                                 })
                               }
-                              className="text-[14px] text-[#535353]"
+                              className="text-[14px] cursor-pointer text-[#535353]"
                             >
                               {variationType.name}
                             </span>
