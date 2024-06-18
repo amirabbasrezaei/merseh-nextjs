@@ -5,7 +5,7 @@ import fs from "fs";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import path, { dirname } from "path";
 import { ArgsStructure } from "./category.controller";
-
+import {rimraf} from "rimraf";
 const ACCESSKEY = process.env.LIARA_ACCESS_KEY;
 const SECRETKEY = process.env.LIARA_SECRET_KEY;
 const ENDPOINT = process.env.LIARA_ENDPOINT;
@@ -228,9 +228,7 @@ export async function addProductController({
           const image = fs.readFileSync(`${dirname}${fileName}`);
 
           handleUpload(image, fileName).then(() => {
-            fs.rmdir(imagePathFolder, (res) => {
-              console.log(res);
-            });
+            rimraf(imagePathFolder);
             return { status: "ok" };
           });
         } catch (error) {
