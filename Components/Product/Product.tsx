@@ -213,7 +213,16 @@ export default function Product({ productId }: Props) {
                                 type="radio"
                               />
                             </div>
-                            <span className="text-[14px] text-[#535353]">
+                            <span
+                              onClick={() =>
+                                setSelectedProductVariation({
+                                  price: variationType.price,
+                                  variationId: variation.id,
+                                  variationValueid: variationType.id,
+                                })
+                              }
+                              className="text-[14px] text-[#535353]"
+                            >
                               {variationType.name}
                             </span>
                           </div>
