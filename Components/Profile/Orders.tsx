@@ -10,7 +10,7 @@ export default function Orders() {
 
   return (
     <motion.div layout className=" w-full flex flex-col gap-4">
-      <LayoutGroup id="orders">
+      
         {isLoading ? (
           <div></div>
         ) : data?.orders.length ? (
@@ -32,7 +32,7 @@ export default function Orders() {
             />
           ))
         ) : null}
-      </LayoutGroup>
+
     </motion.div>
   );
 }

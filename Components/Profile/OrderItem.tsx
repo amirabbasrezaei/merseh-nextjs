@@ -8,7 +8,6 @@ interface Props {
   orderId: number;
   orderStatus: string;
   orderProducts: any;
-
   address: {
     title?: string;
     postalCode?: string;
@@ -77,9 +76,14 @@ export default function OrderItem({
             ? orderProducts.map((pr: any, i: number) => (
                 <Link
                   href={`/product/${pr.Product.id}`}
-                  className="flex flex-col items-center border border-[#e9e9e9] rounded-[10px] p-5"
+                  className="flex flex-col relative  items-center border border-[#e9e9e9] rounded-[10px] p-5"
                   key={i}
                 >
+                  <div className="absolute top-1  z-20 right-1 h-6 w-6 flex items-center justify-center bg-[#00BD84] rounded-full">
+                    <span className=" text-white z-20 text-center mt-[2px]">
+                      {pr.numberOfproduct}
+                    </span>
+                  </div>
                   <Image
                     width={100}
                     height={100}
