@@ -202,7 +202,7 @@ export default function Product({ productId }: Props) {
                                   })
                                 }
                                 className={classNames(
-                                  "appearance-none text-center center w-[15px]  h-[15px] rounded-full",
+                                  "appearance-none cursor-pointer text-center center w-[15px]  h-[15px] rounded-full",
                                   selectedProductVariation?.variationId ===
                                     variation.id &&
                                     selectedProductVariation.variationValueid ===
