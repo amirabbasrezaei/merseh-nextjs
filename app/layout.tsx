@@ -7,6 +7,7 @@ import RecoilRootProvider from "@/Components/StateManager/RecoilRootProvider";
 import { cookies } from "next/headers";
 import ThemeController from "@/Components/ThemeController";
 import { Toaster } from "react-hot-toast";
+import { GoogleTagManager } from '@next/third-parties/google'
 export const metadata: Metadata = {
   title: "Merseh",
   description: "محصولات ارگانیک مرسه",
@@ -23,6 +24,9 @@ export default function RootLayout({
       <head>
         <meta charSet="utf-8" />
       </head>
+      {process.env.NODE_ENV === "production" ? (
+          <GoogleTagManager gtmId="GTM-T83BTZM4" />
+        ) : null}
       <body
         className={`overflow-x-hidden  bg-white ${IRANYekanXFaNum.className}`}
       >
@@ -34,7 +38,7 @@ export default function RootLayout({
             </ThemeController>
           </TRPC_Provider>
         </RecoilRootProvider>
-        {/* <Footer /> */}
+        
       </body>
     </html>
   );
