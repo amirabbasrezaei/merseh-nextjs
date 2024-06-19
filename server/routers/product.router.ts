@@ -1,9 +1,7 @@
 import {
-
   categoriesController,
   createCategory,
   createCategorySchema,
-
 } from "../Controllers/category.controller";
 import {
   AddProductControllerArgSchema,
@@ -13,6 +11,7 @@ import {
   getProductInputSchema,
   productCarouselController,
   productCartInfoController,
+  productsController,
 } from "../Controllers/product.controller";
 import { publicProcedure, router } from "../trpc";
 
@@ -33,4 +32,5 @@ export const productRouter = router({
     .input(ProductCartInfoInputSchema)
     .query(productCartInfoController),
   productCarousel: publicProcedure.query(productCarouselController),
+  products: publicProcedure.mutation(productsController),
 });
