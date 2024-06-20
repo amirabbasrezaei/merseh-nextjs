@@ -16,7 +16,7 @@ export default function Main_Categories() {
       </div>
       <div
         style={{ scrollbarWidth: "none" }}
-        className="sm:h-fit h-fit flex flex-row items-center sm:justify-evenly gap-6  overflow-x-scroll "
+        className="sm:h-fit h-fit flex flex-row items-center sm:justify-evenly gap-6 sm:gap-0 overflow-x-scroll "
       >
         {!isLoading && data?.length && data[0]?.subCategories?.length
           ? data[0].subCategories.map((category) => (
@@ -42,7 +42,8 @@ export default function Main_Categories() {
           : Array.from(Array(6)).map((e) => (
               <div
                 key={e}
-                className="h-full w-fit flex flex-col items-center gap-3 animate-pulse"
+                style={{width: 160.28}}
+                className="h-full  flex flex-col items-center gap-3 animate-pulse"
               >
                 <div className="sm:w-[160px] sm:h-[160px] h-[120px] w-[120px] rounded-[10px] sm:rounded-[50px] bg-[#f1f1f1] "></div>
                 <div className="w-[70%] h-5 bg-[#f1f1f1] rounded-[7px] "></div>
