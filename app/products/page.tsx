@@ -1,6 +1,11 @@
 import Layout from "@/Components/Layout/Layout";
 import Products from "@/Components/Products/Products";
+import { Metadata } from "next";
 import React from "react";
+
+export const metadata: Metadata = {
+ title: "محصولات"
+}
 
 export default function page() {
   return (

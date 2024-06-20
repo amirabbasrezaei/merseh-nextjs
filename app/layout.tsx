@@ -10,9 +10,13 @@ import { Toaster } from "react-hot-toast";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 export const metadata: Metadata = {
-  title: "Merseh",
-  description: "محصولات ارگانیک مرسه",
+  title: {
+    default: "فروشگاه محصولات طبیعی مرسه",
+    template: "%s  -  فروشگاه محصولات طبیعی مرسه",
+  },
+  description: "خرید محصولات کاملا طبیعی و ارگانیک در مرسه",
 };
+
 export default function RootLayout({
   children,
 }: Readonly<{
