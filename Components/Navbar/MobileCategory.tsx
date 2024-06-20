@@ -15,6 +15,7 @@ export default function MobileCategory() {
         {data?.length && data[0].subCategories?.length
           ? data[0].subCategories.map((category, catIndex) => (
               <div
+              key={category.id}
                 onClick={() => setSelectedCategoryIndex(catIndex)}
                 className={classNames(
                   "cursor-pointer   gap-1  px-3   flex flex-row items-center justify-center     h-[70px] w-full",

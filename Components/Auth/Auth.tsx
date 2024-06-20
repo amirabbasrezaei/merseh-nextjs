@@ -19,7 +19,7 @@ export default function Auth({
 }: Props) {
   const [loginStatus, setLoginStatus] = useState(0);
   const [input, setInput] = useState<string>("");
-  const { data, isPending, mutate, status } =
+  const { data, isLoading, mutate, status } =
     trpc.user.sendVerifyCode.useMutation();
 
   useEffect(() => {
@@ -78,14 +78,14 @@ export default function Auth({
             className={`flex text-black1 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none h-[45px] appearance-none rounded-[8px]  w-full px-5 outline-none  border border-[#E6E6E6]`}
           />
           <button
-            disabled={isPending}
+            disabled={isLoading}
             onClick={() => mutate({ phoneNumber: input })}
             className={classnames(
               "flex   h-[45px] w-full  rounded-[8px] items-center justify-center text-white ",
-              isPending ? "bg-gray-100" : "bg-green1"
+              isLoading ? "bg-gray-100" : "bg-green1"
             )}
           >
-            {!isPending ? (
+            {!isLoading ? (
               <span className="text-[15px]">ارسال رمز یکبار مصرف</span>
             ) : (
               <Loading_SVG classname="w-8 h-auto" />

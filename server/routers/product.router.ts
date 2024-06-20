@@ -32,5 +32,5 @@ export const productRouter = router({
     .input(ProductCartInfoInputSchema)
     .query(productCartInfoController),
   productCarousel: publicProcedure.query(productCarouselController),
-  products: publicProcedure.mutation(productsController),
+  products: publicProcedure.query(productsController),
 });

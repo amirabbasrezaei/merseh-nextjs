@@ -25,19 +25,19 @@ export default function Shipping() {
   const {
     mutate: mutateOrder,
     data: activeOrderData,
-    isPending: isPendingActiveOrderData,
-    error,
+    isLoading: isLoadingActiveOrderData,
+
   } = trpc.order.updateActiveOrder.useMutation({});
   const {
     data: shippingPricesData,
     mutate: mutateShippingPrices,
-    isPending: isPendingShippingPrices,
+    isLoading: isLoadingShippingPrices,
   } = trpc.shipping.shippingPrices.useMutation();
 
   const {
     mutate: mutateCreatePayment,
     data: createPaymentData,
-    isPending: isCreatePaymentPending,
+    isLoading: isCreatePaymentPending,
   } = trpc.payment.createPayment.useMutation();
 
   useEffect(() => {
@@ -79,7 +79,7 @@ export default function Shipping() {
 
           <div className="flex flex-col gap-6">
             <AnimatePresence presenceAffectsLayout mode="sync">
-              {isPendingShippingPrices
+              {isLoadingShippingPrices
                 ? Array.from(Array(3)).map((_, i) => (
                     <motion.div
                       key={String(i)}
@@ -208,8 +208,8 @@ export default function Shipping() {
             }
             isLoading={
               isCreatePaymentPending ||
-              isPendingShippingPrices ||
-              isPendingActiveOrderData
+              isLoadingShippingPrices ||
+              isLoadingActiveOrderData
             }
             text="پرداخت"
             className="w-full"

@@ -10,7 +10,7 @@ interface Props {
 export default function Signup({ input, setLoginStatus }: Props) {
   const {
     data: createUserData,
-    isPending: isCreateUserLoading,
+    isLoading: isCreateUserLoading,
     mutate: mutateCreateUser,
   } = trpc.user.createUser.useMutation();
   const utils = trpc.useUtils();

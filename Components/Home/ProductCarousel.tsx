@@ -99,9 +99,8 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
 
         {productCarouselData?.products.length
           ? productCarouselData.products.map((product, index) => (
-              <SwiperSlide>
+              <SwiperSlide key={product.id}>
                 <motion.div
-                  key={product.id}
                   transition={{ duration: 0.3 }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}

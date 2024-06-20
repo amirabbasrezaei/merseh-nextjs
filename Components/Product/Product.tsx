@@ -322,7 +322,7 @@ export default function Product({ productId }: Props) {
                   );
                 }
                 if (p.type === "break") {
-                  return <br />;
+                  return <br key={index} />;
                 }
               })
             : Array.from(Array(2)).map((_, i) => (

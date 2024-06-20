@@ -1,8 +1,7 @@
-import { trpc } from "@/utils/trpc";
+import axios from "axios";
 import { MetadataRoute } from "next";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const {  mutateAsync } = trpc.product.products.useMutation();
   const links: MetadataRoute.Sitemap = [
     {
       url: "https://merseh.com",
@@ -10,20 +9,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "yearly",
       priority: 1,
     },
+    {
+      url: "https://merseh.com/products",
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
   ];
 
-  const { products } = await mutateAsync();
-
-
-    products.map((product) => {
-      links.push({
-        url: `${process.env.BASE_URL || ""}/product/${product.id}`,
-        lastModified: new Date(product.updatedAt),
-        changeFrequency: "weekly",
-        priority: 0.5,
+  try {
+    const { data } = await axios.get(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/trpc/product.products`
+    );
+    if (data.result.data?.products?.length) {
+      data.result.data.products.map((product: any) => {
+        links.push({
+          url: `${process.env.NEXT_PUBLIC_BASE_URL || ""}/product/${
+            product.id
+          }`,
+          lastModified: new Date(product.updatedAt),
+          changeFrequency: "weekly",
+          priority: 0.6,
+        });
       });
-    });
-  
-
-  return links;
+    }
+    return links;
+  } catch (error) {
+    return links;
+  }
 }

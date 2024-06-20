@@ -26,7 +26,7 @@ export default function Verify({
   const {
     mutate: mutateVerifyLoginCode,
     isSuccess: isVerifyLoginCodeSuccess,
-    isPending,
+    isLoading,
     data,
     error,
   } = trpc.user.verifyLoginCode.useMutation({ retry: 2 });
@@ -100,7 +100,7 @@ export default function Verify({
         onClick={() => mutateVerifyLoginCode({ code, phoneNumber })}
         className={classNames(
           "flex   h-[45px] w-full mt-4 rounded-[8px] items-center justify-center text-white ",
-          isPending ? "" : "bg-green1"
+          isLoading ? "" : "bg-green1"
         )}
       >
         <span className=" text-white text-center text-[15px]">

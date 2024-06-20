@@ -61,7 +61,7 @@ export default function UserAuth() {
   const { data, isLoading, error } = trpc.user.userInfo.useQuery(undefined, {
     retry: false,
     networkMode: "online",
-    gcTime: 0,
+    cacheTime:0
   });
 
   const { user } = trpc.useUtils();

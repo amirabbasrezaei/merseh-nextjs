@@ -23,7 +23,7 @@ const animation = {
 export default function HeaderSearch() {
   const { height } = useWindowSize();
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const { data, isPending, mutate } = trpc.filter.search.useMutation();
+  const { data, isLoading, mutate } = trpc.filter.search.useMutation();
   // for mobile purpose
   const [showSearch, setShowSearch] = useState(false);
 

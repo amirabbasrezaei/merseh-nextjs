@@ -23,7 +23,7 @@ export default function Products() {
   const {
     mutate: mutate,
     data,
-    isPending,
+    isLoading,
   } = trpc.filter.filterProduct.useMutation({});
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function Products() {
       <div className="sm:basis-9/12 flex flex-col gap-4 items-center justify-center">
         <div className="sm:grid grid-cols-4 flex flex-col gap-4 w-full ">
           <AnimatePresence mode="sync">
-            {data?.length && !isPending 
+            {data?.length && !isLoading 
               ? // @ts-ignore
                 data.map((pr, index) => (
                   <ProductCard
