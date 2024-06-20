@@ -3,28 +3,36 @@ import Product from "@/Components/Product/Product";
 import { trpc } from "@/utils/trpc";
 import axios from "axios";
 import { Metadata, NextPage } from "next";
+import { cache } from "react";
+
+export const revalidate = 3600;
+
 export type NextPagePropsType = {
   params: { slug: string };
   searchParams: { [key: string]: string | string[] | undefined };
 };
 
+const getProduct = cache(async (productId: string) => {
+  const { data } = await axios.get(
+    `${process.env.BASE_URL}/api/trpc/product.getproduct?input={"productId":${productId}}`
+  );
+  return data.result.data;
+});
+
 export async function generateMetadata({
   params,
 }: NextPagePropsType): Promise<Metadata> {
-  const { data } = await axios.get(
-    `http://localhost:3000/api/trpc/product.getproduct?input={"productId":2}`
-  );
-  console.log(data.result.data.product.content);
+  const product = await getProduct(params.slug);
 
-  if (data?.result?.data?.product) {
+  if (product?.product) {
     return {
-      title: data.result.data.product.name,
+      title: product.product.name,
       description:
-        data.result.data.product.content
+        product.product.content
           .filter((e: any) => e.type === "text")[0]
           ?.content.toString() || "",
       openGraph: {
-        images: data.result.data.product.imageUrls.map((e: any) => ({
+        images: product.product.imageUrls.map((e: any) => ({
           url: e,
         })),
       },
@@ -40,12 +48,3 @@ export default function Page({ params }: NextPagePropsType) {
     </Layout>
   );
 }
-
-// export async function getStaticProps(context: GetStaticPropsContext) {
-//   console.log(context)
-//   // const {} = trpc.product.getproduct.useQuery({productId: Router})
-//   return {
-//     props: { message: `Next.js is awesome` },
-//     // will be passed to the page component as props
-//   }
-// }

@@ -15,6 +15,7 @@ export const metadata: Metadata = {
     template: "%s  -  فروشگاه محصولات طبیعی مرسه",
   },
   description: "خرید محصولات کاملا طبیعی و ارگانیک در مرسه",
+
 };
 
 export default function RootLayout({
