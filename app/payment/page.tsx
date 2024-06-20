@@ -9,11 +9,7 @@ import { trpc } from "@/utils/trpc";
 import { Metadata } from "next";
 type Props = {};
 
-export function generateMetadata(): Metadata {
-  return {
-    title: "نتیجه پرداخت",
-  };
-}
+
 
 export default function Payment({}: Props) {
   const router = useRouter();
