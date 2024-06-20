@@ -6,7 +6,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Success from "@/Components/Payment/Success";
 import { trpc } from "@/utils/trpc";
+import { Metadata } from "next";
 type Props = {};
+
+export function generateMetadata(): Metadata {
+  return {
+    title: "نتیجه پرداخت",
+  };
+}
 
 export default function Payment({}: Props) {
   const router = useRouter();
