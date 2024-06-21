@@ -161,9 +161,9 @@ export default function Product({ productId }: Props) {
 
           <div className="h-full  w-full sm:basis-5/12 p-4 flex flex-col gap-10">
             {productData?.product ? (
-              <h3 className="text-[26px] text-black1">
+              <h1 className="text-[26px] text-black1">
                 {productData?.product?.name}
-              </h3>
+              </h1>
             ) : (
               <div className="w-[200px] h-[30px] bg-gray-100 animate-pulse rounded-[4px]"></div>
             )}
