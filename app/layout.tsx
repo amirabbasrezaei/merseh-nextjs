@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import "contenido/dist/styles.css";
 import TRPC_Provider from "@/Components/TRPC_Provider";
@@ -37,6 +37,8 @@ export default function RootLayout({
       <body
         className={`overflow-x-hidden  bg-white ${IRANYekanXFaNum.className}`}
       >
+        <Analytics />
+        <SpeedInsights />
         <Toaster />
         <RecoilRootProvider>
           <TRPC_Provider>
