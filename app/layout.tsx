@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import "contenido/dist/styles.css";
 import TRPC_Provider from "@/Components/TRPC_Provider";
@@ -15,7 +16,6 @@ export const metadata: Metadata = {
     template: "%s  -  فروشگاه محصولات طبیعی مرسه",
   },
   description: "خرید محصولات کاملا طبیعی و ارگانیک در مرسه",
-
 };
 
 export default function RootLayout({
