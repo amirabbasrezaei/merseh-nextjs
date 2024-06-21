@@ -5,7 +5,10 @@ import React from "react";
 
 export function generateMetadata():Metadata{
   return{
-    title:"دسته بندی ها"
+    title:"دسته بندی ها",
+    alternates: {
+      canonical: `${process.env.BASE_URL}/mcategory`,
+    },
   }
 }
 

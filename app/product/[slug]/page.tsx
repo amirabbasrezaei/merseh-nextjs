@@ -36,6 +36,9 @@ export async function generateMetadata({
           url: e,
         })),
       },
+      alternates: {
+        canonical: `${process.env.BASE_URL}/product/${params.slug}`,
+      },
     };
   }
   return {};

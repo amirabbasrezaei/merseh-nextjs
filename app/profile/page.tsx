@@ -6,6 +6,9 @@ import React from "react";
 export function generateMetadata(): Metadata {
   return {
     title: "حساب کاربری",
+    alternates:{
+      canonical:`${process.env.BASE_URL}/profile`
+    }
   };
 }
 

@@ -4,8 +4,11 @@ import { Metadata } from "next";
 import React from "react";
 
 export const metadata: Metadata = {
- title: "محصولات"
-}
+  title: "محصولات",
+  alternates: {
+    canonical: `${process.env.BASE_URL}/products`,
+  },
+};
 
 export default function page() {
   return (
