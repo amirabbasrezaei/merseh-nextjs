@@ -27,8 +27,6 @@ export async function filterProductController({
         : {},
     },
   });
-
-  // console.log(filterProducts)
   return filterProducts;
 }
 

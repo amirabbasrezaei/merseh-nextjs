@@ -140,6 +140,7 @@ const imageType = z.object({
 
 export const AddProductControllerArgSchema = z.object({
   name: z.string(),
+  englishName: z.string(),
   price: z.string(),
   images: z.array(imageType),
   categoryId: z.string(),
@@ -246,7 +247,7 @@ export async function addProductController({
         imageNames: input.images.map((img) => img.name),
         name: input.name,
         price: Number(input.price),
-
+        engName: input.englishName,
         category: {
           connect: input?.parentCategories?.length
             ? [

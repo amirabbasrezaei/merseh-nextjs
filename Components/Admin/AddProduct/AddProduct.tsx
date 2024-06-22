@@ -22,6 +22,7 @@ export type filterTypeArgs = {
 export default function AddProduct() {
   const { mutateAsync } = trpc.product.addProduct.useMutation({});
   const [images, setImages] = useState<imageType[]>([]);
+  const [engName, setEngName] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [price, setPrice] = useState<string>("");
   const [files, setFiles] = useState();
@@ -74,7 +75,6 @@ export default function AddProduct() {
     }
   }, [currentImageIndex, files]);
 
-
   const handleVariationInput = (
     variationIndex: number,
     variationName: string
@@ -112,27 +112,16 @@ export default function AddProduct() {
     setVariations((state) => [...state]);
   };
 
-
-
   return (
     <form
       className="w-full max-w-[1400px] flex flex-col gap-10 px-20"
       onSubmit={(e) => {
         e.preventDefault();
-        console.log({
-          images: images,
-          name: name,
-          price: price,
-          categoryId: String(filter.categoryId),
-          parentCategories: filter.parentCategories,
-          productVariations: variations.length ? variations : [],
-          productContent: content,
-        })
         if (filter.categoryId) {
-          
           mutateAsync({
             images: images,
             name: name,
+            englishName: engName,
             price: price,
             categoryId: String(filter.categoryId),
             parentCategories: filter.parentCategories,
@@ -166,6 +155,21 @@ export default function AddProduct() {
           <input
             value={name}
             onChange={(e) => setName(e.currentTarget.value)}
+            className="appearance-none block w-full bg-gray-200 text-gray-700 border  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+            id="grid-first-name"
+            type="text"
+          />
+        </div>
+        <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+          <label
+            className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+            htmlFor="grid-first-name"
+          >
+            نام انگلیسی محصول
+          </label>
+          <input
+            value={engName}
+            onChange={(e) => setEngName(e.currentTarget.value)}
             className="appearance-none block w-full bg-gray-200 text-gray-700 border  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
             id="grid-first-name"
             type="text"
