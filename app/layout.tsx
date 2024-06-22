@@ -17,10 +17,12 @@ export const metadata: Metadata = {
     template: "%s  -  فروشگاه محصولات طبیعی مرسه",
   },
   description: "خرید محصولات کاملا طبیعی و ارگانیک در مرسه",
-  alternates:{
-    canonical: `${process.env.BASE_URL}`
-  }
+  alternates: {
+    canonical: `${process.env.BASE_URL}`,
+  },
 };
+
+
 
 export default function RootLayout({
   children,
