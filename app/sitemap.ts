@@ -24,7 +24,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.log(data);
     if (data.result.data?.products?.length) {
       const products = data.result.data.products.map((product: any) => ({
-        url: `${process.env.BASE_URL || ""}/product/${product.id}`,
+        url: `${
+          process.env.NODE_ENV === "production"
+            ? process.env.BASE_URL
+            : "http://localhost:3000"
+        }/product/${product.id}/${(product.name as string).replaceAll(
+          " ",
+          "-"
+        )}`,
         lastModified: new Date(product.updatedAt),
         changeFrequency: "weekly",
         priority: 0.6,

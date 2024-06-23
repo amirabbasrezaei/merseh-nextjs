@@ -22,8 +22,9 @@ const getProduct = cache(async (productId: string) => {
 export async function generateMetadata({
   params,
 }: NextPagePropsType): Promise<Metadata> {
-  const product = await getProduct(params.slug);
-
+  const product = await getProduct(params.slug[0]);
+  
+  console.log(product?.product)
   if (product?.product) {
     return {
       title: product.product.name,
@@ -37,7 +38,7 @@ export async function generateMetadata({
         })),
       },
       alternates: {
-        canonical: `${process.env.BASE_URL}/product/${params.slug}`,
+        canonical: `${process.env.BASE_URL}/product/${params.slug[0]}/${product.product.name}`,
       },
     };
   }
@@ -45,9 +46,10 @@ export async function generateMetadata({
 }
 
 export default function Page({ params }: NextPagePropsType) {
+  console.log(params)
   return (
     <Layout>
-      <Product productId={params.slug} />
+      <Product productId={params.slug[0]} />
     </Layout>
   );
 }

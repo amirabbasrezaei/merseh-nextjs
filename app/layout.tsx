@@ -11,6 +11,7 @@ import ThemeController from "@/Components/ThemeController";
 import { Toaster } from "react-hot-toast";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
+
 export const metadata: Metadata = {
   title: {
     default: "فروشگاه محصولات طبیعی مرسه",
