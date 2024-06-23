@@ -111,7 +111,10 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
                   <Link
                     // style={{ pointerEvents: "none" }}
                     // aria-disabled={drag !== 0 ? "true" : "false"}
-                    href={`/product/${product.id}`}
+                    href={`/product/${product.id}/${product.name.replaceAll(
+                      " ",
+                      "-"
+                    )}`}
                     className="border pb-4  sm:px-5 h-full w-[160px] justify-between  gap-3 flex flex-col  items-center sm:justify-center relative   border-[#EDEDED] rounded-[12px]  "
                   >
                     <div className="w-full h-full flex flex-col items-center justify-center">

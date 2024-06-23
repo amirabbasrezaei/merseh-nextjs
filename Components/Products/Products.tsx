@@ -52,7 +52,7 @@ export default function Products() {
       <div className="sm:basis-9/12 flex flex-col gap-4 items-center justify-center">
         <div className="sm:grid grid-cols-4 flex flex-col gap-4 w-full ">
           <AnimatePresence mode="sync">
-            {data?.length && !isLoading 
+            {data?.length && !isLoading
               ? // @ts-ignore
                 data.map((pr, index) => (
                   <ProductCard
@@ -60,7 +60,10 @@ export default function Products() {
                     imageNames={pr.imageNames}
                     price={pr.price || 0}
                     title={pr.name}
-                    pathname={`product/${String(pr.id)}`}
+                    pathname={`product/${String(pr.id)}/${pr.name.replaceAll(
+                      " ",
+                      "-"
+                    )}`}
                     isLoading={true}
                   />
                 ))
