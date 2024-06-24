@@ -17,7 +17,7 @@ export default function Header() {
       </div>
       <div className="flex items-center justify-between gap-10 sm:basis-11/12  w-full h-full ">
         <HeaderCategory />
-        {/* <HeaderSearch /> */}
+        <HeaderSearch />
         <Link
           className="basis-1/12 flex-none flex  flex-row gap-2 items-center"
           href={"/"}

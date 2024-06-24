@@ -115,10 +115,12 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
                         {product.name}
                       </span>
                     </div>
-                    <span className="font-normal text-nowrap text-[14px] sm:text-[16px] basis-1/4 text-green1 w-fit">
-                      {splitNumber(product.price)}{" "}
-                      <span className="text-[11px]">تومان</span>
-                    </span>
+                    <div className="flex-row flex items-center gap-1">
+                      <span className="font-normal text-nowrap text-[14px] sm:text-[16px] basis-1/4 text-green1 w-fit">
+                        {splitNumber(product.price)}{" "}
+                      </span>
+                      <span className="text-[11px] text-black1">تومان</span>
+                    </div>
                   </Link>
                 </motion.div>
               </SwiperSlide>

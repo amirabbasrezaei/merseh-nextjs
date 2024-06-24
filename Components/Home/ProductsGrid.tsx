@@ -87,7 +87,6 @@ export default function ProductsGrid({ title, categoryId }: props) {
 
   useEffect(() => {
     data?.length && prepareProductsForGridView(data);
-    data && console.log(data[4]);
   }, [data]);
 
   return (
@@ -140,21 +139,39 @@ export default function ProductsGrid({ title, categoryId }: props) {
                               },
                               close: { y: 20, opacity: 0 },
                             }}
-                            className="border border-[#f3f3f3] rounded-[5px] flex flex-row items-center justify-start gap-2"
+                            className="border border-[#f3f3f3] pl-3 py-2 rounded-[5px] flex flex-row items-center justify-around gap-2"
                           >
-                            <Image
-                              width={120}
-                              height={120}
-                              alt={product.imageNames[0]}
-                              src={`${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${product.imageNames[0]}`}
-                            />
-                            <span>
-                              {product.name} { product?.ProductVariation?.length &&
-                              product.ProductVariation[0]?.values[0]?.length
-                                ? " - " + product.ProductVariation[0].values[0].name
-                                : ""}
-                            </span>
-                            <span></span>
+                            <div className="flex flex-row items-center gap-2">
+                              <Image
+                                width={120}
+                                height={120}
+                                alt={product.imageNames[0]}
+                                src={`${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${product.imageNames[0]}`}
+                              />
+                              <div className="flex flex-col items-start justify-center gap-1">
+                                <span className="font-[400] basis-2/4 text-[14px] sm:text-[14px] text-black1 w-fit">
+                                  {product.name}
+                                </span>
+                                {product?.ProductVariation?.length ? (
+                                  <span className="font-[400] basis-2/4 text-[12px] sm:text-[14px] text-black1">
+                                    {product.ProductVariation[0].values[0].name}
+                                  </span>
+                                ) : null}
+                              </div>
+                            </div>
+                            <div className="flex flex-row items-center gap-1">
+                              <span className="font-normal text-nowrap text-[14px] sm:text-[16px] basis-1/4 text-green1 w-fit">
+                                {splitNumber(
+                                  product?.ProductVariation?.length
+                                    ? product.ProductVariation[0].values[0]
+                                        .price
+                                    : product.price
+                                )}{" "}
+                              </span>
+                              <span className="text-[11px] text-black1">
+                                تومان{" "}
+                              </span>
+                            </div>
                           </motion.div>
                         </Link>
                       ))}

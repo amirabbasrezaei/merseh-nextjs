@@ -22,6 +22,7 @@ const animation = {
 };
 
 export default function HeaderSearch() {
+  const [isClient, setisClient] = useState(false);
   const { height } = useWindowSize();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const { data, isLoading, mutate } = trpc.filter.search.useMutation();
@@ -29,6 +30,7 @@ export default function HeaderSearch() {
   const [showSearch, setShowSearch] = useState(false);
 
   useEffect(() => {
+    setisClient(true);
     let timeOut: any;
     if (searchTerm.length) {
       timeOut = setTimeout(() => {
@@ -79,7 +81,7 @@ export default function HeaderSearch() {
             : null}
         </motion.div>
 
-        {typeof window !== undefined
+        {isClient
           ? createPortal(
               <motion.div
                 onClick={() => setSearchTerm("")}
@@ -101,7 +103,7 @@ export default function HeaderSearch() {
       >
         <Magnifier classname=" w-[20px] h-auto fill-[#363636]" />
       </div>
-      {typeof window !== undefined
+      {isClient
         ? createPortal(
             <motion.div
               initial={false}
