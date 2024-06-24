@@ -94,10 +94,11 @@ export default function ProductsGrid({ title, categoryId }: props) {
       <h3 className="text-[20px] text-black1 font-normal w-full ">{title}</h3>
       <Swiper
         onSwiper={swiperRef}
-        spaceBetween={10}
+        spaceBetween={20}
+        style={width > 639 ? { paddingRight: 20, paddingLeft: 20 } : {}}
         slidesPerView={width > 639 ? 3 : 1}
         direction="horizontal"
-        className="w-full h-full "
+        className="w-full h-full sm:border border-[#f3f3f3] rounded-[5px]"
         autoplay={{ delay: 5000, disableOnInteraction: false }}
         modules={[Autoplay]}
       >
@@ -109,7 +110,7 @@ export default function ProductsGrid({ title, categoryId }: props) {
                 return productSlice.length >= 3 ? (
                   <SwiperSlide key={index}>
                     <motion.div
-                      className="flex flex-col gap-3 h-full"
+                      className="flex flex-col gap-3 h-full "
                       variants={{
                         open: {
                           transition: {
@@ -123,8 +124,9 @@ export default function ProductsGrid({ title, categoryId }: props) {
                       initial="close"
                       animate={"open"}
                     >
-                      {productSlice.map((product: any) => (
+                      {productSlice.map((product: any, i: number) => (
                         <Link
+                          className="relative"
                           key={product.id}
                           href={`/product/${
                             product.id
@@ -139,12 +141,13 @@ export default function ProductsGrid({ title, categoryId }: props) {
                               },
                               close: { y: 20, opacity: 0 },
                             }}
-                            className="border border-[#f3f3f3] pl-3 py-2 rounded-[5px] flex flex-row items-center justify-around gap-2"
+                            className=" pl-3 py-2 rounded-[5px] flex flex-row items-center justify-around gap-2"
                           >
                             <div className="flex flex-row items-center gap-2">
                               <Image
-                                width={120}
-                                height={120}
+                                width={140}
+                                height={140}
+                                quality={100}
                                 alt={product.imageNames[0]}
                                 src={`${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${product.imageNames[0]}`}
                               />
@@ -173,6 +176,9 @@ export default function ProductsGrid({ title, categoryId }: props) {
                               </span>
                             </div>
                           </motion.div>
+                          {productSlice.length - 1 !== i ? (
+                            <hr className="border-[1x] border-[#f3f3f3] w-[65%] absolute left-0 bottom-0" />
+                          ) : null}
                         </Link>
                       ))}
                     </motion.div>
