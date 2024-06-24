@@ -153,7 +153,7 @@ export default function ProductsGrid({ title, categoryId }: props) {
                                   {product.name}
                                 </span>
                                 {product?.ProductVariation?.length ? (
-                                  <span className="font-[400] basis-2/4 text-[12px] sm:text-[14px] text-black1">
+                                  <span className="font-[400] basis-2/4 text-[12px] sm:text-[13px] text-black1">
                                     {product.ProductVariation[0].values[0].name}
                                   </span>
                                 ) : null}

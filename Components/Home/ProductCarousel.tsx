@@ -38,16 +38,20 @@ export function SlideNextButton() {
 
 export function SlidePrevButton() {
   const swiper = useSwiper();
-
+  console.log(swiper.previousIndex)
   return (
-    <div className=" absolute z-20 top-0 right-0  h-full  w-12 hidden sm:flex justify-center items-center ">
-      <div
-        onClick={() => swiper.slidePrev()}
-        className="w-10 cursor-pointer h-10 flex items-center justify-center bg-white border border-[#dfdfdf] rounded-full "
-      >
-        <Chevron_Down_sharp_light classname="rotate-[-90deg] w-6 fill-[#b8b8b8]" />
-      </div>
-    </div>
+    <>
+      {swiper.activeIndex !== 0 ? (
+        <div className=" absolute z-20 top-0 right-0  h-full  w-12 hidden sm:flex justify-center items-center ">
+          <div
+            onClick={() => swiper.slidePrev()}
+            className="w-10 cursor-pointer h-10 flex items-center justify-center bg-white border border-[#dfdfdf] rounded-full "
+          >
+            <Chevron_Down_sharp_light classname="rotate-[-90deg] w-6 fill-[#b8b8b8]" />
+          </div>
+        </div>
+      ) : null}
+    </>
   );
 }
 
