@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import "keen-slider/keen-slider.min.css";
 
 import Image from "next/image";
@@ -6,18 +6,11 @@ import { Chevron_Down_sharp_light } from "../SVGS";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 import splitNumber from "../utils/splitNumber";
-import { Autoplay, Virtual } from "swiper/modules";
+import { Autoplay } from "swiper/modules";
 import "react-multi-carousel/lib/styles.css";
 import { motion } from "framer-motion";
-import {
-  Swiper,
-  SwiperClass,
-  SwiperRef,
-  SwiperSlide,
-  useSwiper,
-} from "swiper/react";
+import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
 
-// Import Swiper styles
 import "swiper/css";
 import useWindowSize from "../useWindowSize";
 
@@ -25,25 +18,6 @@ interface props {
   title: string;
   sliderStartDelay: number;
 }
-
-const responsive = {
-  desktop: {
-    breakpoint: { max: 3000, min: 1024 },
-    items: 3,
-    slidesToSlide: 3, // optional, default to 1.
-  },
-  tablet: {
-    breakpoint: { max: 1024, min: 464 },
-    items: 2,
-    slidesToSlide: 2, // optional, default to 1.
-  },
-  mobile: {
-    breakpoint: { max: 464, min: 0 },
-    items: 1,
-    slidesToSlide: 1, // optional, default to 1.
-  },
-};
-const animation = { duration: 1000, easing: (t: any) => t };
 
 export function SlideNextButton() {
   const swiper = useSwiper();
@@ -85,7 +59,7 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
 
   return (
     <section className="w-full  flex flex-col items-center gap-5 ">
-      <span className="text-[25px] text-black1 font-normal">{title}</span>
+      <h3 className="text-[20px] w-full text-black1 font-normal">{title}</h3>
       <Swiper
         onSwiper={swiperRef}
         spaceBetween={50}

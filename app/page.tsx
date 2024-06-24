@@ -3,7 +3,7 @@ import Home from "@/Components/Home/Home";
 import Layout from "@/Components/Layout/Layout";
 
 
-export const revalidate = 3600;
+// export const revalidate = 3600;
 
 
 

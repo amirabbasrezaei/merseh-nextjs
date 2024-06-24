@@ -21,9 +21,8 @@ export const metadata: Metadata = {
   alternates: {
     canonical: `${process.env.BASE_URL}`,
   },
+  metadataBase: new URL("https://merseh.com"),
 };
-
-
 
 export default function RootLayout({
   children,

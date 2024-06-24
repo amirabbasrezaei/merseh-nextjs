@@ -25,7 +25,19 @@ export async function filterProductController({
             },
           }
         : {},
+
     },
+    select:{
+      id: true,
+      price: true,
+      imageNames: true,
+      ProductVariation: {
+        include:{
+          values: true
+        }
+      },
+      name: true
+    }
   });
   return filterProducts;
 }

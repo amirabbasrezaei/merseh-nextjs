@@ -19,9 +19,9 @@ export default function Main_Categories() {
         className="sm:h-fit h-fit flex flex-row items-center sm:justify-evenly gap-6 sm:gap-0 overflow-x-scroll "
       >
         {!isLoading && data?.length && data[0]?.subCategories?.length
-          ? data[0].subCategories.map((category) => (
+          ? data[0].subCategories.map((category, index) => (
               <Link
-                key={category.id}
+                key={index}
                 href={`/products?catId=${category.id}`}
                 className="flex w-full h-full flex-col items-center  max-w-none gap-3"
               >
@@ -34,15 +34,15 @@ export default function Main_Categories() {
                   height={200}
                   style={{ objectFit: "contain" }}
                 />
-                <span className="text-[14px] sm:text-[18px] text-[#4A4A4A] font-[400]">
+                <h2 className="text-[14px] sm:text-[18px] text-[#4A4A4A] font-[400]">
                   {category.title}
-                </span>
+                </h2>
               </Link>
             ))
-          : Array.from(Array(6)).map((e) => (
+          : Array.from(Array(6)).map((e, index) => (
               <div
-                key={e}
-                style={{width: 160.28}}
+                key={index}
+                style={{ width: 160.28 }}
                 className="h-full  flex flex-col items-center gap-3 animate-pulse"
               >
                 <div className="sm:w-[160px] sm:h-[160px] h-[120px] w-[120px] rounded-[10px] sm:rounded-[50px] bg-[#f1f1f1] "></div>

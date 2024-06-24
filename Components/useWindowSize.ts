@@ -7,6 +7,6 @@ export default function useWindowSize() {
     if (window !== undefined) {
       setWindowSize({ width: window.innerWidth, height: window.innerHeight });
     }
-  }, [window]);
+  }, []);
   return { width: windowSize.width, height: windowSize.height };
 }

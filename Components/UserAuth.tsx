@@ -61,7 +61,7 @@ export default function UserAuth() {
   const { data, isLoading, error } = trpc.user.userInfo.useQuery(undefined, {
     retry: false,
     networkMode: "online",
-    cacheTime:0
+    cacheTime: 0,
   });
 
   const { user } = trpc.useUtils();
@@ -161,29 +161,31 @@ export default function UserAuth() {
             <Login_icon classname="w-[15px] h-auto mt-[2px] fill-[#303030]" />
           </div>
 
-          {createPortal(
-            <AnimatePresence mode="sync">
-              {themeStore.openAuthModal && (
-                <motion.div
-                  key="portal"
-                  animate={{ opacity: 1, backdropFilter: "blur(2px)" }}
-                  exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-                  transition={{ duration: 0.3 }}
-                  onClick={(e) => {
-                    setThemeStore((state) => ({
-                      ...state,
-                      openAuthModal: true,
-                    }));
-                    e.stopPropagation();
-                  }}
-                  className="w-full h-full z-20  flex items-center justify-center fixed left-0 right-0  top-0 bottom-0 "
-                >
-                  <Auth setShowAuthModal={setThemeStore} isModal={true} />
-                </motion.div>
-              )}
-            </AnimatePresence>,
-            document.body
-          )}
+          {process.browser
+            ? createPortal(
+                <AnimatePresence mode="sync">
+                  {themeStore.openAuthModal && (
+                    <motion.div
+                      key="portal"
+                      animate={{ opacity: 1, backdropFilter: "blur(2px)" }}
+                      exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+                      transition={{ duration: 0.3 }}
+                      onClick={(e) => {
+                        setThemeStore((state) => ({
+                          ...state,
+                          openAuthModal: true,
+                        }));
+                        e.stopPropagation();
+                      }}
+                      className="w-full h-full z-20  flex items-center justify-center fixed left-0 right-0  top-0 bottom-0 "
+                    >
+                      <Auth setShowAuthModal={setThemeStore} isModal={true} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>,
+                document.body
+              )
+            : null}
         </>
       )}
     </div>

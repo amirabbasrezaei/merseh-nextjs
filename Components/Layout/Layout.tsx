@@ -1,7 +1,6 @@
 "use client";
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useState } from "react";
 import Header from "../Home/Header";
-import { IRANYekanXFaNum } from "@/app/fonts";
 import Footer from "../Footer";
 import { motion } from "framer-motion";
 import Navbar from "../Navbar/Navbar";
@@ -36,6 +35,7 @@ export default function Layout({
         >
           {header ? <Header /> : null}
           <Navbar />
+
           <div className=" w-full grow  flex flex-col gap-16">
             <div className=" grow">{children}</div>
             {footer ? (

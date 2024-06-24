@@ -24,7 +24,7 @@ export async function generateMetadata({
 }: NextPagePropsType): Promise<Metadata> {
   const product = await getProduct(params.slug[0]);
   
-  console.log(product?.product)
+
   if (product?.product) {
     return {
       title: product.product.name,

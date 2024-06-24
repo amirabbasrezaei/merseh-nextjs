@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import {
   Category_Svg,
   Home_Svg,
@@ -15,10 +16,14 @@ import { shopingCartStateAtom } from "../Cart/HeaderShoppingCart";
 
 export default function Navbar() {
   const path = usePathname();
-
-  console.log(path.split("/"));
+  const [isClient, setIsClient] = useState(false);
 
   const [shoppngCart] = useRecoilState(shopingCartStateAtom);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, [isClient]);
+
   return (
     <div
       style={{ boxShadow: "rgb(237 237 237) 0px 0px 14px" }}
@@ -80,7 +85,9 @@ export default function Navbar() {
             path === "/cart/checkout" ? "fill-green1" : "fill-[#363636]"
           )}
         />
-        {shoppngCart?.orderitems?.length && path !== "/cart/checkout" ? (
+        {shoppngCart?.orderitems?.length &&
+        path !== "/cart/checkout" &&
+        isClient ? (
           <div className=" absolute top-[-7px] right-[29px] ">
             <svg className="fill-green1 w-4 h-4 flex items justify-center animate-pulse">
               <circle r="3" cx="10" cy="10" className="" />

@@ -1,16 +1,16 @@
 "use client";
-
 import React, { useEffect, useState } from "react";
 import { atom, useRecoilState, useRecoilValue } from "recoil";
 import { Shop_Cart, Shopping_Cart_Empty, XMark_Svg } from "../SVGS";
 import { trpc } from "@/utils/trpc";
 import { AnimatePresence, motion } from "framer-motion";
 import HeaderShoppingCartItem from "./HeaderShoppingCartItem";
-import { useRouter } from "next/navigation";
+
 import { themeRecoilStateAtom } from "../ThemeController";
-import { createPortal } from "react-dom";
+// import { createPortal } from "react-dom";
 import { userInfoStoreAtom } from "../UserAuth";
 import { browser } from "process";
+import { createPortal } from "react-dom";
 import splitNumber from "../utils/splitNumber";
 import Link from "next/link";
 
@@ -152,6 +152,7 @@ const cartAnimation = {
 };
 
 export default function HeaderShoppingCart() {
+  const [isClient, setIsClient] = useState(false);
   const [themeStore, setThemeStore] = useRecoilState(themeRecoilStateAtom);
   const [userInfo, setUserInfo] = useRecoilState(userInfoStoreAtom);
   const {
@@ -171,6 +172,7 @@ export default function HeaderShoppingCart() {
     useRecoilState(shopingCartStateAtom);
 
   useEffect(() => {
+    setIsClient(true);
     refetch().then(() => {
       if (userInfo && shoppingCartState.updateActiveOrder) {
         mutateActiveOrder({
@@ -259,17 +261,23 @@ export default function HeaderShoppingCart() {
         }
         className=" hover:bg-hover1 hover:fill-green1 cursor-pointer rounded-[15px] relative"
       >
-        {shoppingCartState?.orderitems?.length ? (
-          <div className=" absolute top-0 right-0 ">
-            <svg className="fill-green1 w-4 h-4 flex items justify-center animate-pulse">
-              <circle r="3" cx="10" cy="10" className="" />
-            </svg>
-          </div>
-        ) : null}
+        <div
+          style={{
+            visibility: shoppingCartState?.orderitems?.length && isClient
+              ? "visible"
+              : "hidden",
+          }}
+          className=" absolute top-0 right-0 flex"
+        >
+          <svg className="fill-green1 w-4 h-4 flex items justify-center animate-pulse">
+            <circle r="3" cx="10" cy="10" />
+          </svg>
+        </div>
+
         <Shop_Cart classname="hover:fill-inherit fill-[#363636] w-[53px] p-3" />
       </div>
 
-      {process.browser
+      { isClient
         ? createPortal(
             <AnimatePresence mode="wait">
               {shoppingCartState.showCart && (
@@ -388,7 +396,7 @@ export default function HeaderShoppingCart() {
                 </motion.div>
               )}
             </AnimatePresence>,
-            // @ts-ignore
+
             document.body
           )
         : null}

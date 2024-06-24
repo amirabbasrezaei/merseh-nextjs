@@ -89,7 +89,7 @@ export default function Slider() {
   //   };
   // }, [sliderControl1]);
   return (
-    <section className="flex flex-row sm:gap-4 w-full h-[350px] sm:h-[430px] sm:p-6  items-center justify-evenly">
+    <section className="flex flex-row sm:gap-4 w-full h-[350px] sm:h-[430px]   items-center justify-evenly">
       <div className="sm:basis-2/3 h-full fader  relative" 
       // ref={sliderRef}
       >
