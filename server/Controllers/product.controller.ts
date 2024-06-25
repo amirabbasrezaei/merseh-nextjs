@@ -321,7 +321,11 @@ export async function productCarouselController({
   ctx: { prisma },
 }: ArgsStructure) {
   try {
-    const products = await prisma.product.findMany();
+    const products = await prisma.product.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
     return { products, status: "ok", error: null };
   } catch (error) {
     return { products: [], status: "failed", error };
@@ -339,5 +343,84 @@ export async function productsController({ ctx }: ArgsStructure) {
     return { products: products, error: null };
   } catch (error) {
     return { products: [], error };
+  }
+}
+type TorobScema = {
+  product_id: string;
+  page_url: string;
+  price: string;
+  availability: string;
+  old_price: string;
+};
+export async function forTorobProductController({ ctx }: ArgsStructure) {
+  console.log("hi");
+  const { prisma } = ctx;
+  try {
+    const products = await prisma.product.findMany({
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        quantity: true,
+        discount: true,
+        ProductVariation: {
+          select: {
+            values: {
+              select: {
+                name: true,
+                discount: true,
+                price: true,
+                id: true,
+                quantity: true,
+              },
+            },
+            id: true,
+          },
+        },
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+    const torobSchema: TorobScema[] = [];
+
+    products.map((pr) => {
+      if (pr.ProductVariation.length) {
+        pr.ProductVariation.map((prValues) => {
+          prValues.values.map((variationValue) => {
+            torobSchema.push({
+              availability:
+                variationValue.quantity > 0 ? "instock" : "outofstock",
+              old_price: String(variationValue.price),
+              price: String(
+                variationValue.price * (100 - variationValue.discount)
+              ),
+              page_url: `${process.env.BASE_URL}/${pr.id}/${pr.name.replaceAll(
+                " ",
+                "-"
+              )}?variation=${prValues.id}&variationValue=${variationValue.id}`,
+              product_id: String(pr.id),
+            });
+          });
+        });
+        return;
+      }
+
+      torobSchema.push({
+        availability: pr.quantity > 0 ? "instock" : "outofstock",
+        old_price: String(pr.price),
+        price: String(pr.price * (100 - pr.discount)),
+        page_url: `${process.env.BASE_URL}/${pr.id}/${pr.name.replaceAll(
+          " ",
+          "-"
+        )}`,
+        product_id: String(pr.id),
+      });
+    });
+
+    return torobSchema;
+  } catch (error) {
+    console.log(error);
+    return error;
   }
 }

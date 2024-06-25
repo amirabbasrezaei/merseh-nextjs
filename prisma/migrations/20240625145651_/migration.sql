@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "Product" ADD COLUMN     "discount" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "quantity" INTEGER NOT NULL DEFAULT 10;
+
+-- AlterTable
+ALTER TABLE "ProductVariationValue" ADD COLUMN     "discount" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "quantity" INTEGER NOT NULL DEFAULT 10;

@@ -7,6 +7,7 @@ import {
   AddProductControllerArgSchema,
   ProductCartInfoInputSchema,
   addProductController,
+  forTorobProductController,
   getProductController,
   getProductInputSchema,
   productCarouselController,
@@ -33,4 +34,5 @@ export const productRouter = router({
     .query(productCartInfoController),
   productCarousel: publicProcedure.query(productCarouselController),
   products: publicProcedure.query(productsController),
+  productsForTorob: publicProcedure.query(forTorobProductController),
 });

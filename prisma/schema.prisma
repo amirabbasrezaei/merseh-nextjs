@@ -8,12 +8,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
 
 model Address {
   id                 String   @id @default(uuid())
@@ -80,16 +78,19 @@ model Product {
   category         Category[]
   ProductForOrder  ProductForOrder[]
   content          String
+  quantity         Int                @default(10)
+  discount         Int                @default(0)
 }
 
 model ProductVariationValue {
-  id                 Int              @id @default(autoincrement())
+  id                 Int               @id @default(autoincrement())
   name               String
   price              Int
   ProductVariationId Int
-  ProductVariation   ProductVariation @relation(fields: [ProductVariationId], references: [id])
-
-  ProductForOrder ProductForOrder[]
+  quantity           Int               @default(10)
+  discount           Int               @default(0)
+  ProductVariation   ProductVariation  @relation(fields: [ProductVariationId], references: [id])
+  ProductForOrder    ProductForOrder[]
 }
 
 model ProductVariation {
