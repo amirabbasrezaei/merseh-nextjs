@@ -4,16 +4,17 @@ import Addresses from "./Address/Addresses";
 import { trpc } from "@/utils/trpc";
 import RadioInput from "../RadioInput";
 import { useRecoilState } from "recoil";
-import { shopingCartStateAtom } from "../Cart/HeaderShoppingCart";
+
 import Image from "next/image";
 import splitNumber from "../utils/splitNumber";
 import Link from "next/link";
 import Button from "../Button";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import useShoppingCart from "../useShoppingCart";
 export default function Shipping() {
   const router = useRouter();
-  const [cartState] = useRecoilState(shopingCartStateAtom);
+  const { activeOrderId, items, finalPrice } = useShoppingCart();
   const [selectedAddress, setSelectedAddress] = useState<string>("");
   const [selectedShipping, setSelectedShipping] = useState<{
     shippingTypeIndex: number;
@@ -26,7 +27,6 @@ export default function Shipping() {
     mutate: mutateOrder,
     data: activeOrderData,
     isLoading: isLoadingActiveOrderData,
-
   } = trpc.order.updateActiveOrder.useMutation({});
   const {
     data: shippingPricesData,
@@ -41,17 +41,17 @@ export default function Shipping() {
   } = trpc.payment.createPayment.useMutation();
 
   useEffect(() => {
-    if (cartState.activeOrderId) {
+    if (activeOrderId) {
       mutateShippingPrices({
         addressId: selectedAddress,
-        orderId: cartState.activeOrderId,
+        orderId: activeOrderId,
       });
     }
   }, [selectedAddress]);
 
   useEffect(() => {
     mutateOrder({
-      selectedProducts: cartState.orderitems,
+      selectedProducts: items,
       shippingInfo: {
         shippingPartnerId: selectedShipping.shippingPartnerId,
       },
@@ -157,7 +157,7 @@ export default function Shipping() {
               </span>
               {activeOrderData?.price ? (
                 <span className="text-green1 font-[500] text-[18px] flex flex-row gap-1 items-center">
-                  {splitNumber(cartState.price?.totalPrice)}
+                  {splitNumber(finalPrice)}
                   <span className="text-[10px] text-black1 font-[400]">
                     تومان
                   </span>
@@ -203,8 +203,7 @@ export default function Shipping() {
         <Link className="w-full h-full" href={"/cart/shipping"}>
           <Button
             onClick={() =>
-              cartState.activeOrderId &&
-              mutateCreatePayment({ orderId: cartState.activeOrderId })
+              activeOrderId && mutateCreatePayment({ orderId: activeOrderId })
             }
             isLoading={
               isCreatePaymentPending ||

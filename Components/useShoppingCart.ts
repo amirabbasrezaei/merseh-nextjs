@@ -371,5 +371,6 @@ export default function useShoppingCart() {
     getProduct,
     finalPrice: shoppingCart.price?.totalPrice,
     items: shoppingCart.orderitems,
+    activeOrderId: shoppingCart.activeOrderId
   };
 }
