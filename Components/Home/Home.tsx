@@ -14,7 +14,7 @@ export default function Home() {
       <Slider />
       <Main_Categories />
       <ProductsGrid categoryId={2} title="روغن های گیاهی"/>
-      <ProductsGrid categoryId={6} title="گیاهان خشک شده"/>
+      {/* <ProductsGrid categoryId={6} title="گیاهان خشک شده"/> */}
       <ProductCarousel
         key={"popular_products"}
         title="محصولات جدید"

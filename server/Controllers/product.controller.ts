@@ -331,7 +331,11 @@ export async function productCarouselController({
 export async function productsController({ ctx }: ArgsStructure) {
   const { prisma } = ctx;
   try {
-    const products = await prisma.product.findMany();
+    const products = await prisma.product.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
     return { products: products, error: null };
   } catch (error) {
     return { products: [], error };

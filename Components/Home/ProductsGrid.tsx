@@ -96,13 +96,13 @@ export default function ProductsGrid({ title, categoryId }: props) {
         onSwiper={swiperRef}
         spaceBetween={20}
         style={width > 639 ? { paddingRight: 20, paddingLeft: 20 } : {}}
-        slidesPerView={width > 639 ? 3 : 1}
+        slidesPerView={width > 639 ? 2 : 1}
         direction="horizontal"
         className="w-full h-full sm:border border-[#f3f3f3] rounded-[5px]"
         autoplay={{ delay: 5000, disableOnInteraction: false }}
         modules={[Autoplay]}
       >
-        <SlidePrevButton />
+        {/* <SlidePrevButton /> */}
 
         {data?.length
           ? prepareProductsForGridView(data).map(
@@ -145,14 +145,14 @@ export default function ProductsGrid({ title, categoryId }: props) {
                           >
                             <div className="flex flex-row items-center gap-2">
                               <Image
-                                width={140}
-                                height={140}
+                                width={180}
+                                height={180}
                                 quality={100}
                                 alt={product.imageNames[0]}
                                 src={`${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${product.imageNames[0]}`}
                               />
                               <div className="flex flex-col items-start justify-center gap-1">
-                                <span className="font-[400] basis-2/4 text-[14px] sm:text-[14px] text-black1 w-fit">
+                                <span className="font-[400] basis-2/4 text-[14px] sm:text-[16px] text-black1 w-fit">
                                   {product.name}
                                 </span>
                                 {product?.ProductVariation?.length ? (
@@ -205,7 +205,7 @@ export default function ProductsGrid({ title, categoryId }: props) {
               </SwiperSlide>
             ))}
 
-        <SlideNextButton />
+        {/* <SlideNextButton /> */}
       </Swiper>
     </section>
   );
