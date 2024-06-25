@@ -12,7 +12,7 @@ import ProductCarousel from "../Home/ProductCarousel";
 import useShoppingCart, { ShoppingCart } from "../useShoppingCart";
 import toast from "react-hot-toast";
 import useWindowSize from "../useWindowSize";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Check, Minus_Svg, Plus_Svg, TrashBin_SVG } from "../SVGS";
 import Link from "next/link";
 
@@ -27,7 +27,8 @@ type ProductVariation = {
 } | null;
 export default function Product({ productId }: Props) {
   const { width } = useWindowSize();
-
+  const params = useSearchParams();
+  console.log(params.get("variation"));
   const router = useRouter();
   const [productInShoppingCart, setProductInShoppingCart] = useState<
     ShoppingCart["orderitems"][0] | null
@@ -65,10 +66,19 @@ export default function Product({ productId }: Props) {
       setSelectedProductVariation(
         productData?.product?.variations?.length
           ? {
-              variationId: productData.product.variations[0].id,
+              variationId:
+                Number(params.get("variation")) ||
+                productData?.product?.variations[0].id,
               variationValueid:
-                productData.product.variations[0].variations[0].id,
-              price: productData.product.variations[0].variations[0].price,
+                Number(params.get("variationValue")) ||
+                productData?.product?.variations[0].variations[0].id,
+              price:
+                productData?.product?.variations
+                  .find((e) => e.id === Number(params.get("variation")))
+                  ?.variations.find(
+                    (e) => e.id === Number(params.get("variationValue"))
+                  )?.price ||
+                productData?.product?.variations[0].variations[0].price,
             }
           : null
       );
