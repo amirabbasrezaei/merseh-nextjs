@@ -392,9 +392,7 @@ export async function forTorobProductController({ ctx }: ArgsStructure) {
               availability:
                 variationValue.quantity > 0 ? "instock" : "outofstock",
               old_price: String(variationValue.price),
-              price: String(
-                variationValue.price * (100 - variationValue.discount)
-              ),
+              price: String(variationValue.price - variationValue.discount),
               page_url: `${process.env.BASE_URL}/${pr.id}/${pr.name.replaceAll(
                 " ",
                 "-"
@@ -409,7 +407,7 @@ export async function forTorobProductController({ ctx }: ArgsStructure) {
       torobSchema.push({
         availability: pr.quantity > 0 ? "instock" : "outofstock",
         old_price: String(pr.price),
-        price: String(pr.price * (100 - pr.discount)),
+        price: String(pr.price - pr.discount),
         page_url: `${process.env.BASE_URL}/${pr.id}/${pr.name.replaceAll(
           " ",
           "-"
