@@ -397,7 +397,7 @@ export async function forTorobProductController({ ctx }: ArgsStructure) {
                 " ",
                 "-"
               )}?variation=${prValues.id}&variationValue=${variationValue.id}`,
-              product_id: String(pr.id),
+              product_id: `${pr.id}_${prValues.id}_${variationValue.id}`,
             });
           });
         });
