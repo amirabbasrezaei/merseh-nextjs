@@ -12,13 +12,15 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import classNames from "classnames";
 import { useRecoilState } from "recoil";
-import { shopingCartStateAtom } from "../Cart/HeaderShoppingCart";
+import useShoppingCart from "../useShoppingCart";
+
 
 export default function Navbar() {
+  const {items} = useShoppingCart()
   const path = usePathname();
   const [isClient, setIsClient] = useState(false);
 
-  const [shoppngCart] = useRecoilState(shopingCartStateAtom);
+
 
   useEffect(() => {
     setIsClient(true);
@@ -85,7 +87,7 @@ export default function Navbar() {
             path === "/cart/checkout" ? "fill-green1" : "fill-[#363636]"
           )}
         />
-        {shoppngCart?.orderitems?.length &&
+        {items?.length &&
         path !== "/cart/checkout" &&
         isClient ? (
           <div className=" absolute top-[-7px] right-[29px] ">

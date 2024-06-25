@@ -192,7 +192,7 @@ export default function ProductsGrid({ title, categoryId }: props) {
                   {Array.from(Array(3)).map((_, i) => (
                     <div
                       key={i}
-                      className="flex flex-row gap-3 border border-[#f3f3f3] justify-between rounded-[5px] p-3 items-center"
+                      className="flex flex-row gap-3  justify-between rounded-[5px] p-3 items-center"
                     >
                       <div className="flex flex-row gap-4 items-center">
                         <div className="w-[120px] h-[120px] bg-gray-100 animate-pulse rounded-[5px]"></div>

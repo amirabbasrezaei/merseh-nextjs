@@ -38,7 +38,7 @@ export function SlideNextButton() {
 
 export function SlidePrevButton() {
   const swiper = useSwiper();
-  console.log(swiper.previousIndex)
+
   return (
     <>
       {swiper.activeIndex !== 0 ? (
@@ -56,7 +56,7 @@ export function SlidePrevButton() {
 }
 
 export default function ProductCarousel({ title, sliderStartDelay }: props) {
-  const [swiperRef, setSwiperRef] = useState();
+  const [swiperRef] = useState();
   const { width } = useWindowSize();
   const { data: productCarouselData, isLoading } =
     trpc.product.productCarousel.useQuery();

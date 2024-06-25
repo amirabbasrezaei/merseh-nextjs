@@ -1,132 +1,34 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../Button";
 import { useRecoilState } from "recoil";
-import { ShoppingCart, shopingCartStateAtom } from "./HeaderShoppingCart";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Minus_Svg, Plus_Svg } from "../SVGS";
 import splitNumber from "../utils/splitNumber";
 import { trpc } from "@/utils/trpc";
 import { themeRecoilStateAtom } from "../ThemeController";
+import useShoppingCart from "../useShoppingCart";
 
 export default function Checkout() {
   const [themeStore, setThemeStore] = useRecoilState(themeRecoilStateAtom);
-  const [shoppingCart, setShoppingCart] = useRecoilState(shopingCartStateAtom);
+  const [isClient, setIsClient] = useState(false);
+  const {
+    decrementProductNumber,
+    incrementProductNumber,
+    removeProductFromOrder,
+    finalPrice,
+    items,
+  } = useShoppingCart();
   const { data, error, refetch } = trpc.order.getActiveOrder.useQuery();
 
-  const incrementProductNumber = (
-    variationValueId: number | undefined,
-    productId: number
-  ) => {
-    if (variationValueId) {
-      const newValue = shoppingCart.orderitems.map(
-        (prOrder: ShoppingCart["orderitems"][0]) => {
-          if (prOrder.variationValueId === variationValueId) {
-            return { ...prOrder, numberOfProduct: prOrder.numberOfProduct + 1 };
-          }
-          return prOrder;
-        }
-      );
-      setShoppingCart((state) => ({
-        ...state,
-        orderitems: newValue,
-        updateActiveOrder: true,
-      }));
-      return;
-    }
-
-    if (productId) {
-      const newValue = shoppingCart.orderitems.map(
-        (prOrder: ShoppingCart["orderitems"][0]) => {
-          if (prOrder.productId === productId) {
-            return { ...prOrder, numberOfProduct: prOrder.numberOfProduct + 1 };
-          }
-          return prOrder;
-        }
-      );
-      setShoppingCart((state: ShoppingCart) => ({
-        ...state,
-        orderitems: newValue,
-        updateActiveOrder: true,
-      }));
-    }
-  };
-
-  const decrementProductNumber = (
-    variationValueId: number | undefined,
-    productId: number
-  ) => {
-    if (variationValueId) {
-      const newValue = shoppingCart.orderitems.map(
-        (prOrder: ShoppingCart["orderitems"][0]) => {
-          if (prOrder.variationValueId === variationValueId) {
-            return { ...prOrder, numberOfProduct: prOrder.numberOfProduct - 1 };
-          }
-          return prOrder;
-        }
-      );
-      setShoppingCart((state) => ({
-        ...state,
-        orderitems: newValue,
-        updateActiveOrder: true,
-      }));
-      return;
-    }
-
-    if (productId) {
-      const newValue = shoppingCart.orderitems.map(
-        (prOrder: ShoppingCart["orderitems"][0]) => {
-          if (prOrder.productId === productId) {
-            return { ...prOrder, numberOfProduct: prOrder.numberOfProduct - 1 };
-          }
-          return prOrder;
-        }
-      );
-      setShoppingCart((state: ShoppingCart) => ({
-        ...state,
-        orderitems: newValue,
-        updateActiveOrder: true,
-      }));
-    }
-  };
-
-  const removeProductFromOrder = (
-    variationValueId: number | undefined,
-    productId: number
-  ) => {
-    if (variationValueId) {
-      const remainProducts = shoppingCart.orderitems.filter(
-        (pr) => pr.variationValueId !== variationValueId
-      );
-      setShoppingCart((state) => ({
-        ...state,
-        orderitems: remainProducts,
-        updateActiveOrder: true,
-      }));
-      return;
-    }
-    if (productId) {
-      const remainProducts = shoppingCart.orderitems.filter(
-        (pr) => pr.productId !== productId
-      );
-      setShoppingCart((state) => ({
-        ...state,
-        orderitems: remainProducts,
-        updateActiveOrder: true,
-      }));
-    }
-  };
-
   useEffect(() => {
+    setIsClient(true);
     if (error?.message && JSON.parse(error.message).text === "please log in") {
       setThemeStore({ openAuthModal: true });
     }
   }, [error]);
-
-  
-
-  
 
   return (
     <section className="flex flex-col sm:flex-row w-full gap-[40px]  sm:p-10">
@@ -141,8 +43,8 @@ export default function Checkout() {
           </tr>
         </thead>
         <tbody className="w-full">
-          {shoppingCart?.orderitems.length
-            ? shoppingCart.orderitems?.map((prOrder, index) => (
+          {items.length && isClient
+            ? items?.map((prOrder, index) => (
                 <tr key={index} className="pb-6">
                   <td className=" ">
                     <Link
@@ -157,7 +59,9 @@ export default function Checkout() {
                         className="w-[50px] sm:w-[100px]"
                       />
                       <div className="flex flex-row gap-2 items-center">
-                        <span className="text-[#323232] text-[12px]">{prOrder.name}</span>
+                        <span className="text-[#323232] text-[12px]">
+                          {prOrder.name}
+                        </span>
                         {prOrder.variationValueName?.length ? (
                           <span className="text-[10px] sm:text-[14px] text-[#616161] font-[500]">
                             {`- ${prOrder.variationValueName} `}
@@ -218,9 +122,9 @@ export default function Checkout() {
               <span className="text-lightBlack text-[15px] font-[500] w-full">
                 جمع سبد خرید
               </span>
-              {shoppingCart?.price ? (
+              {finalPrice && isClient ? (
                 <span className="text-green1 font-[500] text-[18px] flex flex-row gap-1 items-center">
-                  {splitNumber(shoppingCart.price?.totalPrice)}
+                  {splitNumber(finalPrice)}
                   <span className="text-[10px] text-black1 font-[400]">
                     تومان
                   </span>
