@@ -58,7 +58,6 @@ export async function generateMetadata({
         ? variationValue.price
         : product.product.price;
 
-        console.log(product)
 
     const availability =
       variation && variationValue
