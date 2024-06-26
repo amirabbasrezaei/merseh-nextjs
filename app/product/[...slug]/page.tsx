@@ -5,7 +5,7 @@ import axios from "axios";
 import { Metadata, NextPage } from "next";
 import { cache } from "react";
 
-export const revalidate = 3600;
+export const revalidate = 120;
 
 export type NextPagePropsType = {
   params: { slug: string };
@@ -14,18 +14,61 @@ export type NextPagePropsType = {
 
 const getProduct = cache(async (productId: string) => {
   const { data } = await axios.get(
-    `${process.env.BASE_URL}/api/trpc/product.getproduct?input={"productId":${productId}}`
+    `${
+      process.env.NODE_ENV === "production"
+        ? process.env.BASE_URL
+        : "http://localhost:3000"
+    }/api/trpc/product.getproduct?input={"productId":${productId}}`
   );
   return data.result.data;
 });
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: NextPagePropsType): Promise<Metadata> {
   const product = await getProduct(params.slug[0]);
-  
 
   if (product?.product) {
+    const variation = product.product?.variations.find(
+      (vr: any) => vr.id == searchParams.variation
+    );
+
+    const variationValue = variation?.variations?.find(
+      (value: any) => value.id == searchParams.variationValue
+    );
+
+    const product_id =
+      variation && variationValue
+        ? `${product.product.id}_${variation.id}_${variationValue.id}`
+        : product.product.id;
+
+    const product_name =
+      variation && variationValue
+        ? `${product.product.name} - ${variationValue.name}`
+        : product.product.name;
+
+    const product_price =
+      variation && variationValue
+        ? variationValue.price - variationValue.discount
+        : product.product.price - product.product.discount;
+
+    const product_old_price =
+      variation && variationValue
+        ? variationValue.price
+        : product.product.price;
+
+        console.log(product)
+
+    const availability =
+      variation && variationValue
+        ? variationValue.instock
+          ? "instock"
+          : "outofstock"
+        : product.product.instock
+        ? "instock"
+        : "outofstock";
+
     return {
       title: product.product.name,
       description:
@@ -38,7 +81,16 @@ export async function generateMetadata({
         })),
       },
       alternates: {
-        canonical: `${process.env.BASE_URL}/product/${params.slug[0]}/${product.product.name}`,
+        canonical: `${process.env.BASE_URL}/product/${params.slug[0]}/${(
+          product.product.name as string
+        ).replaceAll(" ", "-")}`,
+      },
+      other: {
+        product_id,
+        product_name,
+        product_price,
+        product_old_price,
+        availability,
       },
     };
   }
@@ -46,7 +98,6 @@ export async function generateMetadata({
 }
 
 export default function Page({ params }: NextPagePropsType) {
-  console.log(params)
   return (
     <Layout>
       <Product productId={params.slug[0]} />

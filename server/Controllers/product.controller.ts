@@ -69,6 +69,7 @@ export const getProductPayloadSchema = z.object({
 type GetProductPayloadType = z.infer<typeof getProductPayloadSchema>;
 
 type GetProductInputArgs = z.infer<typeof getProductInputSchema>;
+
 export async function getProductController({
   ctx,
   input,
@@ -84,6 +85,8 @@ export async function getProductController({
         imageNames: true,
         price: true,
         content: true,
+        quantity: true,
+        discount: true,
         ProductVariation: {
           select: {
             values: true,
@@ -112,6 +115,8 @@ export async function getProductController({
           name: variationValue.name,
           price: variationValue.price,
           id: variationValue.id,
+          discount: variationValue.discount,
+          instock: variationValue.quantity ? true : false,
         })),
       })),
       content: JSON.parse(product.content).map((e: any) => {
@@ -126,6 +131,8 @@ export async function getProductController({
         }
         return e;
       }),
+      instock: product.quantity ? true : false,
+      discount: product.discount,
     };
     return { product: result, message: "ok" };
   } catch (error) {
@@ -393,10 +400,11 @@ export async function forTorobProductController({ ctx }: ArgsStructure) {
                 variationValue.quantity > 0 ? "instock" : "outofstock",
               old_price: String(variationValue.price),
               price: String(variationValue.price - variationValue.discount),
-              page_url: `${process.env.BASE_URL}/product/${pr.id}/${pr.name.replaceAll(
-                " ",
-                "-"
-              )}?variation=${prValues.id}&variationValue=${variationValue.id}`,
+              page_url: `${process.env.BASE_URL}/product/${
+                pr.id
+              }/${pr.name.replaceAll(" ", "-")}?variation=${
+                prValues.id
+              }&variationValue=${variationValue.id}`,
               product_id: `${pr.id}_${prValues.id}_${variationValue.id}`,
             });
           });
@@ -408,10 +416,9 @@ export async function forTorobProductController({ ctx }: ArgsStructure) {
         availability: pr.quantity > 0 ? "instock" : "outofstock",
         old_price: String(pr.price),
         price: String(pr.price - pr.discount),
-        page_url: `${process.env.BASE_URL}/product/${pr.id}/${pr.name.replaceAll(
-          " ",
-          "-"
-        )}`,
+        page_url: `${process.env.BASE_URL}/product/${
+          pr.id
+        }/${pr.name.replaceAll(" ", "-")}`,
         product_id: String(pr.id),
       });
     });
