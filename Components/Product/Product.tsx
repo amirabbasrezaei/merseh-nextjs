@@ -106,12 +106,7 @@ export default function Product({ productId }: Props) {
           : 0
       );
 
-      // console.log(productData?.product?.variations
-      //   .find((e) => e.id === Number(params.get("variation")))
-      //   ?.variations.find(
-      //     (e) => e.id === Number(params.get("variationValue"))
-      //   )?.price ||
-      // productData?.product?.variations[0]?.variations[0].price )
+
     }
   }, [isFetched]);
 
