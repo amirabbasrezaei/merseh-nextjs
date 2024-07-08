@@ -67,27 +67,24 @@ export async function generateMetadata({
         ? "instock"
         : "outofstock";
 
-    console.log(
-      product.product?.variations[0].variations
-        .map((e: any) => e.name)
-        .join(", ")
-    );
     return {
       title: " قیمت و خرید" + " " + product.product.name,
       description:
         "خرید اینترنتی" +
         " " +
         product.product.name +
-        ` با ${
+        `${
           product.product?.variations?.length
-            ? product.product?.variations[0]?.variationName
+            ? " با " + product.product?.variations[0]?.variationName
             : ""
         }` +
-        " " +
-        product.product?.variations[0]?.variations
-          .map((e: any) => e.name)
-          .join(", ") +
-        " " +
+        ` ${
+          product.product?.variations.length
+            ? product.product?.variations[0]?.variations
+                .map((e: any) => e.name)
+                .join(", ")
+            : ""
+        } ` +
         "به همراه مشخصات، خواص و قیمت امروز محصولات طبیعی و ارگانیک و عطاری در فروشگاه مرسه",
       openGraph: {
         images: product.product.imageUrls.map((e: any) => ({
