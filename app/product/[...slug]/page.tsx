@@ -58,7 +58,6 @@ export async function generateMetadata({
         ? variationValue.price
         : product.product.price;
 
-
     const availability =
       variation && variationValue
         ? variationValue.instock
@@ -68,12 +67,28 @@ export async function generateMetadata({
         ? "instock"
         : "outofstock";
 
+    console.log(
+      product.product?.variations[0].variations
+        .map((e: any) => e.name)
+        .join(", ")
+    );
     return {
-      title: product.product.name,
+      title: " قیمت و خرید" + " " + product.product.name,
       description:
-        product.product.content
-          .filter((e: any) => e.type === "text")[0]
-          ?.content.toString() || "",
+        "خرید اینترنتی" +
+        " " +
+        product.product.name +
+        ` با ${
+          product.product?.variations?.length
+            ? product.product?.variations[0]?.variationName
+            : ""
+        }` +
+        " " +
+        product.product?.variations[0]?.variations
+          .map((e: any) => e.name)
+          .join(", ") +
+        " " +
+        "به همراه مشخصات، خواص و قیمت امروز محصولات طبیعی و ارگانیک و عطاری در فروشگاه مرسه",
       openGraph: {
         images: product.product.imageUrls.map((e: any) => ({
           url: e,
