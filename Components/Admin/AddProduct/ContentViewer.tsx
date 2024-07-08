@@ -23,10 +23,11 @@ export function ContentViewer({ contentForView }: Props) {
                           ? `data:image/${node.content.format},${node.content.src}`
                           : node.content.src
                       }
-                      width={800}
-                      height={800}
+                      width={1000}
+                      height={1000}
                       alt={node.content.name}
-                      quality={100}
+                      quality={80}
+                      priority={false}
                     />
                   </div>
                 );
