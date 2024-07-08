@@ -145,6 +145,7 @@ export async function editCategoryController({
         content: input.content,
         englishTitle: input.englishName,
         title: input.name,
+        
       },
     });
     return { status: true, error: null, message: "تغییرات با موفقیت انجام شد" };

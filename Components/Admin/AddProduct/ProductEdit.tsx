@@ -61,7 +61,7 @@ export default function ProductEdit({ productId }: Props) {
       setPrice(String(data.product.price));
       setContent(data.product.content);
       seteditProductImages({
-        existingImages: data.product.imageUrls.map((img) => ({
+        existingImages: data.product.imageUrls.map((img: any) => ({
           url: img,
           name: img.split("/").at(-1) || "",
         })),

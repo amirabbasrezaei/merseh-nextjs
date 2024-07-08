@@ -76,16 +76,16 @@ export default function Product({ productId }: Props) {
                 productData?.product?.variations[0].variations[0].id,
               price:
                 productData?.product?.variations
-                  .find((e) => e.id === Number(params.get("variation")))
+                  .find((e: any) => e.id === Number(params.get("variation")))
                   ?.variations.find(
-                    (e) => e.id === Number(params.get("variationValue"))
+                    (e: any) => e.id === Number(params.get("variationValue"))
                   )?.price ||
                 productData?.product?.variations[0]?.variations[0].price,
               discount:
                 productData?.product?.variations
-                  .find((e) => e.id === Number(params.get("variation")))
+                  .find((e:  any) => e.id === Number(params.get("variation")))
                   ?.variations.find(
-                    (e) => e.id === Number(params.get("variationValue"))
+                    (e: any) => e.id === Number(params.get("variationValue"))
                   )?.discount ||
                 productData?.product?.variations[0].variations[0]?.discount,
             }
@@ -147,7 +147,7 @@ export default function Product({ productId }: Props) {
             )}
 
             {!isLoading && productData?.product ? (
-              productData?.product?.variations.map((variation) => (
+              productData?.product?.variations.map((variation: any) => (
                 <div
                   key={variation.id}
                   className="flex flex-row items-center gap-2"
@@ -158,7 +158,7 @@ export default function Product({ productId }: Props) {
                   <div className="flex flex-col gap-5">
                     <div className="flex items-center gap-4">
                       {variation.variations.map(
-                        (variationType, variationTypeIndex) => (
+                        (variationType: any, variationTypeIndex : number) => (
                           <div
                             key={variationType.id}
                             className="flex items-center gap-2"
@@ -168,7 +168,7 @@ export default function Product({ productId }: Props) {
                                 checked={
                                   selectedProductVariation?.variationId ===
                                     variation.id &&
-                                  selectedProductVariation.variationValueid ===
+                                  selectedProductVariation?.variationValueid ===
                                     variationType.id
                                 }
                                 onChange={(e) =>
@@ -184,7 +184,7 @@ export default function Product({ productId }: Props) {
                                   "appearance-none cursor-pointer text-center center w-[15px]  h-[15px] rounded-full",
                                   selectedProductVariation?.variationId ===
                                     variation.id &&
-                                    selectedProductVariation.variationValueid ===
+                                    selectedProductVariation?.variationValueid ===
                                       variationType.id
                                     ? "checked:bg-green1"
                                     : ""

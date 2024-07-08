@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -19,43 +13,43 @@ model Address {
   latitude           Float
   longitude          Float
   cityId             Int
-  city               City     @relation(fields: [cityId], references: [id])
-  Order              Order[]
-  User               User?    @relation(fields: [userId], references: [id])
   userId             String?
   postalCode         BigInt?
   addressDetails     String
-  Province           Province @relation(fields: [provinceId], references: [id])
   provinceId         Int
   reciverPhoneNumber String
   reciverName        String
   reciverFamilyName  String
+  city               City     @relation(fields: [cityId], references: [id])
+  Province           Province @relation(fields: [provinceId], references: [id])
+  User               User?    @relation(fields: [userId], references: [id])
+  Order              Order[]
 }
 
 model Province {
   id      Int       @id @default(autoincrement())
-  Address Address[]
   name    String
   engName String
+  Address Address[]
   City    City[]
 }
 
 model City {
   id         Int       @id @default(autoincrement())
-  Address    Address[]
   name       String
   engName    String
-  Province   Province  @relation(fields: [provinceId], references: [id])
   provinceId Int
+  Address    Address[]
+  Province   Province  @relation(fields: [provinceId], references: [id])
 }
 
 model OrderShipping {
   id                Int             @id @default(autoincrement())
   price             Int
-  ShippingPartner   ShippingPartner @relation(fields: [shippingPartnerId], references: [id])
   shippingPartnerId Int
-  Order             Order           @relation(fields: [orderId], references: [id])
   orderId           Int             @unique
+  Order             Order           @relation(fields: [orderId], references: [id])
+  ShippingPartner   ShippingPartner @relation(fields: [shippingPartnerId], references: [id])
 }
 
 model ShippingPartner {
@@ -69,17 +63,19 @@ model ShippingPartner {
 model Product {
   id               Int                @id @default(autoincrement())
   name             String
-  engName          String             @default("")
   price            Int
   imageNames       String[]
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @default(now())
-  ProductVariation ProductVariation[]
-  category         Category[]
-  ProductForOrder  ProductForOrder[]
   content          String
-  quantity         Int                @default(10)
+  engName          String             @default("")
   discount         Int                @default(0)
+  quantity         Int                @default(10)
+  mainCategoryId   Int                @default(1)
+  metaDescription  String             @default("")
+  ProductForOrder  ProductForOrder[]
+  ProductVariation ProductVariation[]
+  category         Category[]         @relation("CategoryToProduct")
 }
 
 model ProductVariationValue {
@@ -87,31 +83,31 @@ model ProductVariationValue {
   name               String
   price              Int
   ProductVariationId Int
-  quantity           Int               @default(10)
   discount           Int               @default(0)
-  ProductVariation   ProductVariation  @relation(fields: [ProductVariationId], references: [id])
+  quantity           Int               @default(10)
   ProductForOrder    ProductForOrder[]
+  ProductVariation   ProductVariation  @relation(fields: [ProductVariationId], references: [id])
 }
 
 model ProductVariation {
   id              Int                     @id @default(autoincrement())
   variateName     String
-  values          ProductVariationValue[]
   ProductId       Int
-  Product         Product                 @relation(fields: [ProductId], references: [id])
   ProductForOrder ProductForOrder[]
+  Product         Product                 @relation(fields: [ProductId], references: [id])
+  values          ProductVariationValue[]
 }
 
 model ProductForOrder {
   id                      Int                    @id @default(autoincrement())
   numberOfproduct         Int
-  Order                   Order?                 @relation(fields: [orderId], references: [id])
   orderId                 Int?
   productId               Int
-  Product                 Product                @relation(fields: [productId], references: [id])
   productVariationId      Int?
-  ProductVariation        ProductVariation?      @relation(fields: [productVariationId], references: [id])
   productVariationValueId Int?
+  Order                   Order?                 @relation(fields: [orderId], references: [id])
+  Product                 Product                @relation(fields: [productId], references: [id])
+  ProductVariation        ProductVariation?      @relation(fields: [productVariationId], references: [id])
   ProductVariationValue   ProductVariationValue? @relation(fields: [productVariationValueId], references: [id])
 }
 
@@ -120,26 +116,28 @@ model Order {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @default(now())
   status            OrderStatus
-  ProductForOrder   ProductForOrder[]
   userId            String
-  user              User              @relation(fields: [userId], references: [id])
-  Address           Address?          @relation(fields: [addressId], references: [id])
   addressId         String?
-  ShippingPartner   ShippingPartner?  @relation(fields: [shippingPartnerId], references: [id])
-  shippingPartnerId Int?
-  OrderShipping     OrderShipping?
   finalPrice        Int?
+  shippingPartnerId Int?
+  Address           Address?          @relation(fields: [addressId], references: [id])
+  ShippingPartner   ShippingPartner?  @relation(fields: [shippingPartnerId], references: [id])
+  user              User              @relation(fields: [userId], references: [id])
+  OrderShipping     OrderShipping?
   Payment           Payment[]
+  ProductForOrder   ProductForOrder[]
 }
 
 model Category {
   id               Int        @id @default(autoincrement())
   title            String
   parentCategoryId Int?
+  imageName        String     @default("")
+  content          String     @default("")
+  englishTitle     String     @default("")
   parentCategory   Category?  @relation("SubCategories", fields: [parentCategoryId], references: [id])
   subCategories    Category[] @relation("SubCategories")
-  products         Product[]
-  imageName        String     @default("")
+  products         Product[]  @relation("CategoryToProduct")
 }
 
 model User {
@@ -153,21 +151,21 @@ model User {
   loginCode      String?
   isVerified     Boolean   @default(false)
   credit         Int       @default(0)
-  Payment        Payment[]
-  Session        Session[]
   createdAt      DateTime  @default(now())
   lastLogin      DateTime?
   numberOfLogins Int?      @default(1)
-  order          Order[]
   Addresses      Address[]
+  order          Order[]
+  Payment        Payment[]
+  Session        Session[]
 }
 
 model Session {
   id         String   @id @default(uuid())
   expireDate DateTime @default(now())
   userId     String
-  user       User     @relation(fields: [userId], references: [id])
   createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
 }
 
 model Payment {
@@ -181,16 +179,16 @@ model Payment {
   servicePaymentId     String?   @unique
   paymentUrl           String?
   value                Int
-  user                 User      @relation(fields: [userId], references: [id])
   cardNumber           String?
   paymentDescription   String?
   orderId              Int
   Order                Order     @relation(fields: [orderId], references: [id])
+  user                 User      @relation(fields: [userId], references: [id])
 }
 
 enum role {
   USER
-  SUPERADMIN
+  ADMIN
 }
 
 enum OrderStatus {
