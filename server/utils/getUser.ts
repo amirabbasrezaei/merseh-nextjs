@@ -86,6 +86,7 @@ function checkAccessToken() {
       accessToken,
       process.env.JWT_PRIVATE_KEY as Secret
     );
+
     return token;
   }
   return null;
@@ -101,7 +102,6 @@ type GetUser = {
 export async function getUser(res: Response): Promise<GetUser> {
   const userWithAccessToken = checkAccessToken();
   if (userWithAccessToken) {
-
     return {
       accessToken: userWithAccessToken,
       refreshToken: null,

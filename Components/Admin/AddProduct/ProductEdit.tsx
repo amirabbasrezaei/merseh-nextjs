@@ -1,27 +1,44 @@
 "use client";
 
 import { trpc } from "@/utils/trpc";
-import React, { useEffect, useState } from "react";
+import React, { createElement, useEffect, useState } from "react";
 import "react-quill/dist/quill.snow.css";
 import QuillEditor, { contentType } from "./QuillEditor";
 import { Plus_Svg } from "@/Components/SVGS";
-import Categories from "./Categories.add_product";
+import Category from "../Category/Category.admin";
+import ContentViewer from "./ContentViewer";
+import Image from "next/image";
+import { EditProductInput } from "@/server/Controllers/product.controller";
+import TextArea from "@/Components/TextArea";
+
+type Props = {
+  productId?: string;
+};
 
 type imageType = { base64: string; name: string };
+
+type editImageType = {
+  existingImages: { url: string; name: string }[];
+  newImages?: { base64: string; name: string }[];
+};
+
 type variation = {
   variationName: string;
   variations: { name: string; price: number }[];
 };
 
-export type filterTypeArgs = {
+export interface filterTypeArgs {
   categoryId?: number;
   searchTerm?: string;
   parentCategories?: number[];
-};
+}
 
-export default function AddProduct() {
+export default function ProductEdit({ productId }: Props) {
+  const [metaDescription, setMetaDescription] = useState("");
   const { mutateAsync } = trpc.product.addProduct.useMutation({});
   const [images, setImages] = useState<imageType[]>([]);
+  const [editProductImages, seteditProductImages] =
+    useState<editImageType | null>(null);
   const [engName, setEngName] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [price, setPrice] = useState<string>("");
@@ -31,6 +48,28 @@ export default function AddProduct() {
   const [filter, setFilter] = useState<filterTypeArgs>({});
   const [variations, setVariations] = useState<variation[]>([]);
   const [content, setContent] = useState<contentType[]>([]);
+  const { data } = trpc.product.getproduct.useQuery({
+    productId: Number(productId),
+  });
+  const { mutateAsync: mutateEditProduct } =
+    trpc.product.editProduct.useMutation();
+
+  useEffect(() => {
+    if (data?.product) {
+      setName(data.product.name);
+      setEngName(data.product.englishName);
+      setPrice(String(data.product.price));
+      setContent(data.product.content);
+      seteditProductImages({
+        existingImages: data.product.imageUrls.map((img) => ({
+          url: img,
+          name: img.split("/").at(-1) || "",
+        })),
+      });
+      setMetaDescription(data?.product.metaDescription);
+      setFilter({ categoryId: data.product.mainCategoryId });
+    }
+  }, [data]);
 
   useEffect(() => {
     if ((files as any)?.length && !flag) {
@@ -51,15 +90,41 @@ export default function AddProduct() {
           const chooseImage = (files as any)[currentImageIndex];
           reader.onloadend = (res) => {
             const promise = new Promise((resolved) => {
-              setImages((state: imageType[]) => [
-                ...state,
-                {
-                  base64: (res.target?.result as string)
-                    .replace("data:", "")
-                    .replace(/^.+,/, ""),
-                  name: chooseImage.name,
-                },
-              ]);
+              console.log("hi");
+              if (productId) {
+                seteditProductImages((state) => ({
+                  ...state,
+                  newImages: state?.newImages?.length
+                    ? [
+                        ...state?.newImages,
+                        {
+                          base64: (res.target?.result as string)
+                            .replace("data:", "")
+                            .replace(/^.+,/, ""),
+                          name: chooseImage.name,
+                        },
+                      ]
+                    : [
+                        {
+                          base64: (res.target?.result as string)
+                            .replace("data:", "")
+                            .replace(/^.+,/, ""),
+                          name: chooseImage.name,
+                        },
+                      ],
+                  existingImages: state?.existingImages || [],
+                }));
+              } else {
+                setImages((state: imageType[]) => [
+                  ...state,
+                  {
+                    base64: (res.target?.result as string)
+                      .replace("data:", "")
+                      .replace(/^.+,/, ""),
+                    name: chooseImage.name,
+                  },
+                ]);
+              }
               resolved({ nextIndex: currentImageIndex + 1, status: true });
             });
 
@@ -114,23 +179,57 @@ export default function AddProduct() {
 
   return (
     <form
-      className="w-full max-w-[1400px] flex flex-col gap-10 px-20"
+      className="w-full max-w-[1400px] flex flex-col gap-10 px-20 overflow-y-scroll py-10 h-full"
       onSubmit={(e) => {
         e.preventDefault();
         if (filter.categoryId) {
-          mutateAsync({
-            images: images,
-            name: name,
-            englishName: engName,
-            price: price,
-            categoryId: String(filter.categoryId),
-            parentCategories: filter.parentCategories,
-            productVariations: variations.length ? variations : [],
-            productContent: content,
-          }).then((res) => console.log(res));
+          if (productId) {
+            const convertProductImage = {
+              existingImages: editProductImages?.existingImages.map(
+                (e) => e.name
+              ) || [""],
+              newImages: editProductImages?.newImages || [],
+            };
+            const editProductBody: EditProductInput = {
+              images: convertProductImage,
+              productId: productId,
+              categoryId: String(filter.categoryId),
+              englishName: engName,
+              name,
+              price,
+              productContent: content,
+              parentCategories: filter.parentCategories,
+              productVariations: variations.length ? variations : [],
+              metaDescription: metaDescription,
+            };
+            console.log(editProductBody)
+            mutateEditProduct(editProductBody);
+          } else {
+            mutateAsync({
+              images: images,
+              name: name,
+              englishName: engName,
+              price: price,
+              categoryId: String(filter.categoryId),
+              parentCategories: filter.parentCategories,
+              productVariations: variations.length ? variations : [],
+              productContent: content,
+            }).then((res) => console.log(res));
+          }
         }
       }}
     >
+      <div>
+        {editProductImages?.existingImages.map((image, i) => (
+          <Image
+            key={i}
+            src={image.url}
+            alt={image.name}
+            width={200}
+            height={200}
+          />
+        ))}
+      </div>
       <div>
         <input
           onChange={(e) => {
@@ -141,7 +240,7 @@ export default function AddProduct() {
           }}
           multiple
           type="file"
-          // accept="image/*"
+          accept="image/*"
         />
       </div>
       <div className="flex flex-wrap -mx-3 mb-6">
@@ -191,6 +290,14 @@ export default function AddProduct() {
           />
         </div>
       </div>
+      <label>توضیحات متا</label>
+      <textarea
+        value={metaDescription}
+        onChange={(e) => {
+          setMetaDescription(e.target.value);
+        }}
+        className="bg-gray-50 appearance-none outline-none p-4"
+      />
       <div className="flex flex-col gap-4 justify-center  w-full">
         <h3 className="text-lg ">انواع محصول</h3>
         {variations.map((variation, variationIndex) => (
@@ -288,10 +395,10 @@ export default function AddProduct() {
         </div>
       </div>
 
-      <Categories isAddProductPage={true} setFilter={setFilter} />
+      <Category filter={filter} setFilter={setFilter} />
 
       <QuillEditor setContent={setContent} content={content} />
-
+      <ContentViewer contentForView={content} />
       <button className="bg-green2 h-10 text-white w-[300px] rounded-[13px]">
         افزودن محصول
       </button>

@@ -23,6 +23,8 @@ export async function categoriesController({ ctx }: ArgsStructure) {
     title: string;
     parentCategoryId: number | null;
     imageUrl: string;
+    englishTitle: string;
+    content: string;
   }
 
   interface categoryFinalType extends categoryRawType {
@@ -120,4 +122,33 @@ export async function createCategory({
   console.log(input);
 
   return newCategory;
+}
+
+export const EditCategorySchema = z.object({
+  categoryId: z.number(),
+  englishName: z.string(),
+  name: z.string(),
+  content: z.string(),
+});
+type EditCategory = z.infer<typeof EditCategorySchema>;
+export async function editCategoryController({
+  ctx,
+  input,
+}: ArgsStructure<EditCategory>) {
+  const { prisma } = ctx;
+  try {
+    await prisma.category.update({
+      where: {
+        id: input.categoryId,
+      },
+      data: {
+        content: input.content,
+        englishTitle: input.englishName,
+        title: input.name,
+      },
+    });
+    return { status: true, error: null, message: "تغییرات با موفقیت انجام شد" };
+  } catch (error) {
+    return { status: false, error, message: "خطا در تغییر دسته بندی" };
+  }
 }

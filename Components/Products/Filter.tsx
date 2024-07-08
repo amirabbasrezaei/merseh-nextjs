@@ -24,6 +24,8 @@ export interface categoryType {
   parentCategoryId: number | null;
   subCategories?: any[] | undefined;
   insertedIntoParent?: boolean | undefined;
+  englishTitle: string;
+  content: string;
 }
 [];
 

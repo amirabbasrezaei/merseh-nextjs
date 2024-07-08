@@ -6,6 +6,7 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import path, { dirname } from "path";
 import { ArgsStructure } from "./category.controller";
 import { rimraf } from "rimraf";
+import uploadFile from "../utils/uploadFile";
 const ACCESSKEY = process.env.LIARA_ACCESS_KEY;
 const SECRETKEY = process.env.LIARA_SECRET_KEY;
 const ENDPOINT = process.env.LIARA_ENDPOINT;
@@ -34,8 +35,11 @@ const productVariation = z.object({
 });
 
 const content = z.object({
-  content: z.string().or(z.object({ src: z.string(), name: z.string() })),
-  type: z.enum(["image", "text", "title", "break"]),
+  content: z
+    .string()
+    .or(z.object({ src: z.string(), name: z.string(), format: z.string() })),
+  type: z.string(),
+  childs: z.any(),
 });
 
 const productVariationForPayload = z.object({
@@ -73,7 +77,7 @@ type GetProductInputArgs = z.infer<typeof getProductInputSchema>;
 export async function getProductController({
   ctx,
   input,
-}: ProductRouterArgsController<GetProductInputArgs>): Promise<GetProductPayloadType> {
+}: ProductRouterArgsController<GetProductInputArgs>) {
   try {
     const product = await ctx.prisma.product.findUnique({
       where: {
@@ -87,6 +91,10 @@ export async function getProductController({
         content: true,
         quantity: true,
         discount: true,
+        engName: true,
+        category: true,
+        mainCategoryId: true,
+        metaDescription: true,
         ProductVariation: {
           select: {
             values: true,
@@ -98,7 +106,7 @@ export async function getProductController({
     });
 
     if (!product) {
-      return { message: "product doesn't found", error: "" };
+      return { product: null, message: "product doesn't found", error: "" };
     }
     const result = {
       id: product.id,
@@ -107,6 +115,7 @@ export async function getProductController({
           `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${imgName}`
       ),
       name: product.name,
+      englishName: product.engName,
       price: product.price || 0,
       variations: product.ProductVariation.map((variation) => ({
         id: variation.id,
@@ -120,23 +129,30 @@ export async function getProductController({
         })),
       })),
       content: JSON.parse(product.content).map((e: any) => {
-        if (e.type === "image") {
+        if (e.type === "img") {
           return {
             content: {
-              src: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${e.content}`,
-              name: e.content,
+              src: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/articleImages/${e.content.name}`,
+              name: e.content.name,
             },
-            type: "image",
+            type: "img",
           };
         }
         return e;
       }),
       instock: product.quantity ? true : false,
       discount: product.discount,
+      category: product.category,
+      mainCategoryId: product.mainCategoryId,
+      metaDescription: product.metaDescription,
     };
     return { product: result, message: "ok" };
   } catch (error) {
-    return { message: "error while finding product", error: String(error) };
+    return {
+      product: null,
+      message: "error while finding product",
+      error: String(error),
+    };
   }
 }
 
@@ -255,6 +271,7 @@ export async function addProductController({
         name: input.name,
         price: Number(input.price),
         engName: input.englishName,
+        mainCategoryId: Number(input.categoryId),
         category: {
           connect: input?.parentCategories?.length
             ? [
@@ -428,4 +445,108 @@ export async function forTorobProductController({ ctx }: ArgsStructure) {
     console.log(error);
     return error;
   }
+}
+
+export const editProductInputSchema = z.object({
+  images: z.object({
+    existingImages: z.array(z.string()),
+    newImages: z.array(imageType),
+  }),
+  name: z.string(),
+  englishName: z.string(),
+  price: z.string(),
+  categoryId: z.string(),
+  parentCategories: z.array(z.number()).optional(),
+  productVariations: z.array(productVariation).optional(),
+  productContent: z.array(content),
+  productId: z.string(),
+  metaDescription: z.string(),
+});
+
+export type EditProductInput = z.infer<typeof editProductInputSchema>;
+export async function editProductController({
+  ctx,
+  input,
+}: ArgsStructure<EditProductInput>) {
+  const { prisma } = ctx;
+  try {
+    uploadFile({
+      images: input.images.newImages,
+      uploadDirectory: "productImages",
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
+  try {
+    const filterContentImages = input.productContent.map((e) =>
+      typeof e.content !== "string" &&
+      e.type === "img" &&
+      !e.content.src.includes("https://")
+        ? { base64: e.content.src, name: e.content.name }
+        : { base64: "", name: "" }
+    );
+    uploadFile({
+      images: filterContentImages,
+      uploadDirectory: "articleImages",
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
+  const productImageStructure = input.productContent.map((e) => {
+    if (typeof e.content !== "string" && e.type === "img") {
+      return {
+        content: {
+          name: e.content?.name
+            ? e.content.name
+            : e.content.src.split("/").at(-1),
+        },
+        type: e.type,
+      };
+    }
+    return e;
+  });
+  await prisma.product.update({
+    where: {
+      id: Number(input.productId),
+    },
+    data: {
+      imageNames: [
+        ...input.images.existingImages,
+        ...input.images.newImages.map((e) => e.name),
+      ],
+      metaDescription: input.metaDescription,
+      name: input.name,
+      price: Number(input.price),
+      content: JSON.stringify(productImageStructure),
+      engName: input.englishName,
+      mainCategoryId: Number(input.categoryId),
+      category: {
+        connect: input?.parentCategories?.length
+          ? [
+              ...input.parentCategories.map((catId) => ({
+                id: Number(catId),
+              })),
+              { id: Number(input.categoryId) },
+            ]
+          : { id: Number(input.categoryId) },
+      },
+      ProductVariation: input.productVariations?.length
+        ? {
+            create: input.productVariations.map((variation) => ({
+              variateName: variation.variationName,
+              values: {
+                createMany: {
+                  data: variation.variations.map((variationValue) => ({
+                    name: variationValue.name,
+                    price: variationValue.price,
+                  })),
+                },
+              },
+            })),
+          }
+        : {},
+    },
+  });
 }

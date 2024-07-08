@@ -1,4 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  createElement,
+  DOMAttributes,
+  DOMElement,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import styles from "./MyComponent.module.css";
@@ -7,8 +14,9 @@ import { IRANYekanXFaNum } from "@/app/fonts";
 import { Image_Svg } from "@/Components/SVGS";
 
 export type contentType = {
-  type: "image" | "text" | "title" | "break";
-  content: string | { src: string; name: string };
+  type: Node["nodeName"];
+  content: string | { src: string; name: string; format: string };
+  childs?: contentType[] | null;
 };
 
 interface Props {
@@ -16,60 +24,89 @@ interface Props {
   content: contentType[];
 }
 
-export default function QuillEditor({ setContent }: Props) {
-  const [value, setValue] = useState("");
-  const QuillRef = useRef<ReactQuill>();
-  useEffect(() => {
-    const convertToDom = new DOMParser().parseFromString(value, "text/html");
+const contentToHTML = (content: contentType[], parent: HTMLElement): any => {
+  console.log(content);
 
-    const temp: contentType[] = [];
+  for (let ct of content) {
+    console.log(ct);
+    if (!ct.childs?.length) {
+      if (ct.type === "#text") {
+        const element = document.createElement("p", {});
+        element.innerHTML = ct.content as string;
+        parent.append(element);
+        break;
+      } else if (ct.type === "img" && typeof ct.content !== "string") {
+        const element = document.createElement("img", { is: ct.content.name });
 
-    // convertToDom?.querySelectorAll("p").forEach((e) => {
-    //   if (e.firstChild?.nodeName == "#text") {
-    //     temp.push({ content: e.innerText, type: "text" });
-    //   } else if (e.firstChild?.nodeName == "IMG") {
-    //     // @ts-ignore
-    //     temp.push({ content: e.firstChild.src || "", type: "image" });
-    //   }
-    // });
-
-    convertToDom.body.childNodes.forEach((e) => {
-      if (e.nodeName === "P") {
-        if (e.firstChild?.nodeName === "#text") {
-          temp.push({ content: e.firstChild.textContent || "", type: "text" });
-          return;
-        }
-        if (e.firstChild?.nodeName === "IMG") {
-          temp.push({
-            content: {
-              src:
-                // @ts-ignore
-                e.firstChild.src.replace("data:", "").replace(/^.+,/, "") || "",
-              // @ts-ignore
-              name: e.firstChild.alt,
-            },
-            type: "image",
-          });
-          return;
-        }
-
-        if (e.firstChild?.nodeName === "BR") {
-          temp.push({ content: e.firstChild.textContent || "", type: "break" });
-          return;
-        }
+        element.src =
+          ct.content.format !== undefined
+            ? `data:image/${ct.content.format},${ct.content.src}`
+            : ct.content.src;
+        element.alt = ct.content.name;
+        parent.append(element);
+      } else {
+        const element = document.createElement(ct.type, {});
+        element.innerHTML = ct.content as string;
+        parent.append(element);
       }
-      console.log(e);
-      if (e.nodeName.startsWith("H")) {
-        temp.push({
-          content: e.firstChild?.textContent || "",
-          type: "title",
-        });
-        return;
-      }
+
+      // break;
+    } else {
+      const secParent = document.createElement(ct.type);
+      parent.append(contentToHTML(ct.childs, secParent));
+    }
+  }
+  return parent;
+};
+
+const HTMLtoContent = (childNodes: NodeListOf<ChildNode> | []) => {
+  if (!childNodes.length) {
+    return null;
+  }
+  const result: contentType[] = [];
+  childNodes.forEach((e) => {
+    if (e.firstChild?.nodeName === "IMG") {
+      // @ts-ignore
+
+      result.push({
+        content: {
+          src:
+            // @ts-ignore
+            e.firstChild.src.replace("data:", "").replace(/^.+,/, "") || "",
+          // @ts-ignore
+          name: e.firstChild.alt,
+          // @ts-ignore
+          format: (e.firstChild.src as string).split("/").at(1)?.split(",")[0],
+        },
+        type: e.firstChild.nodeName.toLowerCase(),
+        childs: null,
+      });
+      return;
+    }
+
+    result.push({
+      content: e?.nodeValue || "",
+      type: e.nodeName.toLowerCase(),
+      childs: HTMLtoContent(e.childNodes),
     });
-    console.log(temp);
-    setContent(temp);
-  }, [value]);
+  });
+  // console.log(result)
+  return result;
+};
+
+export default function QuillEditor({ setContent, content }: Props) {
+  const [flag, setFlag] = useState(false);
+  const [value, setValue] = useState(String(content));
+  const QuillRef = useRef<ReactQuill>();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    if (content && !flag) {
+      const parent = document.createElement("div");
+      setValue(contentToHTML(content, parent).innerHTML);
+    }
+  }, [content]);
 
   const imageHandler = () => {
     const reader = new FileReader();
@@ -95,63 +132,83 @@ export default function QuillEditor({ setContent }: Props) {
     };
   };
 
+  useEffect(() => {
+    if (value.length) {
+      setFlag(true);
+    }
+    const convertToDom = new DOMParser().parseFromString(value, "text/html");
+    const finalContent = HTMLtoContent(
+      convertToDom.querySelector("body")?.childNodes || []
+    );
+
+    finalContent?.length && setContent(finalContent);
+  }, [value]);
+
   return (
     <div className="">
       <header className="mb-5">
         <div onClick={() => imageHandler()}>
-          <Image_Svg classname="w-6 h-6 fill-lightBlack hover:fill-green1" />
+          <Image_Svg classname="w-6 h-6 cursor-pointer fill-lightBlack hover:fill-green1" />
         </div>
       </header>
-      <div className={`[&_.ql-editor]:text-right [&_.ql-editor]:min-h-[360px] [&_img]:w-3/4  [&_p]:text-lg [&_.ql-container]:font-normal`}>
-        <ReactQuill
-          ref={(element) => {
-            if (element != null) {
-              QuillRef.current = element;
-            }
-          }}
-          style={{fontFamily: "inherit"}}
-          modules={{
-            toolbar: {
-              container: [
-                [{ header: "1" }, { header: "2" }, { font: [IRANYekanXFaNum.className] }],
-                [{ size: [12, 15] }],
-                ["bold", "italic", "underline", "strike", "blockquote"],
-                [
-                  { list: "ordered" },
-                  { list: "bullet" },
-                  { indent: "-1" },
-                  { indent: "+1" },
+      <div
+        className={`[&_.ql-editor]:text-right [&_.ql-editor]:min-h-[360px] [&_img]:w-3/4  [&_p]:text-lg [&_.ql-container]:font-normal`}
+      >
+        {isClient && document !== undefined ? (
+          <ReactQuill
+            ref={(element) => {
+              if (element != null) {
+                QuillRef.current = element;
+              }
+            }}
+            style={{ fontFamily: "inherit" }}
+            modules={{
+              toolbar: {
+                container: [
+                  [
+                    { header: "1" },
+                    { header: "2" },
+                    { header: "3" },
+                    { font: [IRANYekanXFaNum.className] },
+                  ],
+                  [{ size: [12, 15] }],
+                  ["bold", "italic", "underline", "strike", "blockquote"],
+                  [
+                    { list: "ordered" },
+                    { list: "bullet" },
+                    { indent: "-1" },
+                    { indent: "+1" },
+                  ],
+                  ["link", "image", "video"],
+                  ["clean"],
                 ],
-                ["link", "image", "video"],
-                ["code-block"],
-                ["clean"],
-              ],
-            },
-            clipboard: {
-              matchVisual: false,
-            },
-          }}
-          formats={[
-            "header",
-            "font",
-            "size",
-            "bold",
-            "italic",
-            "underline",
-            "strike",
-            "blockquote",
-            "list",
-            "bullet",
-            "indent",
-            "link",
-            "image",
-            "video",
-            "code-block",
-          ]}
-          theme="snow"
-          value={value}
-          onChange={setValue}
-        />
+              },
+              clipboard: {
+                matchVisual: false,
+              },
+            }}
+            formats={[
+              "header",
+              "font",
+              "size",
+              "bold",
+              "italic",
+              "underline",
+              "strike",
+              "blockquote",
+              "list",
+              "bullet",
+              "indent",
+              "link",
+              "image",
+              "video",
+              "code-block",
+            ]}
+            theme="snow"
+            value={value}
+            onChange={setValue}
+          />
+        ) : null}
       </div>
     </div>
   );

@@ -43,7 +43,7 @@ export default function Input(props: Props) {
   return (
     <div style={{ height: 50, borderRadius: "10px" }} className=" relative ">
       <input
-        {...field}
+        {...field} 
         style={{ height: 50, borderRadius: "10px" }}
         type={type}
         className={`border border-gray-200 px-2 outline-none focus:outline-green1     ${className}`}

@@ -1,12 +1,16 @@
 import {
+  EditCategorySchema,
   categoriesController,
   createCategory,
   createCategorySchema,
+  editCategoryController,
 } from "../Controllers/category.controller";
 import {
   AddProductControllerArgSchema,
   ProductCartInfoInputSchema,
   addProductController,
+  editProductController,
+  editProductInputSchema,
   forTorobProductController,
   getProductController,
   getProductInputSchema,
@@ -14,7 +18,7 @@ import {
   productCartInfoController,
   productsController,
 } from "../Controllers/product.controller";
-import { publicProcedure, router } from "../trpc";
+import { adminProtectedProcedure, publicProcedure, router } from "../trpc";
 
 export const productRouter = router({
   getproduct: publicProcedure
@@ -22,10 +26,10 @@ export const productRouter = router({
     .query(getProductController),
   categories: publicProcedure.query(categoriesController),
 
-  addProduct: publicProcedure
+  addProduct: adminProtectedProcedure
     .input(AddProductControllerArgSchema)
     .mutation(addProductController),
-  createCategory: publicProcedure
+  createCategory: adminProtectedProcedure
     .input(createCategorySchema)
     .mutation(createCategory),
   // get product image for shopping cart
@@ -35,4 +39,10 @@ export const productRouter = router({
   productCarousel: publicProcedure.query(productCarouselController),
   products: publicProcedure.query(productsController),
   productsForTorob: publicProcedure.query(forTorobProductController),
+  editCategory: adminProtectedProcedure
+    .input(EditCategorySchema)
+    .mutation(editCategoryController),
+  editProduct: adminProtectedProcedure
+    .input(editProductInputSchema)
+    .mutation(editProductController),
 });

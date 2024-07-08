@@ -118,12 +118,14 @@ export async function updateActiveOrderController({
                   name: true,
                   price: true,
                   id: true,
+                  discount: true,
                 },
               },
               ProductVariationValue: {
                 select: {
                   name: true,
                   price: true,
+                  discount: true,
                 },
               },
             },
@@ -144,12 +146,18 @@ export async function updateActiveOrderController({
           },
         })),
       };
+
+      // calculate final price
       let totalPrice: number = 0;
       for (let pr of activeOrder.ProductForOrder) {
         if (pr.ProductVariationValue?.price) {
-          totalPrice += pr.ProductVariationValue.price * pr.numberOfproduct;
-        } else if (!pr.ProductVariationValue?.price) {
-          totalPrice += pr.Product.price * pr.numberOfproduct;
+          totalPrice +=
+            (pr.ProductVariationValue.price -
+              pr.ProductVariationValue.discount) *
+            pr.numberOfproduct;
+        } else {
+          totalPrice +=
+            (pr.Product.price - pr.Product.discount) * pr.numberOfproduct;
         }
       }
       return {
@@ -161,12 +169,17 @@ export async function updateActiveOrderController({
     }
 
     if (findActiveOrder) {
+      // calculate final price
       let totalPrice: number = 0;
       for (let pr of findActiveOrder.ProductForOrder) {
         if (pr.ProductVariationValue?.price) {
-          totalPrice += pr.ProductVariationValue.price * pr.numberOfproduct;
-        } else if (!pr.ProductVariationValue?.price) {
-          totalPrice += pr.Product.price * pr.numberOfproduct;
+          totalPrice +=
+            (pr.ProductVariationValue.price -
+              pr.ProductVariationValue.discount) *
+            pr.numberOfproduct;
+        } else {
+          totalPrice +=
+            (pr.Product.price - pr.Product.discount) * pr.numberOfproduct;
         }
       }
       if (
@@ -320,12 +333,17 @@ export async function getActiveOrderController({ ctx }: ArgsStructure) {
         })),
       };
 
+      // calculate final price
       let totalPrice: number = 0;
       for (let pr of activeOrder.ProductForOrder) {
         if (pr.ProductVariationValue?.price) {
-          totalPrice += pr.ProductVariationValue.price * pr.numberOfproduct;
-        } else if (!pr.ProductVariationValue?.price) {
-          totalPrice += pr.Product.price * pr.numberOfproduct;
+          totalPrice +=
+            (pr.ProductVariationValue.price -
+              pr.ProductVariationValue.discount) *
+            pr.numberOfproduct;
+        } else {
+          totalPrice +=
+            (pr.Product.price - pr.Product.discount) * pr.numberOfproduct;
         }
       }
       return {

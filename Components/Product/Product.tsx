@@ -15,6 +15,7 @@ import useWindowSize from "../useWindowSize";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Check, Minus_Svg, Plus_Svg, TrashBin_SVG } from "../SVGS";
 import Link from "next/link";
+import Content from "../Admin/AddProduct/ContentViewer";
 
 type Props = {
   productId: string;
@@ -22,13 +23,13 @@ type Props = {
 
 type ProductVariation = {
   price: number;
+  discount: number;
   variationValueid: number;
   variationId: number;
 } | null;
 export default function Product({ productId }: Props) {
   const { width } = useWindowSize();
   const params = useSearchParams();
-  console.log(params.get("variation"));
   const router = useRouter();
   const [productInShoppingCart, setProductInShoppingCart] = useState<
     ShoppingCart["orderitems"][0] | null
@@ -55,6 +56,7 @@ export default function Product({ productId }: Props) {
         variationId: 0,
         variationValueid: 0,
         price: 0,
+        discount: 0,
       }
     : null;
 
@@ -78,10 +80,38 @@ export default function Product({ productId }: Props) {
                   ?.variations.find(
                     (e) => e.id === Number(params.get("variationValue"))
                   )?.price ||
-                productData?.product?.variations[0].variations[0].price,
+                productData?.product?.variations[0]?.variations[0].price,
+              discount:
+                productData?.product?.variations
+                  .find((e) => e.id === Number(params.get("variation")))
+                  ?.variations.find(
+                    (e) => e.id === Number(params.get("variationValue"))
+                  )?.discount ||
+                productData?.product?.variations[0].variations[0]?.discount,
             }
           : null
       );
+      console.log(
+        selectedProductVariation?.price && !selectedProductVariation?.discount
+      );
+      console.log(
+        selectedProductVariation?.price && selectedProductVariation.discount
+          ? splitNumber(
+              selectedProductVariation?.price -
+                selectedProductVariation.discount
+            )
+          : selectedProductVariation?.price &&
+            !selectedProductVariation?.discount
+          ? splitNumber(productData?.product?.price)
+          : 0
+      );
+
+      // console.log(productData?.product?.variations
+      //   .find((e) => e.id === Number(params.get("variation")))
+      //   ?.variations.find(
+      //     (e) => e.id === Number(params.get("variationValue"))
+      //   )?.price ||
+      // productData?.product?.variations[0]?.variations[0].price )
     }
   }, [isFetched]);
 
@@ -147,6 +177,7 @@ export default function Product({ productId }: Props) {
                                     price: variationType.price,
                                     variationId: variation.id,
                                     variationValueid: variationType.id,
+                                    discount: variationType.discount,
                                   })
                                 }
                                 className={classNames(
@@ -167,6 +198,7 @@ export default function Product({ productId }: Props) {
                                   price: variationType.price,
                                   variationId: variation.id,
                                   variationValueid: variationType.id,
+                                  discount: variationType.discount,
                                 })
                               }
                               className="text-[14px] cursor-pointer text-[#535353]"
@@ -198,18 +230,53 @@ export default function Product({ productId }: Props) {
           </div>
           <div className="h-full flex flex-col items-center gap-4 justify-center w-full sm:basis-3/12 ">
             <div className="w-full py-6 gap-5 border border-[#EAEAEA] rounded-[8px] flex flex-col items-center justify-center ">
-              <div className="flex flex-row items-center justify-center gap-1 w-[80%]">
+              <div className="flex flex-row items-center justify-center  w-[80%]">
                 {isLoading ? (
                   <div className="animate-pulse h-8 w-full bg-gray-100" />
                 ) : (
-                  <>
-                    <span className="text-green1 text-[25px] font-[600]">
-                      {selectedProductVariation?.price
-                        ? splitNumber(selectedProductVariation?.price)
-                        : splitNumber(productData?.product?.price)}
-                    </span>
-                    <span className="text-black1 text-[10px]">تومان</span>
-                  </>
+                  <div className="flex flex-col">
+                    {(productData?.product?.discount &&
+                      !selectedProductVariation?.price) ||
+                    selectedProductVariation?.discount ? (
+                      <div className="flex flex-row items-center justify-between">
+                        <span className="line-through text-[13px] text-lightBlack">
+                          {selectedProductVariation?.price
+                            ? splitNumber(selectedProductVariation.price)
+                            : productData?.product?.price
+                            ? splitNumber(productData.product.price)
+                            : 0}
+                        </span>
+                        <span className="bg-green1 rounded-[10px] px-[6px] py-[2px] text-white text-[15px] font-[300]">
+                          {(
+                            (selectedProductVariation?.price
+                              ? selectedProductVariation?.discount /
+                                selectedProductVariation?.price
+                              : productData?.product?.price
+                              ? productData.product.discount /
+                                productData.product.price
+                              : 0) * 100
+                          ).toFixed(0)}
+                          %
+                        </span>
+                      </div>
+                    ) : null}
+                    <div className="flex flex-row items-center justify-center gap-1">
+                      <span className="text-[#3c3c3c] text-[25px] font-[500]">
+                        {selectedProductVariation?.price
+                          ? splitNumber(
+                              selectedProductVariation.price -
+                                selectedProductVariation.discount
+                            )
+                          : productData?.product?.price
+                          ? splitNumber(
+                              productData.product.price -
+                                productData.product.discount
+                            )
+                          : 0}
+                      </span>
+                      <span className="text-black1 text-[10px]">تومان</span>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
@@ -361,52 +428,55 @@ export default function Product({ productId }: Props) {
           <h3 className="text-[22px] font-[500] text-lightBlack">
             معرفی محصول
           </h3>
-          {!isLoading && productData?.product
-            ? productData?.product?.content.map((p, index) => {
-                if (p.type === "text") {
-                  return (
-                    <p
-                      key={index}
-                      className="font-[300] text-[#4a4a4a] leading-9"
-                    >
-                      {p.content as string}
-                    </p>
-                  );
-                }
-                if (p.type === "title") {
-                  return (
-                    <h3
-                      key={index}
-                      className="font-[500] text-[#5a5a5a] text-[18px] mb-[-10px]"
-                    >
-                      {p.content as string}
-                    </h3>
-                  );
-                }
-                if (p.type === "image") {
-                  return (
-                    <img
-                      key={index}
-                      // @ts-ignore
-                      src={p.content.src as string}
-                      // @ts-ignore
-                      alt={p.content.name}
-                      className="w-full h-auto"
-                    />
-                  );
-                }
-                if (p.type === "break") {
-                  return <br key={index} />;
-                }
-              })
-            : Array.from(Array(2)).map((_, i) => (
-                <div className="flex flex-col gap-3 my-5" key={i}>
-                  <div className="bg-gray-100 w-[150px] h-[26px] rounded-[7px]"></div>
-                  <div className="bg-gray-100 w-full h-[20px] rounded-[4px]"></div>
-                  <div className="bg-gray-100 w-full h-[20px] rounded-[4px]"></div>
-                  <div className="bg-gray-100 w-full h-[20px] rounded-[4px]"></div>
-                </div>
-              ))}
+          {!isLoading && productData?.product ? (
+            // productData?.product?.content.map((p, index) => {
+            //     if (p.type === "text") {
+            //       return (
+            //         <p
+            //           key={index}
+            //           className="font-[300] text-[#4a4a4a] leading-9"
+            //         >
+            //           {p.content as string}
+            //         </p>
+            //       );
+            //     }
+            //     if (p.type === "title") {
+            //       return (
+            //         <h3
+            //           key={index}
+            //           className="font-[500] text-[#5a5a5a] text-[18px] mb-[-10px]"
+            //         >
+            //           {p.content as string}
+            //         </h3>
+            //       );
+            //     }
+            //     if (p.type === "image") {
+            //       return (
+            //         <img
+            //           key={index}
+            //           // @ts-ignore
+            //           src={p.content.src as string}
+            //           // @ts-ignore
+            //           alt={p.content.name}
+            //           className="w-full h-auto"
+            //         />
+            //       );
+            //     }
+            //     if (p.type === "break") {
+            //       return <br key={index} />;
+            //     }
+            //   })
+            <Content contentForView={productData?.product.content} />
+          ) : (
+            Array.from(Array(2)).map((_, i) => (
+              <div className="flex flex-col gap-3 my-5" key={i}>
+                <div className="bg-gray-100 w-[150px] h-[26px] rounded-[7px]"></div>
+                <div className="bg-gray-100 w-full h-[20px] rounded-[4px]"></div>
+                <div className="bg-gray-100 w-full h-[20px] rounded-[4px]"></div>
+                <div className="bg-gray-100 w-full h-[20px] rounded-[4px]"></div>
+              </div>
+            ))
+          )}
         </div>
 
         <div className="w-full flex flex-col gap-5">

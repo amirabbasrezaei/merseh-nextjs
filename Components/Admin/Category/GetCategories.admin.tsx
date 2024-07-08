@@ -1,20 +1,19 @@
 import classNames from "classnames";
-
 import { motion } from "framer-motion";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-
 import { trpc } from "@/utils/trpc";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { filterTypeArgs } from "./AddProduct";
 import { categoryType } from "@/Components/Products/Filter";
 import { Check, Chevron_Down, Plus_Svg } from "@/Components/SVGS";
+import { ManageCategory } from "./ManageCategory";
 
 interface Props {
   data: categoryType[];
   parentAnimation?: boolean;
   catId: number[];
-  setFilter: Dispatch<SetStateAction<filterTypeArgs>>;
+  setFilter: Dispatch<SetStateAction<ManageCategory>>;
+  filter: ManageCategory;
 }
 
 export default function GetCategories({
@@ -22,6 +21,7 @@ export default function GetCategories({
   data,
   parentAnimation = false,
   setFilter,
+  filter,
 }: Props) {
   const router = useRouter();
   const params = useSearchParams();
@@ -67,12 +67,16 @@ export default function GetCategories({
               ...state,
               categoryId: cat.id,
               parentCategories: catId,
+              englishName: cat.englishTitle,
+              name: cat.title,
+              content: cat.content
             }));
           }}
           style={{ cursor: "pointer" }} // it doesn't work with taiwlind
           className={classNames(
-            "text-[13px] text-black1 cursor-poiner",
-            cat.subCategories?.length ? "" : "mr-3"
+            "text-[13px]  cursor-poiner",
+            cat.subCategories?.length ? "" : "mr-3",
+            filter.categoryId === cat.id ? "text-green1" : "text-black1"
           )}
         >
           {cat.title}
@@ -133,6 +137,7 @@ export default function GetCategories({
             parentAnimation={parentAnimation}
             catId={[...catId, cat.id]}
             setFilter={setFilter}
+            filter={filter}
           />
         </motion.div>
       ) : null}
