@@ -48,6 +48,7 @@ export default function ProductEdit({ productId }: Props) {
   const [filter, setFilter] = useState<filterTypeArgs>({});
   const [variations, setVariations] = useState<variation[]>([]);
   const [content, setContent] = useState<contentType[]>([]);
+  const [productDetails, setProductDetails] = useState<string[]>([]);
   const { data } = trpc.product.getproduct.useQuery({
     productId: Number(productId),
   });
@@ -60,6 +61,7 @@ export default function ProductEdit({ productId }: Props) {
       setEngName(data.product.englishName);
       setPrice(String(data.product.price));
       setContent(data.product.content);
+      setProductDetails(data.product.details);
       seteditProductImages({
         existingImages: data.product.imageUrls.map((img: any) => ({
           url: img,
@@ -177,6 +179,8 @@ export default function ProductEdit({ productId }: Props) {
     setVariations((state) => [...state]);
   };
 
+  console.log(productDetails);
+
   return (
     <form
       className="w-full max-w-[1400px] flex flex-col gap-10 px-20 overflow-y-scroll py-10 h-full"
@@ -201,8 +205,9 @@ export default function ProductEdit({ productId }: Props) {
               parentCategories: filter.parentCategories,
               productVariations: variations.length ? variations : [],
               metaDescription: metaDescription,
+              details: productDetails,
             };
-            console.log(editProductBody)
+            console.log(editProductBody);
             mutateEditProduct(editProductBody);
           } else {
             mutateAsync({
@@ -214,6 +219,7 @@ export default function ProductEdit({ productId }: Props) {
               parentCategories: filter.parentCategories,
               productVariations: variations.length ? variations : [],
               productContent: content,
+              details: productDetails,
             }).then((res) => console.log(res));
           }
         }
@@ -290,6 +296,14 @@ export default function ProductEdit({ productId }: Props) {
           />
         </div>
       </div>
+      <label>ویژگی محصول</label>
+      <textarea
+        value={productDetails.join("\r\n")}
+        onChange={(e) => {
+          setProductDetails(e.target.value.split(/\r?\n/));
+        }}
+        className="bg-gray-50 appearance-none outline-none p-4"
+      />
       <label>توضیحات متا</label>
       <textarea
         value={metaDescription}

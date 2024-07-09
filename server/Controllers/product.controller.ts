@@ -95,6 +95,7 @@ export async function getProductController({
         category: true,
         mainCategoryId: true,
         metaDescription: true,
+        details: true,
         ProductVariation: {
           select: {
             values: true,
@@ -117,6 +118,7 @@ export async function getProductController({
       name: product.name,
       englishName: product.engName,
       price: product.price || 0,
+      details: product.details,
       variations: product.ProductVariation.map((variation) => ({
         id: variation.id,
         variationName: variation.variateName,
@@ -170,6 +172,7 @@ export const AddProductControllerArgSchema = z.object({
   parentCategories: z.array(z.number()).optional(),
   productVariations: z.array(productVariation).optional(),
   productContent: z.array(content),
+  details: z.array(z.string()),
 });
 
 type AddProductControllerArg = z.infer<typeof AddProductControllerArgSchema>;
@@ -272,6 +275,7 @@ export async function addProductController({
         price: Number(input.price),
         engName: input.englishName,
         mainCategoryId: Number(input.categoryId),
+        details: input.details,
         category: {
           connect: input?.parentCategories?.length
             ? [
@@ -461,6 +465,7 @@ export const editProductInputSchema = z.object({
   productContent: z.array(content),
   productId: z.string(),
   metaDescription: z.string(),
+  details: z.array(z.string()),
 });
 
 export type EditProductInput = z.infer<typeof editProductInputSchema>;
@@ -522,6 +527,7 @@ export async function editProductController({
       content: JSON.stringify(productImageStructure),
       engName: input.englishName,
       mainCategoryId: Number(input.categoryId),
+      details: input.details,
       category: {
         connect: input?.parentCategories?.length
           ? [

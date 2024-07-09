@@ -76,6 +76,7 @@ model Product {
   ProductForOrder  ProductForOrder[]
   ProductVariation ProductVariation[]
   category         Category[]         @relation("CategoryToProduct")
+  details          String[]
 }
 
 model ProductVariationValue {

@@ -83,7 +83,7 @@ export default function Product({ productId }: Props) {
                 productData?.product?.variations[0]?.variations[0].price,
               discount:
                 productData?.product?.variations
-                  .find((e:  any) => e.id === Number(params.get("variation")))
+                  .find((e: any) => e.id === Number(params.get("variation")))
                   ?.variations.find(
                     (e: any) => e.id === Number(params.get("variationValue"))
                   )?.discount ||
@@ -105,8 +105,6 @@ export default function Product({ productId }: Props) {
           ? splitNumber(productData?.product?.price)
           : 0
       );
-
-
     }
   }, [isFetched]);
 
@@ -122,7 +120,7 @@ export default function Product({ productId }: Props) {
 
   return (
     <>
-      <section className="flex sm:px-20 flex-col gap-20 w-full">
+      <section className="flex sm:px-20 flex-col gap-10 w-full">
         <div className="sm:h-[450px] h-fit w-full flex flex-col sm:flex-row sm:mt-[85px]">
           <div className="h-full w-full sm:basis-4/12 ">
             {productData?.product ? (
@@ -132,42 +130,64 @@ export default function Product({ productId }: Props) {
             )}
           </div>
 
-          <div className="h-full  w-full sm:basis-5/12 p-4 flex flex-col gap-10">
-            {productData?.product ? (
-              <h1 className="text-[26px] text-black1">
-                {productData?.product?.name}
-              </h1>
-            ) : (
-              <div className="w-[200px] h-[30px] bg-gray-100 animate-pulse rounded-[4px]"></div>
-            )}
+          <div className="h-full  w-full sm:basis-5/12 p-4 flex flex-col gap-[50px]">
+            <div className="flex flex-col gap-10">
+              {productData?.product ? (
+                <h1 className="text-[26px] text-black1">
+                  {productData?.product?.name}
+                </h1>
+              ) : (
+                <div className="w-[200px] h-[30px] bg-gray-100 animate-pulse rounded-[4px]"></div>
+              )}
 
-            {!isLoading && productData?.product ? (
-              productData?.product?.variations.map((variation: any) => (
-                <div
-                  key={variation.id}
-                  className="flex flex-row items-center gap-2"
-                >
-                  <span className="ml-4 text-[18px] text-[#252525]">
-                    {variation.variationName}
-                  </span>
-                  <div className="flex flex-col gap-5">
-                    <div className="flex items-center gap-4">
-                      {variation.variations.map(
-                        (variationType: any, variationTypeIndex : number) => (
-                          <div
-                            key={variationType.id}
-                            className="flex items-center gap-2"
-                          >
-                            <div className="w-[21px] cursor-pointer h-[21px] flex items-center justify-center border-2 border-[#DFDFDF] rounded-full">
-                              <input
-                                checked={
-                                  selectedProductVariation?.variationId ===
-                                    variation.id &&
-                                  selectedProductVariation?.variationValueid ===
-                                    variationType.id
-                                }
-                                onChange={(e) =>
-                                  e.target.checked &&
+              {!isLoading && productData?.product ? (
+                productData?.product?.variations.map((variation: any) => (
+                  <div
+                    key={variation.id}
+                    className="flex flex-row items-center gap-2"
+                  >
+                    <span className="ml-4 text-[18px] text-[#252525]">
+                      {variation.variationName}
+                    </span>
+                    <div className="flex flex-col gap-5">
+                      <div className="flex items-center gap-4">
+                        {variation.variations.map(
+                          (variationType: any, variationTypeIndex: number) => (
+                            <div
+                              key={variationType.id}
+                              className="flex items-center gap-2"
+                            >
+                              <div className="w-[21px] cursor-pointer h-[21px] flex items-center justify-center border-2 border-[#DFDFDF] rounded-full">
+                                <input
+                                  checked={
+                                    selectedProductVariation?.variationId ===
+                                      variation.id &&
+                                    selectedProductVariation?.variationValueid ===
+                                      variationType.id
+                                  }
+                                  onChange={(e) =>
+                                    e.target.checked &&
+                                    setSelectedProductVariation({
+                                      price: variationType.price,
+                                      variationId: variation.id,
+                                      variationValueid: variationType.id,
+                                      discount: variationType.discount,
+                                    })
+                                  }
+                                  className={classNames(
+                                    "appearance-none cursor-pointer text-center center w-[15px]  h-[15px] rounded-full",
+                                    selectedProductVariation?.variationId ===
+                                      variation.id &&
+                                      selectedProductVariation?.variationValueid ===
+                                        variationType.id
+                                      ? "checked:bg-green1"
+                                      : ""
+                                  )}
+                                  type="radio"
+                                />
+                              </div>
+                              <span
+                                onClick={() =>
                                   setSelectedProductVariation({
                                     price: variationType.price,
                                     variationId: variation.id,
@@ -175,53 +195,51 @@ export default function Product({ productId }: Props) {
                                     discount: variationType.discount,
                                   })
                                 }
-                                className={classNames(
-                                  "appearance-none cursor-pointer text-center center w-[15px]  h-[15px] rounded-full",
-                                  selectedProductVariation?.variationId ===
-                                    variation.id &&
-                                    selectedProductVariation?.variationValueid ===
-                                      variationType.id
-                                    ? "checked:bg-green1"
-                                    : ""
-                                )}
-                                type="radio"
-                              />
+                                className="text-[14px] cursor-pointer text-[#535353]"
+                              >
+                                {variationType.name}
+                              </span>
                             </div>
-                            <span
-                              onClick={() =>
-                                setSelectedProductVariation({
-                                  price: variationType.price,
-                                  variationId: variation.id,
-                                  variationValueid: variationType.id,
-                                  discount: variationType.discount,
-                                })
-                              }
-                              className="text-[14px] cursor-pointer text-[#535353]"
-                            >
-                              {variationType.name}
-                            </span>
-                          </div>
-                        )
-                      )}
+                          )
+                        )}
+                      </div>
                     </div>
                   </div>
+                ))
+              ) : (
+                <div className="flex flex-row gap-5">
+                  <div className="flex flex-row gap-2 items-center">
+                    <div className="w-[70px] h-6 bg-gray-100 animate-pulse rounded-[4px]"></div>
+                  </div>
+                  <div className="flex flex-row gap-2 items-center">
+                    <div className="w-6 h-6 rounded-full bg-gray-100 animate-pulse"></div>
+                    <div className="w-[60px] h-6 bg-gray-100 animate-pulse rounded-[4px]"></div>
+                  </div>
+                  <div className="flex flex-row gap-2 items-center">
+                    <div className="w-6 h-6 rounded-full bg-gray-100 animate-pulse"></div>
+                    <div className="w-[60px] h-6 bg-gray-100 animate-pulse rounded-[4px]"></div>
+                  </div>
                 </div>
-              ))
-            ) : (
-              <div className="flex flex-row gap-5">
-                <div className="flex flex-row gap-2 items-center">
-                  <div className="w-[70px] h-6 bg-gray-100 animate-pulse rounded-[4px]"></div>
-                </div>
-                <div className="flex flex-row gap-2 items-center">
-                  <div className="w-6 h-6 rounded-full bg-gray-100 animate-pulse"></div>
-                  <div className="w-[60px] h-6 bg-gray-100 animate-pulse rounded-[4px]"></div>
-                </div>
-                <div className="flex flex-row gap-2 items-center">
-                  <div className="w-6 h-6 rounded-full bg-gray-100 animate-pulse"></div>
-                  <div className="w-[60px] h-6 bg-gray-100 animate-pulse rounded-[4px]"></div>
-                </div>
+              )}
+            </div>
+            {productData?.product?.details.length ? (
+              <div className="leading-loose text-[#686868] list-disc ">
+                <h2 className="text-[17px] font-[400] mb-1 text-black1">
+                  ویژگی‌ها
+                </h2>
+                <ul className="list-disc  list-inside marker:text-green2">
+                  {productData?.product?.details.map((det) => (
+                    <li>{det}</li>
+                  ))}
+                </ul>
               </div>
-            )}
+            ) : isLoading  ? (
+              <div className="flex flex-col gap-5">
+                <div className="animate-pulse bg-gray-100 w-[200px] h-[20px] rounded-sm" />
+                <div className="animate-pulse bg-gray-100 w-[200px] h-[20px] rounded-sm" />
+                <div className="animate-pulse bg-gray-100 w-[200px] h-[20px] rounded-sm" />
+              </div>
+            ) : null}
           </div>
           <div className="h-full flex flex-col items-center gap-4 justify-center w-full sm:basis-3/12 ">
             <div className="w-full py-6 gap-5 border border-[#EAEAEA] rounded-[8px] flex flex-col items-center justify-center ">
@@ -419,48 +437,11 @@ export default function Product({ productId }: Props) {
             </div>
           </div>
         </div>
-        <div className="sm:px-20 flex flex-col gap-4">
+        <div className="md:px-20 flex flex-col gap-4">
           <h3 className="text-[22px] font-[500] text-lightBlack">
             معرفی محصول
           </h3>
           {!isLoading && productData?.product ? (
-            // productData?.product?.content.map((p, index) => {
-            //     if (p.type === "text") {
-            //       return (
-            //         <p
-            //           key={index}
-            //           className="font-[300] text-[#4a4a4a] leading-9"
-            //         >
-            //           {p.content as string}
-            //         </p>
-            //       );
-            //     }
-            //     if (p.type === "title") {
-            //       return (
-            //         <h3
-            //           key={index}
-            //           className="font-[500] text-[#5a5a5a] text-[18px] mb-[-10px]"
-            //         >
-            //           {p.content as string}
-            //         </h3>
-            //       );
-            //     }
-            //     if (p.type === "image") {
-            //       return (
-            //         <img
-            //           key={index}
-            //           // @ts-ignore
-            //           src={p.content.src as string}
-            //           // @ts-ignore
-            //           alt={p.content.name}
-            //           className="w-full h-auto"
-            //         />
-            //       );
-            //     }
-            //     if (p.type === "break") {
-            //       return <br key={index} />;
-            //     }
-            //   })
             <Content contentForView={productData?.product.content} />
           ) : (
             Array.from(Array(2)).map((_, i) => (
