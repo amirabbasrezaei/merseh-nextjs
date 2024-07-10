@@ -16,13 +16,7 @@ export default function Shipping() {
   const router = useRouter();
   const { activeOrderId, items, finalPrice } = useShoppingCart();
   const [selectedAddress, setSelectedAddress] = useState<string>("");
-  const [selectedShipping, setSelectedShipping] = useState<{
-    shippingTypeIndex: number;
-    shippingPartnerId: number;
-  }>({
-    shippingTypeIndex: 0,
-    shippingPartnerId: 1,
-  });
+  const [selectedShipping, setSelectedShipping] = useState<string | null>(null);
   const {
     mutate: mutateOrder,
     data: activeOrderData,
@@ -50,21 +44,33 @@ export default function Shipping() {
   }, [selectedAddress]);
 
   useEffect(() => {
-    mutateOrder({
-      selectedProducts: items,
-      shippingInfo: {
-        shippingPartnerId: selectedShipping.shippingPartnerId,
-      },
-    });
+    if (selectedShipping) {
+      mutateOrder({
+        selectedProducts: items,
+        shippingInfo: {
+          shippingPartnerName: selectedShipping,
+          addressId: selectedAddress
+        },
+      });
+    }
   }, [selectedShipping, shippingPricesData]);
 
   useEffect(() => {
     if (createPaymentData?.pay_link) {
-      console.log("ready");
       router.push(createPaymentData.pay_link);
     }
     console.log(createPaymentData);
   }, [createPaymentData]);
+
+  useEffect(() => {
+    if (shippingPricesData?.shippings?.length) {
+      setSelectedShipping(
+        shippingPricesData?.shippings[0].shippingPartners[0].name
+      );
+    }
+  }, [shippingPricesData]);
+
+
 
   return (
     <section className="flex flex-col sm:flex-row sm:p-10 gap-12 sm:gap-[200px]">
@@ -79,7 +85,7 @@ export default function Shipping() {
 
           <div className="flex flex-col gap-6">
             <AnimatePresence presenceAffectsLayout mode="sync">
-              {isLoadingShippingPrices
+              {isLoadingShippingPrices || !selectedShipping
                 ? Array.from(Array(3)).map((_, i) => (
                     <motion.div
                       key={String(i)}
@@ -89,8 +95,8 @@ export default function Shipping() {
                       className="animate-pulse bg-gray-100 w-full h-[60px] rounded-[8px]"
                     />
                   ))
-                : shippingPricesData?.result?.length
-                ? shippingPricesData?.result.map(
+                : shippingPricesData?.shippings?.length
+                ? shippingPricesData?.shippings.map(
                     (shippingType, shippingTypeIndex) => (
                       <motion.div
                         initial={{ opacity: 0 }}
@@ -101,23 +107,18 @@ export default function Shipping() {
                       >
                         <h3>{shippingType.shippingTypeName}</h3>
                         {shippingType.shippingPartners.map(
-                          (shippingPartner) => (
+                          (shippingPartner: any) => (
                             <div
                               key={shippingPartner.shippingPartnerId}
                               onClick={() =>
-                                setSelectedShipping({
-                                  shippingPartnerId:
-                                    shippingPartner.shippingPartnerId,
-                                  shippingTypeIndex: shippingTypeIndex,
-                                })
+                                setSelectedShipping(shippingPartner.name)
                               }
-                              className="w-full cursor-pointer px-6 py-4 border border-[#EAEAEA] rounded-[8px] flex flex-row items-center justify-between"
+                              className="w-full cursor-pointer px-6 py-4 border h-[100px] border-[#EAEAEA] rounded-[8px] flex flex-row items-center justify-between"
                             >
                               <div className="flex flex-row gap-3 items-center">
                                 <RadioInput
                                   isChecked={
-                                    selectedShipping.shippingPartnerId ===
-                                    shippingPartner.shippingPartnerId
+                                    selectedShipping === shippingPartner.name
                                   }
                                 />
                                 <Image
@@ -128,7 +129,7 @@ export default function Shipping() {
                                   height={70}
                                 />
                                 <span className="text-black1 text-[13px]">
-                                  ({shippingPartner.name})
+                                  {shippingPartner.title}
                                 </span>
                               </div>
                               <span className="font-[500] text-green1 text-[20px] flex flex-row gap-1 items-center">

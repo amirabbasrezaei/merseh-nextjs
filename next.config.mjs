@@ -12,6 +12,11 @@ const nextConfig = {
             hostname: 'trustseal.enamad.ir',
 
           },
+          {
+            protocol: 'https',
+            hostname: 'portal.podro.com',
+
+          },
         ],
       },
       async headers() {

@@ -2,6 +2,8 @@ import { z } from "zod";
 import { estimate_miare_price } from "./shipping/miare.controller";
 import { ArgsStructure } from "./category.controller";
 import CitiesJson from "./../../public/gistfile1.json";
+import { podroShippingPrices } from "./shipping/podro.controller";
+
 export const ShippingPricesInputSchema = z.object({
   addressId: z.string(),
   orderId: z.number(),
@@ -26,20 +28,21 @@ export async function getShippingPricesController({
 
     if (!address) {
       return {
-        result: null,
+        shippings: null,
         error: null,
         message: "need to add address",
         needToAddAddress: true,
       };
     }
 
-    await prisma.order.update({
+    const order = await prisma.order.update({
       where: {
         id: input.orderId,
       },
       data: {
         addressId: input.addressId,
       },
+      select: { Address: { select: { city: true } }, id: true },
     });
 
     const coordinateBody = {
@@ -52,26 +55,50 @@ export async function getShippingPricesController({
         longitude: address.longitude,
       },
     };
-    const miare = await estimate_miare_price(coordinateBody);
+    const shippings = [];
+    if (order.Address?.city.podroCode === "2301") {
+      const miare = await estimate_miare_price(coordinateBody);
+      if (miare) {
+        shippings.push({
+          shippingTypeName: "پیک موتوری",
+          shippingPartners: [
+            {
+              title: "میاره",
+              name: "miare",
+              image:
+                "https://merseh.storage.iran.liara.space/main_images/miare-logo.svg",
+              price: miare.price,
+              shippingPartnerId: 1,
+            },
+          ],
+        });
+      }
+    }
+    try {
+      
+      const podro = await podroShippingPrices({ orderId: order.id, prisma });
 
-    const result = [
-      {
-        shippingTypeName: "پیک موتوری",
-        shippingPartners: [
-          {
-            name: "میاره",
-            image:
-              "https://merseh.storage.iran.liara.space/main_images/miare-logo.svg",
-            price: miare.price,
-            shippingPartnerId: 1,
-          },
-        ],
-      },
-    ];
+      if (podro?.shipping) {
+        const podro_shippings = {
+          shippingTypeName: "شرکت های پستی",
+          shippingPartners: podro.shipping.map((sh: any) => ({
+            title: sh.title,
+            name: sh.name,
+            image: sh.logo,
+            price: sh.price,
+            shippingPartnerId: sh.id,
+          })),
+        };
+        
+        shippings.push(podro_shippings);
+      }
+    } catch (error) {
+      console.log(error)
+    }
 
-    return { result };
+    return { shippings, error: null };
   } catch (error) {
-    return { result: null, error };
+    return { shippings: null, error };
   }
 }
 
@@ -171,11 +198,11 @@ export async function addAddressController({
             postalCode: BigInt(input.postalCode),
           },
         });
-        return { status: "ok", error: null };
+        return { status: "ok", error: null, addressId: null };
       }
-      return { status: "ok", error: "cannot find user" };
+      return { status: "ok", error: "cannot find user", addressId: null };
     }
-    await prisma.address.create({
+    const address = await prisma.address.create({
       data: {
         userId: user.userId,
         addressDetails: input.detailedAddress,
@@ -191,10 +218,10 @@ export async function addAddressController({
       },
     });
 
-    return { status: "ok", error: null };
+    return { status: "ok", error: null, addressId: address.id };
   } catch (error) {
     console.log(error);
-    return { status: "failed", error };
+    return { status: "failed", error, addressId: null };
   }
 }
 

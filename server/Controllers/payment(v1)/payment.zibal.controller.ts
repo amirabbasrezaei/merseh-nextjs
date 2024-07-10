@@ -38,11 +38,16 @@ export async function createPaymentControllerZibal({
       where: {
         id: input.orderId,
       },
+      include: {
+        OrderShipping: true,
+      },
     });
-
+    console.log(findOrder?.OrderShipping?.price);
     const body = {
       merchant: process.env.ZIBAL_MERCHANT_CODE as string,
-      amount: (findOrder?.finalPrice || 0) * 10,
+      amount:
+        (findOrder?.finalPrice || 0) * 10 +
+        (findOrder?.OrderShipping?.price || 0) * 10,
       callbackUrl:
         process.env.NODE_ENV === "production"
           ? "https://merseh.com/payment"
@@ -126,7 +131,7 @@ export async function inquiryPaymentControllerZibal({
         const body = {
           from: "50004001338886",
           to: "09038338886",
-          text:"یک خرید انجام شد",
+          text: "یک خرید انجام شد",
         };
         const { data } = await axios.post(
           "https://console.melipayamak.com/api/send/simple/67798f12b16441749c66f2a10ae881af",

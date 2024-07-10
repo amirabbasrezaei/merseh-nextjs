@@ -47,14 +47,14 @@ model City {
 model OrderShipping {
   id                Int             @id @default(autoincrement())
   price             Int
-  shippingPartnerId Int
+  shippingPartnerId String?
   orderId           Int             @unique
   Order             Order           @relation(fields: [orderId], references: [id])
-  ShippingPartner   ShippingPartner @relation(fields: [shippingPartnerId], references: [id])
+  ShippingPartner   ShippingPartner? @relation(fields: [shippingPartnerId], references: [id])
 }
 
 model ShippingPartner {
-  id            Int             @id @default(autoincrement())
+  id            String          @id @default(uuid())
   name          String
   imageName     String
   Order         Order[]
@@ -121,13 +121,14 @@ model Order {
   userId            String
   addressId         String?
   finalPrice        Int?
-  shippingPartnerId Int?
+  shippingPartnerId String?
   Address           Address?          @relation(fields: [addressId], references: [id])
   ShippingPartner   ShippingPartner?  @relation(fields: [shippingPartnerId], references: [id])
   user              User              @relation(fields: [userId], references: [id])
   OrderShipping     OrderShipping?
   Payment           Payment[]
   ProductForOrder   ProductForOrder[]
+  podroRequestId    String?
 }
 
 model Category {

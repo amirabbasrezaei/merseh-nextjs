@@ -38,37 +38,41 @@ export default function Addresses({
     <div className="w-full justify-center items-center ">
       <h2 className="text-[22px] text-black1 mb-4">آدرس ها</h2>
       <div className="w-full flex flex-col gap-4">
-        <AnimatePresence mode="wait">
-          {isLoading
-            ? Array.from(Array(3)).map((_, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0, transition: { duration: 0.3 } }}
-                  className="animate-pulse bg-gray-100 w-full h-[60px] rounded-[8px]"
+        <AnimatePresence mode="sync">
+          {isLoading ? (
+            Array.from(Array(3)).map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, transition: { duration: 0.3 } }}
+                className="animate-pulse bg-gray-100 w-full h-[60px] rounded-[8px]"
+              />
+            ))
+          ) : userAddressData?.addresses?.length ? (
+            userAddressData.addresses.map((e, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, transition: { duration: 1 } }}
+                exit={{ opacity: 0 }}
+              >
+                <AddressItem
+                  addressDetails={e.addressDetails}
+                  title={e.title}
+                  addressId={e.id}
+                  onSelect={setSelectedAddress}
+                  isSelected={e.id === selectedAddress}
+                  province={e.Province.name}
+                  city={e.city.name}
                 />
-              ))
-            : userAddressData?.addresses?.length
-            ? userAddressData.addresses.map((e, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1, transition: { duration: 1 } }}
-                  exit={{ opacity: 0 }}
-                >
-                  <AddressItem
-                    addressDetails={e.addressDetails}
-                    title={e.title}
-                    addressId={e.id}
-                    onSelect={setSelectedAddress}
-                    isSelected={e.id === selectedAddress}
-                    province={e.Province.name}
-                    city={e.city.name}
-                  />
-                </motion.div>
-              ))
-            : null}
+              </motion.div>
+            ))
+          ) : (
+            <div>
+              <span>یک آدرس جدید ثبت کنید</span>
+            </div>
+          )}
         </AnimatePresence>
       </div>
       <div
@@ -82,6 +86,7 @@ export default function Addresses({
       <Add_Address
         showAddAddress={showAddAddress}
         setShowAddAddress={setShowAddAddress}
+        setSelectedAddress={setSelectedAddress}
       />
     </div>
   );

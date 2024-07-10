@@ -30,11 +30,13 @@ export type Coordinate = {
 interface Props {
   setShowAddAddress: React.Dispatch<React.SetStateAction<boolean>>;
   showAddAddress: boolean;
+  setSelectedAddress: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export default function Add_Address({
   setShowAddAddress,
   showAddAddress,
+  setSelectedAddress,
 }: Props) {
   const { handleSubmit, control, watch } = useForm<FormTypes>({
     mode: "all",
@@ -79,7 +81,8 @@ export default function Add_Address({
   };
 
   useEffect(() => {
-    if (addAddressData?.status === "ok") {
+    if (addAddressData?.status === "ok" && addAddressData?.addressId) {
+      setSelectedAddress(addAddressData.addressId);
       setShowAddAddress(false);
     }
   }, [addAddressData]);

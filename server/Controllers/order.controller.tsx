@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { Context } from "../context";
 import { estimate_miare_price } from "./shipping/miare.controller";
+import { getShippingPricesController } from "./shipping.controller";
 
 type ArgsStructure<T = null> = T extends null
   ? {
@@ -24,7 +25,8 @@ export const activeOrderInputSchema = z.object({
     .optional(),
   shippingInfo: z
     .object({
-      shippingPartnerId: z.number(),
+      shippingPartnerName: z.string(),
+      addressId: z.string(),
     })
     .optional(),
 });
@@ -48,6 +50,7 @@ export async function updateActiveOrderController({
           select: {
             latitude: true,
             longitude: true,
+            id: true,
           },
         },
         ProductForOrder: {
@@ -90,6 +93,7 @@ export async function updateActiveOrderController({
           },
         },
         update: {
+          podroRequestId: null,
           ProductForOrder: {
             deleteMany: { orderId: findActiveOrder?.id },
             create: input.selectedProducts?.length
@@ -160,10 +164,18 @@ export async function updateActiveOrderController({
             (pr.Product.price - pr.Product.discount) * pr.numberOfproduct;
         }
       }
+      await prisma.order.update({
+        where: {
+          id: activeOrder.id,
+        },
+        data: {
+          finalPrice: totalPrice,
+        },
+      });
       return {
         result: "ok",
         activeOrder: addProductImages,
-        price: { totalPrice, shippingPrice: 0, finalPrice: null },
+        price: { totalPrice, shippingPrice: null, finalPrice: null },
         error: null,
       };
     }
@@ -182,97 +194,118 @@ export async function updateActiveOrderController({
             (pr.Product.price - pr.Product.discount) * pr.numberOfproduct;
         }
       }
-      if (
-        input.shippingInfo?.shippingPartnerId === 1 &&
-        findActiveOrder?.Address?.latitude
-      ) {
-        const coordinateBody = {
-          origin: {
-            latitude: Number(process.env.STORE_LATITUDE) as number,
-            longitude: Number(process.env.STORE_LONGITUDE) as number,
-          },
-          destination: {
-            latitude: findActiveOrder?.Address?.latitude,
-            longitude: findActiveOrder?.Address?.longitude,
-          },
-        };
-        const miare = await estimate_miare_price(coordinateBody);
+      await prisma.order.update({
+        where: { id: findActiveOrder?.id },
+        data: {
+          finalPrice: totalPrice,
+        },
+      });
+
+      if (input.shippingInfo?.shippingPartnerName) {
         try {
-          const updateOrderShipping = await prisma.order.update({
-            where: {
-              id: findActiveOrder?.id,
-            },
-            data: {
-              shippingPartnerId: input.shippingInfo.shippingPartnerId,
-              finalPrice: (miare.price as number) + totalPrice,
-              OrderShipping: {
-                upsert: {
-                  where: {
-                    orderId: findActiveOrder?.id || -1,
-                  },
-                  create: {
-                    price: miare.price,
-                    shippingPartnerId: input.shippingInfo.shippingPartnerId,
-                  },
-                  update: {
-                    price: miare.price,
-                    shippingPartnerId: input.shippingInfo.shippingPartnerId,
+          let choosenShipping: any;
+          if (findActiveOrder.Address?.id) {
+            const { shippings } = await getShippingPricesController({
+              ctx,
+              input: {
+                orderId: findActiveOrder.id,
+                addressId: input.shippingInfo.addressId,
+              },
+            });
+            console.log(shippings);
+            shippings?.map((shippingType) => {
+              shippingType.shippingPartners.map((shippingPartner: any) => {
+                if (
+                  shippingPartner.name ==
+                  input.shippingInfo?.shippingPartnerName
+                ) {
+                  choosenShipping = shippingPartner;
+                }
+              });
+            });
+          }
+
+          try {
+            if (choosenShipping?.shippingPartnerId) {
+              console.log(Number(choosenShipping.price))
+              const updateOrderShipping = await prisma.order.update({
+                where: {
+                  id: findActiveOrder?.id,
+                },
+                data: {
+                  OrderShipping: {
+                    upsert: {
+                      where: {
+                        orderId: findActiveOrder?.id || -1,
+                      },
+                      create: {
+                        price: Number(choosenShipping.price),
+                      },
+                      update: {
+                        price: Number(choosenShipping.price),
+                      },
+                    },
                   },
                 },
-              },
-            },
-            include: {
-              ProductForOrder: {
                 include: {
-                  Product: {
-                    select: {
-                      imageNames: true,
-                      name: true,
-                      price: true,
-                      id: true,
+                  ProductForOrder: {
+                    include: {
+                      Product: {
+                        select: {
+                          imageNames: true,
+                          name: true,
+                          price: true,
+                          id: true,
+                        },
+                      },
+                      ProductVariationValue: {
+                        select: {
+                          name: true,
+                          price: true,
+                        },
+                      },
                     },
                   },
-                  ProductVariationValue: {
+                  OrderShipping: {
                     select: {
-                      name: true,
                       price: true,
                     },
                   },
                 },
-              },
-              OrderShipping: {
-                select: {
-                  price: true,
-                },
-              },
-            },
-          });
+              });
 
-          const addProductImages = {
-            ...updateOrderShipping,
-            ProductForOrder: updateOrderShipping.ProductForOrder.map((e) => ({
-              ...e,
-              Product: {
-                ...e.Product,
-                imageUrls: e.Product.imageNames.map(
-                  (imgName) =>
-                    `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${imgName}`
+              const addProductImages = {
+                ...updateOrderShipping,
+                ProductForOrder: updateOrderShipping.ProductForOrder.map(
+                  (e) => ({
+                    ...e,
+                    Product: {
+                      ...e.Product,
+                      imageUrls: e.Product.imageNames.map(
+                        (imgName) =>
+                          `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${imgName}`
+                      ),
+                    },
+                  })
                 ),
-              },
-            })),
-          };
+              };
 
-          return {
-            result: "ok",
-            activeOrder: addProductImages,
-            error: null,
-            price: {
-              totalPrice,
-              shippingPrice: updateOrderShipping.OrderShipping?.price || 0,
-              finalPrice:
-                totalPrice + (updateOrderShipping.OrderShipping?.price || 0),
-            },
-          };
+              return {
+                result: "ok",
+                activeOrder: addProductImages,
+                error: null,
+                price: {
+                  totalPrice,
+                  shippingPrice: updateOrderShipping.OrderShipping?.price || 0,
+                  finalPrice:
+                    totalPrice +
+                    (updateOrderShipping.OrderShipping?.price || 0),
+                },
+              };
+            }
+          } catch (error) {
+            console.log(error);
+          }
         } catch (error) {
           return {
             result: "failed",

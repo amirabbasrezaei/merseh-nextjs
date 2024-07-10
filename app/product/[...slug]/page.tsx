@@ -68,7 +68,8 @@ export async function generateMetadata({
         : "outofstock";
 
     return {
-      title: " قیمت و خرید" + " " + product.product.name,
+      title: { absolute: " قیمت و خرید" + " " + product.product.name },
+
       description:
         "خرید اینترنتی" +
         " " +
