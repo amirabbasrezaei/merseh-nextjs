@@ -41,6 +41,7 @@ model City {
   provinceId Int
   Address    Address[]
   Province   Province  @relation(fields: [provinceId], references: [id])
+  podroCode  String?
 }
 
 model OrderShipping {

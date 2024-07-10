@@ -237,7 +237,7 @@ export async function importCities({ ctx }: ArgsStructure) {
     const createdPr = await ctx.prisma.province.create({
       data: {
         engName: "",
-        name: province.province,
+        name: province.name,
       },
     });
 
@@ -245,8 +245,9 @@ export async function importCities({ ctx }: ArgsStructure) {
       await ctx.prisma.city.create({
         data: {
           engName: "",
-          name: city,
+          name: city.name,
           provinceId: createdPr.id,
+          podroCode: city.code,
         },
       });
     }
