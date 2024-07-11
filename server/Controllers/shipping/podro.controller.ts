@@ -150,6 +150,7 @@ async function createDraft({
       await podroDrafts().then((e) => {
         if (e.drafts) removeDraft({ draftIds: e.drafts }).then;
       });
+      console.log(body, PODRO_HEADER);
 
       try {
         const response = await axios.post(
