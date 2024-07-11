@@ -39,9 +39,9 @@ export default function Layout({
           <div className=" w-full grow  flex flex-col gap-16">
             <div className=" grow">{children}</div>
             {footer ? (
-              <div className="h-[253px]">
+
                 <Footer />
-              </div>
+  
             ) : null}
           </div>
         </div>
