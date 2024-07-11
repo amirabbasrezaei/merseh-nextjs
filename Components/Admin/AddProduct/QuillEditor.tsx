@@ -152,7 +152,7 @@ export default function QuillEditor({ setContent, content }: Props) {
         </div>
       </header>
       <div
-        className={`[&_.ql-editor]:text-right [&_.ql-editor]:min-h-[360px] [&_img]:w-3/4  [&_p]:text-lg [&_.ql-container]:font-normal`}
+        className={`[&_.ql-editor]:text-right [&_.ql-editor]:min-h-[360px] [&_.ql-editor]:h-[800px] [&_img]:w-3/4  [&_p]:text-lg [&_.ql-container]:font-normal`}
       >
         {isClient && document !== undefined ? (
           <ReactQuill
