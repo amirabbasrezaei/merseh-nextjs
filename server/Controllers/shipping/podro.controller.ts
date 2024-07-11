@@ -153,6 +153,7 @@ async function createDraft({
       console.log(body.items, PODRO_HEADER);
 
       try {
+
         const response = await axios.post(
           `${PODRO_BASE_URL}/drafts`,
           body,
@@ -169,6 +170,7 @@ async function createDraft({
 
         return { error: null, requestId: response.data.data.request_id };
       } catch (error) {
+        console.log(error)
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", cause: error });
       }
     } catch (error) {
