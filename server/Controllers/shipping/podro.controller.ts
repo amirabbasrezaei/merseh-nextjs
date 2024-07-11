@@ -150,7 +150,7 @@ async function createDraft({
       await podroDrafts().then((e) => {
         if (e.drafts) removeDraft({ draftIds: e.drafts }).then;
       });
-      console.log(body, PODRO_HEADER);
+      console.log(body.items, PODRO_HEADER);
 
       try {
         const response = await axios.post(
@@ -158,6 +158,7 @@ async function createDraft({
           body,
           PODRO_HEADER
         );
+        console.log(response.data)
 
         await prisma.order.update({
           where: {
