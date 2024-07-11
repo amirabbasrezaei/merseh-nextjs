@@ -227,7 +227,7 @@ export async function updateActiveOrderController({
 
           try {
             if (choosenShipping?.shippingPartnerId) {
-              console.log(Number(choosenShipping.price))
+              console.log(Number(choosenShipping.price));
               const updateOrderShipping = await prisma.order.update({
                 where: {
                   id: findActiveOrder?.id,
@@ -240,9 +240,13 @@ export async function updateActiveOrderController({
                       },
                       create: {
                         price: Number(choosenShipping.price),
+                        name: choosenShipping.name,
+                        title: choosenShipping.title,
                       },
                       update: {
                         price: Number(choosenShipping.price),
+                        name: choosenShipping.name,
+                        title: choosenShipping.title,
                       },
                     },
                   },

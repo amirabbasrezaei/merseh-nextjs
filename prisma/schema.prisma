@@ -45,12 +45,14 @@ model City {
 }
 
 model OrderShipping {
-  id                Int             @id @default(autoincrement())
+  id                Int              @id @default(autoincrement())
   price             Int
   shippingPartnerId String?
-  orderId           Int             @unique
-  Order             Order           @relation(fields: [orderId], references: [id])
+  orderId           Int              @unique
+  Order             Order            @relation(fields: [orderId], references: [id])
   ShippingPartner   ShippingPartner? @relation(fields: [shippingPartnerId], references: [id])
+  name              String           @default("")
+  title              String           @default("")
 }
 
 model ShippingPartner {
