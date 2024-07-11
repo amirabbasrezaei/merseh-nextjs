@@ -212,7 +212,6 @@ export async function updateActiveOrderController({
                 addressId: input.shippingInfo.addressId,
               },
             });
-            console.log(shippings);
             shippings?.map((shippingType) => {
               shippingType.shippingPartners.map((shippingPartner: any) => {
                 if (
@@ -227,7 +226,6 @@ export async function updateActiveOrderController({
 
           try {
             if (choosenShipping?.shippingPartnerId) {
-              console.log(Number(choosenShipping.price));
               const updateOrderShipping = await prisma.order.update({
                 where: {
                   id: findActiveOrder?.id,
