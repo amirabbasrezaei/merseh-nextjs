@@ -225,6 +225,8 @@ export async function podroShippingPrices({
       const body = {
         request_id: requestId,
       };
+
+      console.log(body, PODRO_HEADER);
       const response = await axios.post(
         `${PODRO_BASE_URL}/shippings/enquiry`,
         body,
