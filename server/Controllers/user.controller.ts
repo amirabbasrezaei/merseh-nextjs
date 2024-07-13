@@ -61,9 +61,9 @@ export async function createUserController({
     const generatedCode = Math.random().toString().substring(2, 7);
 
     const body = {
-      bodyId: 125257,
+      bodyId: 232336,
       to: input.phoneNumber,
-      args: [String(generatedCode), input?.hash ? String(input.hash) : ""],
+      args: [String(generatedCode)],
     };
 
     const { status: tokenCodeStatus } = await sendSMSCodeController({
@@ -138,9 +138,9 @@ export async function sendVerifyCodeController({
   const generatedCode = Math.random().toString().substring(2, 7);
 
   const body = {
-    bodyId: 125257,
+    bodyId: 232336,
     to: input.phoneNumber,
-    args: [String(generatedCode), input?.hash ? String(input.hash) : ""],
+    args: [String(generatedCode)],
   };
 
   const { status: tokenCodeStatus } = await sendSMSCodeController({
