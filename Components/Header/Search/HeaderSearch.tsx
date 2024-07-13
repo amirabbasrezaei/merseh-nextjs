@@ -43,6 +43,8 @@ export default function HeaderSearch() {
     };
   }, [searchTerm]);
 
+
+
   return (
     <>
       <div className="hidden basis-6/12 h-[50px] relative sm:flex items-center justify-center">
@@ -65,20 +67,29 @@ export default function HeaderSearch() {
           style={{ overflow: "hidden" }}
           variants={animation}
           animate={searchTerm.length ? "open" : "hidden"}
-          className="absolute  flex flex-col justify-evenly  bg-white w-[104%] z-[1] p-5 pt-20 rounded-[10px] border top-[-15px]"
-          transition={{ duration: 0.5 }}
+          className="absolute gap-5 flex flex-col justify-evenly overflow-y-scroll  bg-white w-[104%] z-[1]  pt-20 rounded-[10px] border top-[-15px]"
+          transition={{ duration: 0.3 }}
         >
-          {data?.result.length
-            ? data.result.map((item, index) => (
-                <Link
-                  onClick={() => setSearchTerm("")}
-                  href={`/products?catId=${item.id}`}
-                  key={index}
-                >
-                  <span>{item.title}</span>
-                </Link>
-              ))
-            : null}
+          <div
+            style={{ scrollbarWidth: "thin" }}
+            className="h-full flex flex-col overflow-y-scroll p-5 pt-0 gap-3 scroll"
+          >
+            {data?.result.length
+              ? data.result.map((item, index) => (
+                  <Link
+                    onClick={() => setSearchTerm("")}
+                    href={`/products?catId=${item.id}`}
+                    key={index}
+                    className="flex flex-row items-center gap-2"
+                  >
+                    <div>
+                      <Category_Svg classname="w-5 fill-green2" />
+                    </div>
+                    <span className="text-black1">{item.title}</span>
+                  </Link>
+                ))
+              : null}
+          </div>
         </motion.div>
 
         {isClient
@@ -103,17 +114,18 @@ export default function HeaderSearch() {
       >
         <Magnifier classname=" w-[20px] h-auto fill-[#363636]" />
       </div>
-      {isClient
+
+      {isClient && height
         ? createPortal(
             <motion.div
               initial={false}
               animate={
                 showSearch
                   ? { translateY: 0, opacity: 1 }
-                  : { translateY: height, opacity: 0 }
+                  : { translateY: 500, opacity: 0 }
               }
               transition={{ bounce: 0.2, type: "tween", duration: 0.3 }}
-              className="fixed items-center py-6 w-full h-full origin-bottom bg-white z-30 flex flex-col gap-2"
+              className="fixed top-0 right-0 left-0 items-center py-6 w-full h-full origin-bottom bg-white z-30 flex flex-col gap-2"
             >
               {showSearch ? (
                 <input
@@ -125,8 +137,8 @@ export default function HeaderSearch() {
                 />
               ) : null}
               <div
-                style={{ overflow: "hidden" }}
-                className="  flex flex-col  h-full bg-white w-full gap-5 p-5 sm:pt-20"
+                // style={{ overflow: "hidden" }}
+                className=" flex flex-col h-full overflow-y-scroll bg-white w-full gap-5 p-5 sm:pt-20"
               >
                 {data?.result.length
                   ? data.result.map((item, index) => (

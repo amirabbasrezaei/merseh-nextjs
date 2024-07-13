@@ -38,8 +38,8 @@ export default function Input(props: Props) {
     lableText,
   } = props;
 
-  const { field } = useController(props);
-
+  const { field, fieldState } = useController(props);
+  console.log(fieldState.error)
   return (
     <div style={{ height: 50, borderRadius: "10px" }} className=" relative ">
       <input

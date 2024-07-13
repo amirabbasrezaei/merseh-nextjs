@@ -11,10 +11,10 @@ import Button from "@/Components/Button";
 import { createPortal } from "react-dom";
 
 export type FormTypes = {
-  Name: string;
-  FamilyName: string;
+  Name: string | null;
+  FamilyName: string | null;
   AddressTitle: string;
-  PhoneNumber: string;
+  PhoneNumber: string | null;
   Province: number;
   City: number;
   Details: string;
@@ -41,17 +41,15 @@ export default function Add_Address({
   const { handleSubmit, control, watch } = useForm<FormTypes>({
     mode: "all",
     defaultValues: {
-      Name: "",
     },
   });
   const [coordinate, setCoordinate] = useState<Coordinate>({
     latitude: 0,
     longitude: 0,
   });
-  const { data: getCitiesData, refetch: refetchGetCities } =
-    trpc.shipping.getCities.useQuery({
-      provinceId: Number(watch().Province || null),
-    });
+  const { data: getCitiesData } = trpc.shipping.getCities.useQuery({
+    provinceId: Number(watch().Province || null),
+  });
 
   const {
     mutate: mutateAddAddress,
@@ -62,14 +60,14 @@ export default function Add_Address({
 
   const onSubmit = (data: any) => {
     const body = {
-      phoneNumber: data.PhoneNumber,
+      phoneNumber: data.PhoneNumber || null,
       coordinate: {
         latitude: coordinate.latitude,
         longitude: coordinate.longitude,
       },
       reciverInfo: {
-        name: data.Name,
-        familyName: data.FamilyName,
+        name: data.Name || null,
+        familyName: data.FamilyName || null,
       },
       provinceId: Number(data.Province),
       cityId: Number(data.City),
@@ -86,6 +84,8 @@ export default function Add_Address({
       setShowAddAddress(false);
     }
   }, [addAddressData]);
+
+  console.log(error);
 
   return (
     <>
@@ -178,7 +178,7 @@ export default function Add_Address({
                 type="text"
                 lableText="نام"
                 name="Name"
-                rules={{ min: 3 }}
+                rules={{   }}
                 className="w-full"
               />
               <Input
@@ -186,7 +186,7 @@ export default function Add_Address({
                 type="text"
                 lableText="نام خانوادگی"
                 name="FamilyName"
-                rules={{ min: 3 }}
+                rules={{  }}
                 className="w-full"
               />
               <Input
@@ -194,7 +194,7 @@ export default function Add_Address({
                 type="text"
                 lableText="شماره تلفن همراه"
                 name="PhoneNumber"
-                rules={{ min: 3 }}
+                rules={{   }}
                 className="w-full"
               />
             </div>

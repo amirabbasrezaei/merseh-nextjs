@@ -9,6 +9,7 @@ import Signup from "./Signup";
 import Verify from "./Verify";
 import { SetterOrUpdater } from "recoil";
 import { ThemeType } from "../ThemeController";
+import toast from "react-hot-toast";
 type Props = {
   isModal?: boolean;
   setShowAuthModal?: SetterOrUpdater<ThemeType>;
@@ -19,7 +20,7 @@ export default function Auth({
 }: Props) {
   const [loginStatus, setLoginStatus] = useState(0);
   const [input, setInput] = useState<string>("");
-  const { data, isLoading, mutate, status } =
+  const { data, isLoading, mutate, status, error } =
     trpc.user.sendVerifyCode.useMutation();
 
   useEffect(() => {
@@ -31,6 +32,12 @@ export default function Auth({
       }
     }
   }, [status]);
+
+  useEffect(() => {
+    if (error?.message) {
+      toast.error(error?.message || "");
+    }
+  }, [error]);
   return (
     <div
       onClick={(e) => e.stopPropagation()}
