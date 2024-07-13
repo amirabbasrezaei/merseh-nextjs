@@ -9,12 +9,13 @@ import SelectInput from "@/Components/SelectInput";
 import TextArea from "@/Components/TextArea";
 import Button from "@/Components/Button";
 import { createPortal } from "react-dom";
+import toast from "react-hot-toast";
 
 export type FormTypes = {
-  Name: string | null;
-  FamilyName: string | null;
+  Name: string;
+  FamilyName: string;
   AddressTitle: string;
-  PhoneNumber: string | null;
+  PhoneNumber: string;
   Province: number;
   City: number;
   Details: string;
@@ -41,6 +42,13 @@ export default function Add_Address({
   const { handleSubmit, control, watch } = useForm<FormTypes>({
     mode: "all",
     defaultValues: {
+      Name: "",
+      FamilyName: "",
+      PhoneNumber: "",
+      AddressTitle: "",
+      Province: -1,
+      City: -1,
+      PostalCode: "",
     },
   });
   const [coordinate, setCoordinate] = useState<Coordinate>({
@@ -60,25 +68,31 @@ export default function Add_Address({
 
   const onSubmit = (data: any) => {
     const body = {
-      phoneNumber: data.PhoneNumber || null,
+      phoneNumber: data.PhoneNumber,
       coordinate: {
         latitude: coordinate.latitude,
         longitude: coordinate.longitude,
       },
       reciverInfo: {
-        name: data.Name || null,
-        familyName: data.FamilyName || null,
+        name: data.Name,
+        familyName: data.FamilyName,
       },
       provinceId: Number(data.Province),
       cityId: Number(data.City),
       detailedAddress: data.Details,
-      postalCode: Number(data.PostalCode),
+      postalCode: data.PostalCode,
       addressTitle: data.AddressTitle,
     };
-    coordinate.latitude && mutateAddAddress(body);
+
+    if (!coordinate.latitude) {
+      toast.error("موقیت آدرس را روی نقشه مشخص کنید");
+    } else {
+      mutateAddAddress(body);
+    }
   };
 
   useEffect(() => {
+    console.log(addAddressData);
     if (addAddressData?.status === "ok" && addAddressData?.addressId) {
       setSelectedAddress(addAddressData.addressId);
       setShowAddAddress(false);
@@ -98,14 +112,14 @@ export default function Add_Address({
           }}
           animate={showAddAddress ? "open" : "hidden"}
           style={{ visibility: showAddAddress ? "visible" : "hidden" }}
-          className="absolute z-30 w-full h-screen flex xl:items-center justify-center overflow-y-scroll"
+          className="absolute z-30 w-full h-screen flex sm:items-center justify-center overflow-y-scroll "
         >
           <form
             style={{ scrollbarWidth: "none" }}
             onSubmit={handleSubmit(onSubmit)}
-            className="  rounded-lg flex flex-col items-center border border-[#f3f3f3] sm:justify-center   overflow-y-scroll w-full sm:w-[470px] p-4 h-fit bg-white gap-8 sm:p-4"
+            className="  rounded-lg flex flex-col items-center border border-[#ececec] sm:justify-center shadow-sm  overflow-y-scroll w-full sm:w-[470px] p-4 h-fit bg-white gap-10 sm:p-4"
           >
-            <div className="w-full  flex flex-col items-center gap-4 h-[400px] sm:h-[500px] ">
+            <div className="w-full  flex flex-col items-center gap-4 h-[400px] sm:h-[300px] mb-10 ">
               <Map coordinate={coordinate} setCoordinate={setCoordinate} />
               {!coordinate?.latitude ? (
                 <span className="text-red-700 text-[16px]">
@@ -115,8 +129,10 @@ export default function Add_Address({
               ) : null}
             </div>
 
-            <h3 className="text-[16px] text-black1 w-full ">اطلاعات ارسال</h3>
             <div className="sm:grid grid-cols-2 flex flex-col  h-fit w-full gap-5">
+              <h3 className="text-[16px] text-black1 w-full col-span-2 ">
+                اطلاعات ارسال
+              </h3>
               <Input
                 control={control}
                 type="text"
@@ -158,13 +174,13 @@ export default function Add_Address({
                 type="text"
                 lableText="کد پستی"
                 name="PostalCode"
-                rules={{ min: 3, required: true, minLength: 10, maxLength: 10 }}
+                rules={{ required: true, minLength:10, maxLength:10 }}
                 className="w-full"
               />
             </div>
             <div>
               <h3 className="text-[16px] text-black1 w-full ">
-                اطلاعات شخصی تحویل گیرنده
+                اطلاعات تحویل گیرنده (اختیاری)
               </h3>
 
               <span className="text-[12px] text-lightBlack">
@@ -178,27 +194,27 @@ export default function Add_Address({
                 type="text"
                 lableText="نام"
                 name="Name"
-                rules={{   }}
                 className="w-full"
+                rules={{ min: 0, required: false }}
               />
               <Input
                 control={control}
                 type="text"
                 lableText="نام خانوادگی"
                 name="FamilyName"
-                rules={{  }}
                 className="w-full"
+                rules={{ min: 0, required: false }}
               />
               <Input
                 control={control}
                 type="text"
                 lableText="شماره تلفن همراه"
                 name="PhoneNumber"
-                rules={{   }}
                 className="w-full"
+                rules={{ min: 0, required: false }}
               />
             </div>
-            <div className="w-full flex flex-col gap-3">
+            <div className="w-full flex md:flex-row-reverse flex-col gap-3">
               <Button
                 isLoading={isPendingAddAddress}
                 text="ثبت آدرس"

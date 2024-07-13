@@ -75,7 +75,6 @@ export async function getShippingPricesController({
       }
     }
     try {
-      
       const podro = await podroShippingPrices({ orderId: order.id, prisma });
 
       if (podro?.shipping) {
@@ -89,11 +88,11 @@ export async function getShippingPricesController({
             shippingPartnerId: sh.id,
           })),
         };
-        
+
         shippings.push(podro_shippings);
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
 
     return { shippings, error: null };
@@ -152,16 +151,19 @@ export const AddAddressInputSchema = z.object({
     latitude: z.number(),
     longitude: z.number(),
   }),
-  addressTitle: z.string().nullable(),
+  addressTitle: z.string().optional(),
   reciverInfo: z.object({
-    name: z.string().nullable(),
-    familyName: z.string().nullable(),
+    name: z.string().optional(),
+    familyName: z.string().optional(),
   }),
-  phoneNumber: z.string().nullable(),
-  provinceId: z.number(),
-  cityId: z.number(),
+  phoneNumber: z
+    .string()
+    .regex(/((0?9)|(\+?989))\d{2}\W?\d{3}\W?\d{4}/g)
+    .or(z.string().optional()),
+  provinceId: z.number().int().positive(),
+  cityId: z.number().int().positive(),
   detailedAddress: z.string(),
-  postalCode: z.number(),
+  postalCode: z.string().length(10),
 });
 
 type AddAddressInput = z.infer<typeof AddAddressInputSchema>;
@@ -183,7 +185,7 @@ export async function addAddressController({
         },
       });
       if (userInfo) {
-        await prisma.address.create({
+        const address = await prisma.address.create({
           data: {
             userId: user.userId,
             addressDetails: input.detailedAddress,
@@ -192,13 +194,15 @@ export async function addAddressController({
             provinceId: input.provinceId,
             latitude: input.coordinate.latitude,
             longitude: input.coordinate.longitude,
-            reciverFamilyName: userInfo?.familyName || "",
+            reciverFamilyName: userInfo?.familyName?.length
+              ? userInfo?.familyName
+              : " ",
             reciverName: userInfo.name,
             reciverPhoneNumber: userInfo.phoneNumber,
             postalCode: BigInt(input.postalCode),
           },
         });
-        return { status: "ok", error: null, addressId: null };
+        return { status: "ok", error: null, addressId: address.id };
       }
       return { status: "ok", error: "cannot find user", addressId: null };
     }

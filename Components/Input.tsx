@@ -39,7 +39,6 @@ export default function Input(props: Props) {
   } = props;
 
   const { field, fieldState } = useController(props);
-  console.log(fieldState.error)
   return (
     <div style={{ height: 50, borderRadius: "10px" }} className=" relative ">
       <input
@@ -48,7 +47,7 @@ export default function Input(props: Props) {
         type={type}
         className={`border border-gray-200 px-2 outline-none focus:outline-green1     ${className}`}
         placeholder={placeholder}
-      />
+      /> 
       <span className="absolute top-[-14px] text-[14px]  right-4  bg-white px-3 text-black1">
         {lableText}
         {props.rules?.required  ? (

@@ -115,7 +115,7 @@ export default function HeaderSearch() {
         <Magnifier classname=" w-[20px] h-auto fill-[#363636]" />
       </div>
 
-      {isClient && height
+      {isClient && showSearch
         ? createPortal(
             <motion.div
               initial={false}
