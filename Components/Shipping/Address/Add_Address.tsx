@@ -112,14 +112,14 @@ export default function Add_Address({
           }}
           animate={showAddAddress ? "open" : "hidden"}
           style={{ visibility: showAddAddress ? "visible" : "hidden" }}
-          className="absolute z-30 w-full h-screen flex sm:items-center justify-center overflow-y-scroll "
+          className="fixed sm:absolute z-[40] w-full h-full flex sm:items-center justify-center overflow-y-scroll "
         >
           <form
             style={{ scrollbarWidth: "none" }}
             onSubmit={handleSubmit(onSubmit)}
             className="  rounded-lg flex flex-col items-center border border-[#ececec] sm:justify-center shadow-sm  overflow-y-scroll w-full sm:w-[470px] p-4 h-fit bg-white gap-10 sm:p-4"
           >
-            <div className="w-full  flex flex-col items-center gap-4 h-[400px] sm:h-[300px] mb-10 ">
+            <div className="w-full  flex flex-col items-center gap-4 h-[400px] sm:h-[300px] sm:mb-4 ">
               <Map coordinate={coordinate} setCoordinate={setCoordinate} />
               {!coordinate?.latitude ? (
                 <span className="text-red-700 text-[16px]">
