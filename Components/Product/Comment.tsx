@@ -64,7 +64,7 @@ export default function Comment({
             )}
           </div>
         </div>
-        <p className="text-[18px]">{content}</p>
+        <p className="text-[16px]">{content}</p>
         <AnimatePresence mode="sync">
           {!showReply ? (
             <motion.div
