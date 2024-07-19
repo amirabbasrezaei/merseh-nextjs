@@ -6,6 +6,16 @@ import {
   editCategoryController,
 } from "../Controllers/category.controller";
 import {
+  add_comment_controller,
+  add_comment_schema,
+  editCommentController,
+  editCommentSchema,
+  get_product_comments,
+  likeCommentController,
+  likeCommentSchema,
+  product_comments_schema,
+} from "../Controllers/comment.controller";
+import {
   AddProductControllerArgSchema,
   ProductCartInfoInputSchema,
   addProductController,
@@ -18,7 +28,12 @@ import {
   productCartInfoController,
   productsController,
 } from "../Controllers/product.controller";
-import { adminProtectedProcedure, publicProcedure, router } from "../trpc";
+import {
+  adminProtectedProcedure,
+  publicProcedure,
+  router,
+  userProtectedProcedure,
+} from "../trpc";
 
 export const productRouter = router({
   getproduct: publicProcedure
@@ -45,4 +60,16 @@ export const productRouter = router({
   editProduct: adminProtectedProcedure
     .input(editProductInputSchema)
     .mutation(editProductController),
+  addComment: userProtectedProcedure
+    .input(add_comment_schema)
+    .mutation(add_comment_controller),
+  productComments: publicProcedure
+    .input(product_comments_schema)
+    .query(get_product_comments),
+  editComment: userProtectedProcedure
+    .input(editCommentSchema)
+    .mutation(editCommentController),
+    likeComment: userProtectedProcedure
+    .input(likeCommentSchema)
+    .mutation(likeCommentController),
 });

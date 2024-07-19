@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { trpc } from "@/utils/trpc";
 import classNames from "classnames";
 import ProductImages from "./ProductImages";
@@ -16,6 +16,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Check, Minus_Svg, Plus_Svg, TrashBin_SVG } from "../SVGS";
 import Link from "next/link";
 import Content from "../Admin/AddProduct/ContentViewer";
+import Comments from "./Comments";
 
 type Props = {
   productId: string;
@@ -28,6 +29,9 @@ type ProductVariation = {
   variationId: number;
 } | null;
 export default function Product({ productId }: Props) {
+  const commentsRef = useRef(null);
+  const contentRef = useRef(null);
+  const [visibleSection, setVisibleSection] = useState("");
   const { width } = useWindowSize();
   const params = useSearchParams();
   const router = useRouter();
@@ -91,20 +95,6 @@ export default function Product({ productId }: Props) {
             }
           : null
       );
-      console.log(
-        selectedProductVariation?.price && !selectedProductVariation?.discount
-      );
-      console.log(
-        selectedProductVariation?.price && selectedProductVariation.discount
-          ? splitNumber(
-              selectedProductVariation?.price -
-                selectedProductVariation.discount
-            )
-          : selectedProductVariation?.price &&
-            !selectedProductVariation?.discount
-          ? splitNumber(productData?.product?.price)
-          : 0
-      );
     }
   }, [isFetched]);
 
@@ -118,9 +108,53 @@ export default function Product({ productId }: Props) {
     }
   }, [selectedProductVariation, items, productData]);
 
+  const isElementInView = (elementRef: any) => {
+    if (elementRef.current) {
+      const rect = elementRef.current.getBoundingClientRect();
+      const isVisible =
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <=
+          (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <=
+          (window.innerWidth || document.documentElement.clientWidth);
+      if (isVisible) return true;
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isElementInView(contentRef)) {
+        setVisibleSection("article");
+      }
+      if (isElementInView(commentsRef)) {
+        setVisibleSection("comments");
+      }
+    };
+
+    document.querySelector("main")?.addEventListener("scroll", handleScroll);
+
+    // Initial check on component mount
+    handleScroll();
+
+    return () => {
+      document
+        .querySelector("main")
+        ?.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    console.log(visibleSection);
+  }, [visibleSection]);
+
   return (
     <>
-      <section className="flex sm:px-20 flex-col gap-10 w-full">
+      <section
+        id="productSection"
+        className="flex sm:px-20 flex-col gap-10 w-full"
+      >
         <div className="sm:h-[450px] h-fit w-full flex flex-col sm:flex-row sm:mt-[85px]">
           <div className="h-full w-full sm:basis-4/12 ">
             {productData?.product ? (
@@ -233,7 +267,7 @@ export default function Product({ productId }: Props) {
                   ))}
                 </ul>
               </div>
-            ) : isLoading  ? (
+            ) : isLoading ? (
               <div className="flex flex-col gap-5">
                 <div className="animate-pulse bg-gray-100 w-[200px] h-[20px] rounded-sm" />
                 <div className="animate-pulse bg-gray-100 w-[200px] h-[20px] rounded-sm" />
@@ -438,11 +472,49 @@ export default function Product({ productId }: Props) {
           </div>
         </div>
         <div className="md:px-20 flex flex-col gap-4">
-          <h3 className="text-[22px] font-[500] text-lightBlack">
-            معرفی محصول
-          </h3>
+          <div className="flex flex-row gap-6">
+            <button
+              onClick={() =>
+                contentRef?.current &&
+                // @ts-ignore
+                contentRef?.current?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "center",
+                  inline: "nearest",
+                })
+              }
+              className={classNames(
+                "text-[16px] font-[500] ",
+                visibleSection === "article" ? "text-green1" : "text-lightBlack"
+              )}
+            >
+              معرفی
+            </button>
+            <button
+              onClick={() =>
+                commentsRef?.current &&
+                // @ts-ignore
+                commentsRef?.current?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "center",
+                  inline: "nearest",
+                })
+              }
+              className={classNames(
+                "text-[16px] font-[500] ",
+                visibleSection === "comments"
+                  ? "text-green1"
+                  : "text-lightBlack"
+              )}
+            >
+              دیدگاه ها
+            </button>
+          </div>
+          <hr />
           {!isLoading && productData?.product ? (
-            <Content contentForView={productData?.product.content} />
+            <div className="w-full h-fit" ref={contentRef}>
+              <Content contentForView={productData?.product.content} />
+            </div>
           ) : (
             Array.from(Array(2)).map((_, i) => (
               <div className="flex flex-col gap-3 my-5" key={i}>
@@ -455,11 +527,7 @@ export default function Product({ productId }: Props) {
           )}
         </div>
 
-        <div className="w-full flex flex-col gap-5">
-          <h3 className="text-[22px] font-[500] text-black1">نظرات</h3>
-          <textarea className="appearance-none p-4 w-full sm:w-[500px] h-[100px] outline-none rounded-[10px] border border-[#ECECEC] bg-[#F9F9F9] " />
-          <Button className="w-[170px] h-[40px]" text="ارسال نظر" />
-        </div>
+        <Comments commentsRef={commentsRef} productId={productId} />
         <ProductCarousel title="دیگران هم خریده اند" sliderStartDelay={0} />
       </section>
     </>

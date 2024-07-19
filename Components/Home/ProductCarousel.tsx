@@ -66,7 +66,7 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
       <h3 className="text-[20px] w-full text-black1 font-normal">{title}</h3>
       <Swiper
         onSwiper={swiperRef}
-        spaceBetween={20}
+        spaceBetween={10}
         slidesPerView={width > 639 ? 5 : 2}
         direction="horizontal"
         className="w-full h-full "
@@ -77,7 +77,7 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
 
         {productCarouselData?.products.length
           ? productCarouselData.products.map((product, index) => (
-              <SwiperSlide key={product.id}>
+              <SwiperSlide className="w-full" key={product.id}>
                 <motion.div
                   transition={{ duration: 0.3 }}
                   initial={{ opacity: 0 }}

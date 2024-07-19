@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { estimate_miare_price } from "./shipping/miare.controller";
 import { ArgsStructure } from "./category.controller";
-import CitiesJson from "./../../public/gistfile1.json";
+import CitiesJson from "../../public/gistfile1.json";
 import { podroShippingPrices } from "./shipping/podro.controller";
 
 export const ShippingPricesInputSchema = z.object({

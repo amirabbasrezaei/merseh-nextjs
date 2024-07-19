@@ -52,7 +52,7 @@ model OrderShipping {
   Order             Order            @relation(fields: [orderId], references: [id])
   ShippingPartner   ShippingPartner? @relation(fields: [shippingPartnerId], references: [id])
   name              String           @default("")
-  title              String           @default("")
+  title             String           @default("")
 }
 
 model ShippingPartner {
@@ -80,6 +80,7 @@ model Product {
   ProductVariation ProductVariation[]
   category         Category[]         @relation("CategoryToProduct")
   details          String[]
+  Comments         Comment[]
 }
 
 model ProductVariationValue {
@@ -146,23 +147,26 @@ model Category {
 }
 
 model User {
-  id             String    @id @default(uuid())
-  name           String    @db.VarChar(20)
-  familyName     String?
-  password       String?
-  email          String?   @unique
-  phoneNumber    String    @unique
-  role           role      @default(USER)
-  loginCode      String?
-  isVerified     Boolean   @default(false)
-  credit         Int       @default(0)
-  createdAt      DateTime  @default(now())
-  lastLogin      DateTime?
-  numberOfLogins Int?      @default(1)
-  Addresses      Address[]
-  order          Order[]
-  Payment        Payment[]
-  Session        Session[]
+  id              String    @id @default(uuid())
+  name            String    @db.VarChar(20)
+  familyName      String?
+  password        String?
+  email           String?   @unique
+  phoneNumber     String    @unique
+  role            role      @default(USER)
+  loginCode       String?
+  isVerified      Boolean   @default(false)
+  credit          Int       @default(0)
+  createdAt       DateTime  @default(now())
+  lastLogin       DateTime?
+  numberOfLogins  Int?      @default(1)
+  Addresses       Address[]
+  order           Order[]
+  Payment         Payment[]
+  Session         Session[]
+  Comment         Comment[] @relation("user_and_comment")
+  Comment_Likes   Comment[] @relation("likes")
+
 }
 
 model Session {
@@ -189,6 +193,28 @@ model Payment {
   orderId              Int
   Order                Order     @relation(fields: [orderId], references: [id])
   user                 User      @relation(fields: [userId], references: [id])
+}
+
+model Comment {
+  id                Int            @id @default(autoincrement())
+  User              User           @relation("user_and_comment", fields: [userId], references: [id])
+  userId            String
+  Product           Product        @relation(fields: [productId], references: [id])
+  productId         Int
+  content           String
+  child_comments    Comment[]      @relation("child_comments")
+  parent_comment    Comment?       @relation("child_comments", fields: [parent_comment_id], references: [id])
+  parent_comment_id Int?
+  status            Comment_Status @default(NEED_REVIEW)
+  likes             User[]         @relation("likes")
+
+}
+
+enum Comment_Status {
+  APPROVED
+  NEED_REVIEW
+  FAILED
+  NOT_SHOWN
 }
 
 enum role {
