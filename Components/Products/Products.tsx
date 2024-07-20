@@ -65,7 +65,7 @@ export default function Products({ categoryId }: Props) {
                       imageNames={pr.imageNames}
                       price={pr.price || 0}
                       title={pr.name}
-                      pathname={`product/${String(pr.id)}/${pr.name.replaceAll(
+                      pathname={`/product/${String(pr.id)}/${pr.name.replaceAll(
                         " ",
                         "-"
                       )}`}
