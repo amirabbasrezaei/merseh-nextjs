@@ -22,7 +22,7 @@ export default function Main_Categories() {
           ? data[0].subCategories.map((category, index) => (
               <Link
                 key={index}
-                href={`/products?catId=${category.id}`}
+                href={`/category/${category.id}/${category.title.replaceAll(" ", "-")}`}
                 className="flex w-full h-full flex-col items-center  max-w-none gap-3"
               >
                 <Image

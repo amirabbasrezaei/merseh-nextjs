@@ -25,7 +25,7 @@ export default function CategoryItem({
       onClick={() => {
         setShowCategories(false);
       }}
-      href={`/products?catId=${categoryId}`}
+      href={`/category/${categoryId}/${categoryName.replaceAll(" ", "-")}`}
     >
       <div
         onMouseOver={() => setSelectedCategoryIndex(categoryIndex)}

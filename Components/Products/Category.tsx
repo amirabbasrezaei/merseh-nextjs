@@ -1,4 +1,10 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { Check, Chevron_Down, Plus_Svg } from "../SVGS";
 import { categoryType } from "./Filter";
 import { AnimatePresence, motion } from "framer-motion";
@@ -6,13 +12,17 @@ import classNames from "classnames";
 import { filterTypeArgs } from "./Products";
 import { trpc } from "@/utils/trpc";
 import GetCategories from "./GetCategories";
-import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 interface Props {
   name: string;
   subCategory?: categoryType[];
   setFilter: Dispatch<SetStateAction<filterTypeArgs>>;
   catId: number;
-
 }
 
 export default function Category({
@@ -20,7 +30,6 @@ export default function Category({
   subCategory = [],
   setFilter,
   catId,
-
 }: Props) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -52,8 +61,10 @@ export default function Category({
     <>
       <div
         onClick={() => {
-          router.push(`products?${createQueryString("catId", String(catId))}`);
-          setShowCategory(state => !state)
+          router.push(
+            `/category/${String(catId)}/${name.replaceAll(" ", "-")}`
+          );
+          setShowCategory((state) => !state);
         }}
         className="flex flex-row items-center gap-1  w-fit  mb-3"
       >
@@ -74,7 +85,6 @@ export default function Category({
         >
           {name}
         </span>
-
       </div>
       {showCreateCategory.state && showCreateCategory.key == catId ? (
         <div className="flex flex-row gap-2">
@@ -112,7 +122,6 @@ export default function Category({
             parentAnimation={showCategory}
             catId={[catId]}
             setFilter={setFilter}
-
           />
         ) : null}
       </motion.div>

@@ -86,7 +86,7 @@ export default function GetCategories({
             // }));
 
             router.push(
-              `products?${createQueryString("catId", String(cat.id))}`
+              `/category/${String(cat.id)}/${cat.title.replaceAll(" ", "-")}`
             );
           }}
           style={{ cursor: "pointer" }} // it doesn't work with taiwlind

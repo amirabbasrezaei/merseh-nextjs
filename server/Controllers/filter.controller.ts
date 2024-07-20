@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ArgsStructure } from "./category.controller";
+import { TRPCClientError } from "@trpc/client";
 
 export const FilterProductArgsSchema = z.object({
   categoryId: z.number().optional(),
@@ -14,32 +15,49 @@ export async function filterProductController({
 }: ArgsStructure<FilterProductArgs>) {
   const { prisma } = ctx;
   const { categoryId, searchTerm } = input;
-
-  const filterProducts = await prisma.product.findMany({
-    where: {
-      name: { contains: searchTerm },
-      category: categoryId
-        ? {
-            some: {
-              id: categoryId,
-            },
-          }
-        : {},
-
-    },
-    select:{
-      id: true,
-      price: true,
-      imageNames: true,
-      ProductVariation: {
-        include:{
-          values: true
-        }
+  try {
+    const filterProducts = await prisma.product.findMany({
+      where: {
+        name: { contains: searchTerm },
+        category: categoryId
+          ? {
+              some: {
+                id: categoryId,
+              },
+            }
+          : {},
       },
-      name: true
-    }
-  });
-  return filterProducts;
+      select: {
+        id: true,
+        price: true,
+        imageNames: true,
+        ProductVariation: {
+          include: {
+            values: true,
+          },
+        },
+        name: true,
+      },
+    });
+    const category = await prisma.category.findUnique({
+      where: {
+        id: categoryId,
+      },
+      select: {
+        content: true,
+        title: true,
+      },
+    });
+    return {
+      products: filterProducts,
+      categoryInfo: {
+        title: category?.title,
+        content: category?.content?.length ? JSON.parse(category.content) : [],
+      },
+    };
+  } catch (error) {
+    throw new TRPCClientError("خطا در دریافت محصولات");
+  }
 }
 
 export const SearchControllerInputSchema = z.object({

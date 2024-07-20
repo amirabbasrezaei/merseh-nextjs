@@ -10,10 +10,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function page() {
+export default function page({ params }: any) {
   return (
     <Layout>
-      <Products />
+      <Products categoryId={Number(params.slug[0])} />
     </Layout>
   );
 }

@@ -13,9 +13,8 @@ export default function CategoryContext({
   categoryId,
   setShowCategories,
 }: Props) {
+  console.log(category);
 
-  console.log(category)
-  
   return (
     <motion.div className="flex flex-col ">
       {category.subCategories?.map((subCategory: categoryType, index) => (
@@ -26,7 +25,10 @@ export default function CategoryContext({
               setShowCategories(false);
             }}
             className=""
-            href={`/products?catId=${subCategory.id}`}
+            href={`/category/${subCategory.id}/${subCategory.title.replaceAll(
+              " ",
+              "-"
+            )}`}
           >
             <div>
               <span className="text-[#4E4E4E] font-[400] text-[15px]">
