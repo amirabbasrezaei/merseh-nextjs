@@ -25,7 +25,7 @@ export interface categoryType {
   subCategories?: any[] | undefined;
   insertedIntoParent?: boolean | undefined;
   englishTitle: string;
-  content: string;
+  content: any;
 }
 [];
 
@@ -35,7 +35,7 @@ export default function Filter({ setFilter, filter }: Props) {
 
   const animation = {
     open: { translateY: 0, opacity: 1 },
-    closed: { translateY: height, opacity: 0},
+    closed: { translateY: height, opacity: 0 },
   };
 
   const searchParams = useSearchParams();
@@ -79,39 +79,39 @@ export default function Filter({ setFilter, filter }: Props) {
         <Categories setFilter={setFilter} />
       </div>
 
-        <motion.div
-          transition={{ type: "tween", duration: 0.3 }}
-          variants={animation}
-          animate={showFilter ? "open" : "closed"}
-          className="sm:basis-3/12 bg-white z-20 p-5 justify-between fixed h-full top-0 right-0 left-0 flex-col gap-10 w-full  flex"
-        >
-          <div className="flex flex-col gap-10">
-            <div className="  h-[40px] px-5 items-center justify-right w-full flex flex-row bg-[#F6F6F6]  rounded-[10px]">
-              <Magnifier classname="w-[18px] " />
-              <input
-                value={filter.searchTerm}
-                onChange={(e) => {
-                  e.preventDefault();
-                  router.push(
-                    path + "?" + createQueryString("searchTerm", e.target.value)
-                  );
-                }}
-                type="text"
-                placeholder="جستجو در میان محصولات زیر"
-                className="bg-transparent  h-full placeholder:text-[13px] w-full text-black1 placeholder:text-[#8b8b8b]  pr-2  appearance-none outline-none"
-              />
-            </div>
-            <Categories setFilter={setFilter} />
-          </div>
-          <div className="w-full flex flex-row gap-5">
-            <Button
-              className="w-[40%]  text-[#3a3a3a] bg-[#ededed]"
-              text="بستن"
-              onClick={() => setShowFilter(false)}
+      <motion.div
+        transition={{ type: "tween", duration: 0.3 }}
+        variants={animation}
+        animate={showFilter ? "open" : "closed"}
+        className="sm:basis-3/12 bg-white z-20 p-5 justify-between fixed h-full top-0 right-0 left-0 flex-col gap-10 w-full  flex"
+      >
+        <div className="flex flex-col gap-10">
+          <div className="  h-[40px] px-5 items-center justify-right w-full flex flex-row bg-[#F6F6F6]  rounded-[10px]">
+            <Magnifier classname="w-[18px] " />
+            <input
+              value={filter.searchTerm}
+              onChange={(e) => {
+                e.preventDefault();
+                router.push(
+                  path + "?" + createQueryString("searchTerm", e.target.value)
+                );
+              }}
+              type="text"
+              placeholder="جستجو در میان محصولات زیر"
+              className="bg-transparent  h-full placeholder:text-[13px] w-full text-black1 placeholder:text-[#8b8b8b]  pr-2  appearance-none outline-none"
             />
-            <Button onClick={() => setShowFilter(false)} text="اعمال فیلتر" />
           </div>
-        </motion.div>
+          <Categories setFilter={setFilter} />
+        </div>
+        <div className="w-full flex flex-row gap-5">
+          <Button
+            className="w-[40%]  text-[#3a3a3a] bg-[#ededed]"
+            text="بستن"
+            onClick={() => setShowFilter(false)}
+          />
+          <Button onClick={() => setShowFilter(false)} text="اعمال فیلتر" />
+        </div>
+      </motion.div>
     </div>
   );
 }

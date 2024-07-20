@@ -11,15 +11,16 @@ import Input from "@/Components/Input";
 export interface ManageCategory extends filterTypeArgs {
   name?: string;
   englishName?: string;
-  content?: string
+  content?: any;
 }
 
 export default function ManageCategory() {
   const [filter, setFilter] = useState<ManageCategory>({
     name: "",
     englishName: "",
+    content: [],
   });
-  const [content, setContent] = useState<contentType[]>([]);
+
   const { isLoading, mutate, data } = trpc.product.editCategory.useMutation();
   useEffect(() => {
     console.log(filter);
@@ -59,10 +60,10 @@ export default function ManageCategory() {
             <input
               value={filter.englishName}
               onChange={(e) => {
-                  setFilter((state) => ({
-                    ...state,
-                    englishName: e.target.value,
-                  }));
+                setFilter((state) => ({
+                  ...state,
+                  englishName: e.target.value,
+                }));
               }}
               className="appearance-none block w-full bg-gray-200 text-gray-700 border  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
               id="grid-eng-name"
@@ -70,13 +71,21 @@ export default function ManageCategory() {
             />
           </div>
         </div>
-        <QuillEditor content={content} setContent={setContent} />
+        <QuillEditor
+          content={filter.content}
+          setContent={(e) =>
+            setFilter((lastState) => ({
+              ...lastState,
+              content: e as contentType[],
+            }))
+          }
+        />
         <Button
           onClick={() =>
             filter?.categoryId &&
             mutate({
               categoryId: filter.categoryId,
-              content: JSON.stringify(content),
+              content: JSON.stringify(filter.content),
               englishName: filter.englishName || "",
               name: filter.name || "",
             })

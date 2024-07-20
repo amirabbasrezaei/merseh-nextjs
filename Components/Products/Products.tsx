@@ -9,7 +9,7 @@ import Filter from "./Filter";
 import ProductCardSkeleton from "../Product/ProductCardSkeleton";
 import { AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
-import { ContentViewer } from "../Admin/AddProduct/ContentViewer";
+import Content, { ContentViewer } from "../Admin/AddProduct/ContentViewer";
 import { contentType } from "../Admin/AddProduct/QuillEditor";
 
 export type filterTypeArgs = {
@@ -81,8 +81,9 @@ export default function Products({ categoryId }: Props) {
         <h1 className="text-[20px] text-[#595959] font-[500]">
           {data?.categoryInfo?.title}
         </h1>
-        <ContentViewer contentForView={data?.categoryInfo?.content} />
+        <Content contentForView={data?.categoryInfo?.content} />
       </div>
     </section>
   );
 }
+

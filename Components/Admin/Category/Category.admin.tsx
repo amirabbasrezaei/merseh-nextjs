@@ -28,6 +28,9 @@ export default function Category({ setFilter, filter }: Props) {
     refetch();
   }, [createCategoryData]);
 
+  useEffect(() => {
+    console.log(data)
+  } , [data])
   return (
     <div>
       <h4 className="text-black1 text-[18px] mb-4">دسته‌بندی‌ ها</h4>

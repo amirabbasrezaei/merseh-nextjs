@@ -1,6 +1,8 @@
 import {
   EditCategorySchema,
   categoriesController,
+  categoryInfoController,
+  categoryInfoSchema,
   createCategory,
   createCategorySchema,
   editCategoryController,
@@ -69,7 +71,10 @@ export const productRouter = router({
   editComment: userProtectedProcedure
     .input(editCommentSchema)
     .mutation(editCommentController),
-    likeComment: userProtectedProcedure
+  likeComment: userProtectedProcedure
     .input(likeCommentSchema)
     .mutation(likeCommentController),
+  categoryInfo: publicProcedure
+    .input(categoryInfoSchema)
+    .query(categoryInfoController),
 });

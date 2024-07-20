@@ -16,7 +16,7 @@ export default function Categories({
 
   return (
     <div>
-      <h4 className="text-black1 text-[18px] mb-4">دسته‌بندی‌ ها</h4>
+      <span className="text-black1 text-[18px] mb-4">دسته‌بندی‌ ها</span>
       {data?.length &&
         data.map((cat, index) => (
           <Category

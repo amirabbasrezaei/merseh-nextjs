@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { Context } from "../context";
+import { contentType } from "@/Components/Admin/AddProduct/QuillEditor";
 
 export type ArgsStructure<T = null> = T extends null
   ? {
@@ -16,6 +17,7 @@ export async function categoriesController({ ctx }: ArgsStructure) {
   categories = categories.map((e) => ({
     ...e,
     imageUrl: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/category/${e.imageName}`,
+    content: e.content.length ? JSON.parse(e.content) : [],
   }));
 
   interface categoryRawType {
@@ -24,7 +26,7 @@ export async function categoriesController({ ctx }: ArgsStructure) {
     parentCategoryId: number | null;
     imageUrl: string;
     englishTitle: string;
-    content: string;
+    content: contentType[];
   }
 
   interface categoryFinalType extends categoryRawType {
@@ -145,11 +147,36 @@ export async function editCategoryController({
         content: input.content,
         englishTitle: input.englishName,
         title: input.name,
-        
       },
     });
     return { status: true, error: null, message: "تغییرات با موفقیت انجام شد" };
   } catch (error) {
     return { status: false, error, message: "خطا در تغییر دسته بندی" };
   }
+}
+
+export const categoryInfoSchema = z.object({
+  categoryId: z.number(),
+});
+
+type CategoryInfo = z.infer<typeof categoryInfoSchema>;
+export async function categoryInfoController({
+  input,
+  ctx: { prisma },
+}: ArgsStructure<CategoryInfo>) {
+  try {
+    const category = await prisma.category.findUnique({
+      where: {
+        id: input.categoryId,
+      },
+      select: { title: true, imageName: true },
+    });
+
+    return {
+      category: {
+        title: category?.title,
+        imageUrl: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/category/${category?.imageName}`,
+      },
+    };
+  } catch (error) {}
 }
