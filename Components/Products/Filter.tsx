@@ -35,7 +35,7 @@ export default function Filter({ setFilter, filter }: Props) {
 
   const animation = {
     open: { translateY: 0, opacity: 1 },
-    closed: { translateY: height, opacity: 0 },
+    closed: { translateY: height, opacity: 0},
   };
 
   const searchParams = useSearchParams();
@@ -52,7 +52,7 @@ export default function Filter({ setFilter, filter }: Props) {
   );
 
   return (
-    <>
+    <div className="relative">
       <div
         onClick={() => setShowFilter(true)}
         className="flex sm:hidden flex-row items-center gap-1 bg-gray-50 rounded-[10px] w-fit px-3 py-2"
@@ -78,12 +78,12 @@ export default function Filter({ setFilter, filter }: Props) {
         </div>
         <Categories setFilter={setFilter} />
       </div>
-      {createPortal(
+
         <motion.div
           transition={{ type: "tween", duration: 0.3 }}
           variants={animation}
           animate={showFilter ? "open" : "closed"}
-          className="sm:basis-3/12 bg-white z-20 p-5 justify-between absolute h-full top-0 right-0 left-0 flex-col gap-10 w-full  flex"
+          className="sm:basis-3/12 bg-white z-20 p-5 justify-between fixed h-full top-0 right-0 left-0 flex-col gap-10 w-full  flex"
         >
           <div className="flex flex-col gap-10">
             <div className="  h-[40px] px-5 items-center justify-right w-full flex flex-row bg-[#F6F6F6]  rounded-[10px]">
@@ -111,9 +111,7 @@ export default function Filter({ setFilter, filter }: Props) {
             />
             <Button onClick={() => setShowFilter(false)} text="اعمال فیلتر" />
           </div>
-        </motion.div>,
-        document.body
-      )}
-    </>
+        </motion.div>
+    </div>
   );
 }

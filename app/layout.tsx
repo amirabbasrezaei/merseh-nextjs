@@ -14,7 +14,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 
 export const metadata: Metadata = {
   title: {
-    default: "فروشگاه محصولات طبیعی مرسه",
+    default: "فروشگاه مرسه",
     template: "%s  -  فروشگاه مرسه",
   },
   description: "خرید محصولات کاملا طبیعی و ارگانیک در مرسه",

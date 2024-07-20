@@ -5,14 +5,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const links: MetadataRoute.Sitemap = [
     {
       url: "https://merseh.com",
-      lastModified: new Date(),
-      changeFrequency: "yearly",
+      lastModified: new Date(Date.now()),
+      changeFrequency: "hourly",
       priority: 1,
     },
     {
       url: "https://merseh.com/products",
-      lastModified: new Date(),
-      changeFrequency: "weekly",
+      lastModified: new Date(Date.now()),
+      changeFrequency: "hourly",
       priority: 0.8,
     },
   ];
@@ -32,7 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           "-"
         )}`,
         lastModified: new Date(product.updatedAt),
-        changeFrequency: "weekly",
+        changeFrequency: "daily",
         priority: 0.9,
       }));
       return [...links, ...products];

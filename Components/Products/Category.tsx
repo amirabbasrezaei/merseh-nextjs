@@ -34,7 +34,7 @@ export default function Category({
     },
     [searchParams]
   );
-  const [showCategory, setShowCategory] = useState(false);
+  const [showCategory, setShowCategory] = useState(true);
   const [newCategoryTitle, setNewCategoryTitle] = useState("");
   const [showCreateCategory, setShowCreateCategory] = useState<{
     state: boolean;
@@ -96,15 +96,15 @@ export default function Category({
       ) : null}
 
       <motion.div
-        initial={{ scale: 0, height: 0 }}
-        animate={{
-          scale: showCategory ? 1 : 0,
-          opacity: showCategory ? 1 : 0,
-          height: showCategory ? "fit-content" : 0,
-        }}
+        // initial={{ scale: 0, height: 0 }}
+        // animate={{
+        //   scale: showCategory ? 1 : 0,
+        //   opacity: showCategory ? 1 : 0,
+        //   height: showCategory ? "fit-content" : 0,
+        // }}
         style={{ originX: 1, originY: 0.5 }}
         transition={{ damping: 1 }}
-        className="pr-4 flex-col mb-5"
+        className="pr-4 flex-col mb-5 h-fit"
       >
         {subCategory?.length ? (
           <GetCategories

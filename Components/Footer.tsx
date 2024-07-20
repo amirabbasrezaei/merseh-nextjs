@@ -16,9 +16,9 @@ export default function Footer() {
       <div className="w-full flex flex-col sm:flex-row ">
         <div className="basis-1/3 flex flex-col   h-full mt-5 sm:mt-0 justify-evenly items-start ">
           <Merseh_nastaliq classname="w-20 h-auto mb-8" />
-          <h3 className="text-[20px] font-[500] text-[#515151] mb-5">
+          <span className="text-[20px] font-[500] text-[#515151] mb-5">
             ارتباط با ما
-          </h3>
+          </span>
           <div className="flex flex-col gap-6">
             <div className="flex flex-row gap-2 items-center">
               <Phone_SVG classname="w-6 h-6 -rotate-[10deg] fill-[#303030]" />

@@ -10,6 +10,7 @@ type Props = {
 
 export default function Comments({ productId, commentsRef }: Props) {
   const [commentInput, setCommentInput] = useState("");
+  
   const {
     data: product_comments_data,
     isLoading: isCommentsLoading,

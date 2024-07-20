@@ -63,7 +63,7 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
 
   return (
     <section className="w-full  flex flex-col items-center gap-5 ">
-      <h3 className="text-[20px] w-full text-black1 font-normal">{title}</h3>
+      <span className="text-[20px] w-full text-black1 font-normal">{title}</span>
       <Swiper
         onSwiper={swiperRef}
         spaceBetween={10}

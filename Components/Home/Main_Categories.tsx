@@ -6,17 +6,17 @@ export default function Main_Categories() {
   const { data, isLoading } = trpc.product.categories.useQuery();
   return (
     <section className="flex flex-col w-full gap-5">
-      <div className="flex flex-row justify-between max-w-full">
-        <h3 className="text-[18px] visible sm:hidden font-[500] text-black1 ">
+      <div className="flex flex-row visible sm:hidden justify-between max-w-full">
+        <span className="text-[18px]  font-[500] text-black1 ">
           دسته‌بندی
-        </h3>
+        </span>
         <Link href={"/mcategory"}>
-          <span className="text-green1 block sm:hidden">سایر دسته‌بندی‌ها</span>
+          <span className="text-green1 ">سایر دسته‌بندی‌ها</span>
         </Link>
       </div>
       <div
         style={{ scrollbarWidth: "none" }}
-        className="sm:h-fit h-fit flex flex-row items-center sm:justify-evenly gap-6 sm:gap-0 overflow-x-scroll "
+        className="sm:h-fit h-fit flex flex-row items-center sm:justify-evenly gap-6 sm:gap-3 overflow-x-scroll "
       >
         {!isLoading && data?.length && data[0]?.subCategories?.length
           ? data[0].subCategories.map((category, index) => (
@@ -26,7 +26,7 @@ export default function Main_Categories() {
                 className="flex w-full h-full flex-col items-center  max-w-none gap-3"
               >
                 <Image
-                  className="sm:w-[160px] sm:h-[160px]  w-[120px]  h-[120px] max-w-none rounded-[10px] sm:rounded-[50px]"
+                  className="lg:w-[150px] lg:h-[150px] md:w-[125px] md:h-[125px]   w-[110px]  h-[110px] max-w-none rounded-[30px] lg:rounded-[50px] md:rounded-[40px] "
                   src={category.imageUrl}
                   alt={category.imageUrl.split("/").at(-1) || ""}
                   quality={100}
@@ -34,12 +34,12 @@ export default function Main_Categories() {
                   height={200}
                   style={{ objectFit: "contain" }}
                 />
-                <h2 className="text-[14px] sm:text-[18px] text-[#4A4A4A] font-[400]">
+                <h2 className="text-[14px] sm:text-[18px] text-[#4A4A4A] font-[400] text-nowrap">
                   {category.title}
                 </h2>
               </Link>
             ))
-          : Array.from(Array(6)).map((e, index) => (
+          : Array.from(Array(7)).map((e, index) => (
               <div
                 key={index}
                 style={{ width: 160.28 }}

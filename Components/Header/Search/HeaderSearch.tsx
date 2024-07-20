@@ -83,7 +83,7 @@ export default function HeaderSearch() {
                     className="flex flex-row items-center gap-2"
                   >
                     <div>
-                      <Category_Svg classname="w-5 fill-green2" />
+                      <Category_Svg classname="w-5 fill-gray-300" />
                     </div>
                     <span className="text-black1">{item.title}</span>
                   </Link>
