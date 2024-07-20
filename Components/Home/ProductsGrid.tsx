@@ -85,9 +85,6 @@ export default function ProductsGrid({ title, categoryId }: props) {
     mutate({ categoryId });
   }, []);
 
-  useEffect(() => {
-    data?.products?.length && prepareProductsForGridView(data);
-  }, [data]);
 
   return (
     <section className="w-full sm:p-4 flex flex-col items-center gap-5 ">
@@ -105,7 +102,7 @@ export default function ProductsGrid({ title, categoryId }: props) {
         {/* <SlidePrevButton /> */}
 
         {data?.products?.length
-          ? prepareProductsForGridView(data).map(
+          ? prepareProductsForGridView(data.products).map(
               (productSlice: any, index: any) => {
                 return productSlice.length >= 3 ? (
                   <SwiperSlide key={index}>
