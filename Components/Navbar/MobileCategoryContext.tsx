@@ -18,7 +18,7 @@ export default function MobileCategoryContext({ category, categoryId }: Props) {
               e.stopPropagation();
             }}
             className=""
-            href={`/products?catId=${subCategory.id}`}
+            href={`/category/${subCategory.id}/${subCategory.title.replaceAll(" ", "-")}`}
           >
 
             

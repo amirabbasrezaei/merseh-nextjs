@@ -15,7 +15,7 @@ export default function MobileCategory() {
         {data?.length && data[0].subCategories?.length
           ? data[0].subCategories.map((category, catIndex) => (
               <div
-              key={category.id}
+                key={category.id}
                 onClick={() => setSelectedCategoryIndex(catIndex)}
                 className={classNames(
                   "cursor-pointer   gap-1  px-3   flex flex-row items-center justify-center     h-[70px] w-full",
@@ -38,7 +38,12 @@ export default function MobileCategory() {
         data[0].subCategories[selectedCategoryIndex] ? (
           <>
             <Link
-              href={`/products?catId=${data[0].subCategories[selectedCategoryIndex].id}`}
+              href={`/category/${
+                data[0].subCategories[selectedCategoryIndex].id
+              }/${data[0].subCategories[selectedCategoryIndex].title.replaceAll(
+                " ",
+                "-"
+              )}`}
               className="mb-5"
             >
               <div className="flex flex-row items-center">
