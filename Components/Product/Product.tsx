@@ -111,13 +111,17 @@ export default function Product({ productId }: Props) {
   const isElementInView = (elementRef: any) => {
     if (elementRef.current) {
       const rect = elementRef.current.getBoundingClientRect();
-      const isVisible =
-        rect.top >= 0 &&
-        rect.left >= 0 &&
-        rect.bottom <=
-          (window.innerHeight || document.documentElement.clientHeight) &&
-        rect.right <=
-          (window.innerWidth || document.documentElement.clientWidth);
+      // const isVisible =
+      //   rect.top >= 0 &&
+      //   rect.left >= 0 &&
+      //   rect.bottom <=
+      //     (window.innerHeight || document.documentElement.clientHeight) &&
+      //   rect.right <=
+      //     (window.innerWidth || document.documentElement.clientWidth);
+
+
+    const isVisible = rect.top <= 0 
+      console.log(rect.bottom)
       if (isVisible) return true;
       return false;
     }
@@ -126,6 +130,7 @@ export default function Product({ productId }: Props) {
   useEffect(() => {
     const handleScroll = () => {
       if (isElementInView(contentRef)) {
+
         setVisibleSection("article");
       }
       if (isElementInView(commentsRef)) {
@@ -262,8 +267,8 @@ export default function Product({ productId }: Props) {
                   ویژگی‌ها
                 </h2>
                 <ul className="list-disc  list-inside marker:text-green2">
-                  {productData?.product?.details.map((det) => (
-                    <li>{det}</li>
+                  {productData?.product?.details.map((det, i) => (
+                    <li key={i}>{det}</li>
                   ))}
                 </ul>
               </div>
@@ -479,7 +484,7 @@ export default function Product({ productId }: Props) {
                 // @ts-ignore
                 contentRef?.current?.scrollIntoView({
                   behavior: "smooth",
-                  block: "center",
+                  block: "start",
                   inline: "nearest",
                 })
               }
@@ -496,7 +501,7 @@ export default function Product({ productId }: Props) {
                 // @ts-ignore
                 commentsRef?.current?.scrollIntoView({
                   behavior: "smooth",
-                  block: "center",
+                  block: "start",
                   inline: "nearest",
                 })
               }

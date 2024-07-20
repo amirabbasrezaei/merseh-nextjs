@@ -25,9 +25,11 @@ export default function Layout({
   return (
     <Suspense fallback={<Loading />}>
       <motion.main
-        className={`justify-center items-center  flex  bg-white w-screen overflow-x-hidden  sm:mb-0 mb-[100px]  h-screen`}
+        style={{ direction: "ltr" }}
+        className={`justify-center items-center   flex  bg-white w-screen overflow-x-hidden  sm:mb-0 mb-[100px]  h-screen`}
       >
         <div
+          style={{ direction: "rtl" }}
           className={classNames(
             "max-w-[1400px]    gap-16 sm:w-full flex-col  items-center flex overflow-y-visible bg-white h-full ",
             fullWidth ? "w-full" : "w-[90%]"
@@ -38,11 +40,7 @@ export default function Layout({
 
           <div className=" w-full grow  flex flex-col gap-16">
             <div className=" grow">{children}</div>
-            {footer ? (
-
-                <Footer />
-  
-            ) : null}
+            {footer ? <Footer /> : null}
           </div>
         </div>
       </motion.main>
