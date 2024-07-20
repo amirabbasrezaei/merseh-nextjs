@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../Button";
 import { z } from "zod";
 import { trpc } from "@/utils/trpc";
@@ -10,13 +10,22 @@ type Props = {
 
 export default function Comments({ productId, commentsRef }: Props) {
   const [commentInput, setCommentInput] = useState("");
-  const { data: product_comments_data, isLoading: isCommentsLoading } =
-    trpc.product.productComments.useQuery({
-      productId: Number(productId),
-    });
+  const {
+    data: product_comments_data,
+    isLoading: isCommentsLoading,
+    refetch,
+  } = trpc.product.productComments.useQuery({
+    productId: Number(productId),
+  });
 
   const { data: addCommentData, mutate: mutateAddComment } =
     trpc.product.addComment.useMutation();
+
+  useEffect(() => {
+    if (addCommentData?.status === "ok") {
+      refetch();
+    }
+  }, [addCommentData]);
   return (
     <div ref={commentsRef} className="flex flex-col gap-5">
       <h3 className="text-[22px] font-[500] text-black1">دیدگاه ها</h3>
