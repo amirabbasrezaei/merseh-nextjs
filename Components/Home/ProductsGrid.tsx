@@ -85,7 +85,6 @@ export default function ProductsGrid({ title, categoryId }: props) {
     mutate({ categoryId });
   }, []);
 
-
   return (
     <section className="w-full sm:p-4 flex flex-col items-center gap-5 ">
       <h3 className="text-[20px] text-black1 font-normal w-full ">{title}</h3>
