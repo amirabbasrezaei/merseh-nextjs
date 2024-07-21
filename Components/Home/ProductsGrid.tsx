@@ -87,7 +87,7 @@ export default function ProductsGrid({ title, categoryId }: props) {
 
   return (
     <section className="w-full sm:p-4 flex flex-col items-center gap-5 ">
-      <h3 className="text-[20px] text-black1 font-normal w-full ">{title}</h3>
+      <span className="text-[20px] text-black1 font-normal w-full ">{title}</span>
       <Swiper
         onSwiper={swiperRef}
         spaceBetween={20}
@@ -148,9 +148,9 @@ export default function ProductsGrid({ title, categoryId }: props) {
                                 src={`${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${product.imageNames[0]}`}
                               />
                               <div className="flex flex-col items-start justify-center gap-1">
-                                <span className="font-[400] basis-2/4 text-[14px] sm:text-[16px] text-black1 w-fit">
+                                <h3 className="font-[400] basis-2/4 text-[14px] sm:text-[16px] text-black1 w-fit">
                                   {product.name}
-                                </span>
+                                </h3>
                                 {product?.ProductVariation?.length ? (
                                   <span className="font-[400] basis-2/4 text-[12px] sm:text-[13px] text-black1">
                                     {product.ProductVariation[0].values[0].name}
