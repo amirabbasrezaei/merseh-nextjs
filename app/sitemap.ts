@@ -40,7 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.9,
       }));
 
-      if((categoryData.result.data?.length){
+      if(categoryData.result.data?.length){
         const categories = categoryData.result.data.map((category: any) => ({
         url: `${
           process.env.NODE_ENV === "production"
