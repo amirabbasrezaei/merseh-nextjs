@@ -6,6 +6,7 @@ import {
   createCategory,
   createCategorySchema,
   editCategoryController,
+  flatCategoriesController
 } from "../Controllers/category.controller";
 import {
   add_comment_controller,
@@ -42,7 +43,7 @@ export const productRouter = router({
     .input(getProductInputSchema)
     .query(getProductController),
   categories: publicProcedure.query(categoriesController),
-
+flatCategories: publicProcedure.query(flatCategoriesController),
   addProduct: adminProtectedProcedure
     .input(AddProductControllerArgSchema)
     .mutation(addProductController),
