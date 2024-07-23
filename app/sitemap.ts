@@ -1,7 +1,6 @@
 import axios from "axios";
 import { MetadataRoute } from "next";
 
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const links: MetadataRoute.Sitemap = [
     {
