@@ -180,3 +180,14 @@ export async function categoryInfoController({
     };
   } catch (error) {}
 }
+
+export async function flatCategoriesController ({ctx:{prisma}}:ArgsStructure){
+try{
+  const categories = await prisma.category.findMany()
+  return categories
+}
+catch(error) {
+  console.log(error)
+}
+  
+}
