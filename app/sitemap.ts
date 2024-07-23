@@ -23,7 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const { data } = await axios.get(
       `${process.env.BASE_URL}/api/trpc/product.products`
     );
-    const {categoryData} = await axios.get(`${process.env.BASE_URL}/api/trpc/product.flatCategories`)
+    const {data:categoryData} = await axios.get(`${process.env.BASE_URL}/api/trpc/product.flatCategories`)
     
     if (data.result.data?.products?.length) {
       const products = data.result.data.products.map((product: any) => ({
