@@ -61,6 +61,7 @@ export async function updateActiveOrderController({
         },
       },
     });
+    
 
     if (!input.shippingInfo) {
       let activeOrder = await prisma.order.upsert({
