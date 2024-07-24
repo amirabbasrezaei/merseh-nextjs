@@ -78,7 +78,7 @@ export default function HeaderSearch() {
               ? data.result.map((item, index) => (
                   <Link
                     onClick={() => setSearchTerm("")}
-                    href={`/products?catId=${item.id}`}
+                    href={`/category/${item.id}/${item.title.replaceAll(" ", "-")}`}
                     key={index}
                     className="flex flex-row items-center gap-2"
                   >
