@@ -32,7 +32,7 @@ const contentToHTML = (content: contentType[], parent: HTMLElement): any => {
         const element = document.createElement("p", {});
         element.innerHTML = ct.content as string;
         parent.append(element);
-        break;
+        // break;
       } else if (ct.type === "img" && typeof ct.content !== "string") {
         const element = document.createElement("img", { is: ct.content.name });
 
@@ -42,20 +42,22 @@ const contentToHTML = (content: contentType[], parent: HTMLElement): any => {
             : ct.content.src;
         element.alt = ct.content.name || "";
         parent.append(element);
-      }  else {
-        const element = document.createElement(ct.type, {});
+      } else {
+        const element = document.createElement(ct.type);
         element.innerHTML = ct.content as string;
         parent.append(element);
       }
 
-      // break;
-    } 
-    // else if(ct.type === "a" && typeof ct.content === "string"){
-    //   const element = document.createElement(ct.type);
 
-    //     parent.append(element);
-    // }
-     else {
+    } else if (ct.type === "a" && typeof ct.content === "string") {
+      console.log(ct);
+      const element = document.createElement(ct.type);
+      element.href = ct.content;
+      // element.innerHTML = ct?.childs?.length
+      //   ? contentToHTML(ct.childs, element)
+      //   : "";
+      parent.append(contentToHTML(ct.childs, element));
+    } else {
       const secParent = document.createElement(ct.type);
       parent.append(contentToHTML(ct.childs, secParent));
     }
@@ -111,7 +113,6 @@ export default function QuillEditor({
   content,
   initialFlag = false,
 }: Props) {
-  
   const [flag, setFlag] = useState(initialFlag);
   const [value, setValue] = useState(String(content));
   const QuillRef = useRef<ReactQuill>();
@@ -120,7 +121,6 @@ export default function QuillEditor({
   useEffect(() => {
     setIsClient(true);
     if (content && !initialFlag) {
-      console.log(initialFlag)
       const parent = document.createElement("div");
       setValue(contentToHTML(content, parent).innerHTML);
     }
