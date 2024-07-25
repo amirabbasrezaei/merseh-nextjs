@@ -78,12 +78,13 @@ export default function Products({ categoryId }: Props) {
             </AnimatePresence>
           </div>
         </div>
-        <h1 className="text-[20px] text-[#595959] font-[500]">
+        <h1 className="text-[20px] text-[#595959] font-[500] mt-[50px] mb-[10px]">
           {data?.categoryInfo?.title}
         </h1>
-        <Content contentForView={data?.categoryInfo?.content} />
+        <div className="[&_h2]:text-[17px] text-[13px] [&_ul]:list-disc [&_ul]:list-inside  text-[#8d8d8d] [&_h2]:text-[#7f7f7f]   leading-loose [&_h3]:text-[#969696] [&_h3]:text-[15px] flex flex-col">
+          <ContentViewer contentForView={data?.categoryInfo?.content} />
+        </div>
       </div>
     </section>
   );
 }
-

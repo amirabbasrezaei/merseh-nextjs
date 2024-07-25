@@ -33,19 +33,20 @@ export async function generateMetadata({
 }: NextPagePropsType): Promise<Metadata> {
   const category = await getCategory(params.slug[0]);
   if (category?.category) {
+    console.log(category)
     return {
       title: category.category.title,
       alternates: {
         canonical: `${process.env.BASE_URL}/category/${params.slug[0]}/${(
           category.category.title as string
-        ).replaceAll(" ", "-")}`,
+        )?.replaceAll(" ", "-")}`,
       },
       openGraph: {
         images: category.category.imageUrl,
         type: "article",
         url: `${process.env.BASE_URL}/category/${params.slug[0]}/${(
           category.category.title as string
-        ).replaceAll(" ", "-")}`,
+        )?.replaceAll(" ", "-")}`,
       },
     };
   }
