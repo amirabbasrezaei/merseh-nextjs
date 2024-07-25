@@ -22,9 +22,7 @@ export default function ManageCategory() {
   });
 
   const { isLoading, mutate, data } = trpc.product.editCategory.useMutation();
-  useEffect(() => {
-    console.log(filter);
-  }, [filter]);
+
   return (
     <section className="flex flex-row items-center h-full w-full px-10 justify-evenly">
       <Category filter={filter} setFilter={setFilter} />

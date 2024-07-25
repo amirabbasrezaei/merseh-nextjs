@@ -15,7 +15,7 @@ import { Image_Svg } from "@/Components/SVGS";
 
 export type contentType = {
   type: Node["nodeName"];
-  content: string | { src: string; name: string; format: string };
+  content: string | { src: string; name?: string; format?: string };
   childs?: contentType[] | null;
 };
 
@@ -25,10 +25,7 @@ interface Props {
 }
 
 const contentToHTML = (content: contentType[], parent: HTMLElement): any => {
-  console.log(content);
-
   for (let ct of content) {
-    console.log(ct);
     if (!ct.childs?.length) {
       if (ct.type === "#text") {
         const element = document.createElement("p", {});
@@ -42,7 +39,7 @@ const contentToHTML = (content: contentType[], parent: HTMLElement): any => {
           ct.content.format !== undefined
             ? `data:image/${ct.content.format},${ct.content.src}`
             : ct.content.src;
-        element.alt = ct.content.name;
+        element.alt = ct.content.name || "";
         parent.append(element);
       } else {
         const element = document.createElement(ct.type, {});
@@ -66,8 +63,6 @@ const HTMLtoContent = (childNodes: NodeListOf<ChildNode> | []) => {
   const result: contentType[] = [];
   childNodes.forEach((e) => {
     if (e.firstChild?.nodeName === "IMG") {
-      // @ts-ignore
-
       result.push({
         content: {
           src:
@@ -75,11 +70,19 @@ const HTMLtoContent = (childNodes: NodeListOf<ChildNode> | []) => {
             e.firstChild.src.replace("data:", "").replace(/^.+,/, "") || "",
           // @ts-ignore
           name: e.firstChild.alt,
-          // @ts-ignore
-          format: (e.firstChild.src as string).split("/").at(1)?.split(",")[0],
         },
         type: e.firstChild.nodeName.toLowerCase(),
         childs: null,
+      });
+      return;
+    }
+
+    if (e.nodeName === "A") {
+      result.push({
+        // @ts-ignore
+        content: e.href,
+        type: e.nodeName.toLowerCase(),
+        childs: e?.childNodes.length ? HTMLtoContent(e.childNodes) : null,
       });
       return;
     }
@@ -90,7 +93,7 @@ const HTMLtoContent = (childNodes: NodeListOf<ChildNode> | []) => {
       childs: HTMLtoContent(e.childNodes),
     });
   });
-  // console.log(result)
+
   return result;
 };
 

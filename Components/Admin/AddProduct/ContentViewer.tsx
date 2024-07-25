@@ -1,6 +1,7 @@
 import React, { createElement } from "react";
 import { contentType } from "./QuillEditor";
 import Image from "next/image";
+import Link from "next/link";
 
 interface Props {
   contentForView: contentType[];
@@ -25,7 +26,7 @@ export function ContentViewer({ contentForView }: Props) {
                       }
                       width={1000}
                       height={1000}
-                      alt={node.content.name}
+                      alt={node.content.name || ""}
                       quality={100}
                       priority={false}
                     />
@@ -35,8 +36,18 @@ export function ContentViewer({ contentForView }: Props) {
               if (node.type === "br") {
                 return <br key={i} />;
               }
+              
 
               return node.content;
+            }
+            if (node.type === "a" && typeof node.content === "string") {
+              return (
+                <Link href={node.content}>
+                  {node?.childs?.length ? (
+                    <ContentViewer contentForView={node.childs} />
+                  ) : null}
+                </Link>
+              );
             }
 
             if (node?.childs?.length) {
