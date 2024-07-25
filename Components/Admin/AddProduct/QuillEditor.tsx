@@ -15,7 +15,7 @@ import { Image_Svg } from "@/Components/SVGS";
 
 export type contentType = {
   type: Node["nodeName"];
-  content: string | { src: string; name?: string; format?: string };
+  content: string | { src: string; name: string; format: string };
   childs?: contentType[] | null;
 };
 
@@ -70,6 +70,8 @@ const HTMLtoContent = (childNodes: NodeListOf<ChildNode> | []) => {
             e.firstChild.src.replace("data:", "").replace(/^.+,/, "") || "",
           // @ts-ignore
           name: e.firstChild.alt,
+          // @ts-ignore
+          format: (e.firstChild.src as string).split("/").at(1)?.split(",")[0]
         },
         type: e.firstChild.nodeName.toLowerCase(),
         childs: null,
