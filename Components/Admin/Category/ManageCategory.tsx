@@ -15,11 +15,16 @@ export interface ManageCategory extends filterTypeArgs {
 }
 
 export default function ManageCategory() {
+  const [lastCategoryId, setLastCategoryId] = useState<number>();
   const [filter, setFilter] = useState<ManageCategory>({
     name: "",
     englishName: "",
     content: [],
   });
+
+  useEffect(() => {
+    setLastCategoryId(filter.categoryId);
+  }, [filter.categoryId]);
 
   const { isLoading, mutate, data } = trpc.product.editCategory.useMutation();
 
@@ -70,6 +75,7 @@ export default function ManageCategory() {
           </div>
         </div>
         <QuillEditor
+          initialFlag={filter.categoryId !== lastCategoryId ? false : true}
           content={filter.content}
           setContent={(e) =>
             setFilter((lastState) => ({

@@ -42,7 +42,7 @@ export function ContentViewer({ contentForView }: Props) {
             }
             if (node.type === "a" && typeof node.content === "string") {
               return (
-                <Link href={node.content}>
+                <Link key={i} href={node.content}>
                   {node?.childs?.length ? (
                     <ContentViewer contentForView={node.childs} />
                   ) : null}

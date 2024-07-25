@@ -22,6 +22,7 @@ export type contentType = {
 interface Props {
   setContent: React.Dispatch<React.SetStateAction<contentType[]>>;
   content: contentType[];
+  initialFlag?: boolean;
 }
 
 const contentToHTML = (content: contentType[], parent: HTMLElement): any => {
@@ -41,14 +42,20 @@ const contentToHTML = (content: contentType[], parent: HTMLElement): any => {
             : ct.content.src;
         element.alt = ct.content.name || "";
         parent.append(element);
-      } else {
+      }  else {
         const element = document.createElement(ct.type, {});
         element.innerHTML = ct.content as string;
         parent.append(element);
       }
 
       // break;
-    } else {
+    } 
+    // else if(ct.type === "a" && typeof ct.content === "string"){
+    //   const element = document.createElement(ct.type);
+
+    //     parent.append(element);
+    // }
+     else {
       const secParent = document.createElement(ct.type);
       parent.append(contentToHTML(ct.childs, secParent));
     }
@@ -71,7 +78,7 @@ const HTMLtoContent = (childNodes: NodeListOf<ChildNode> | []) => {
           // @ts-ignore
           name: e.firstChild.alt,
           // @ts-ignore
-          format: (e.firstChild.src as string).split("/").at(1)?.split(",")[0]
+          format: (e.firstChild.src as string).split("/").at(1)?.split(",")[0],
         },
         type: e.firstChild.nodeName.toLowerCase(),
         childs: null,
@@ -99,19 +106,44 @@ const HTMLtoContent = (childNodes: NodeListOf<ChildNode> | []) => {
   return result;
 };
 
-export default function QuillEditor({ setContent, content }: Props) {
-  const [flag, setFlag] = useState(false);
+export default function QuillEditor({
+  setContent,
+  content,
+  initialFlag = false,
+}: Props) {
+  
+  const [flag, setFlag] = useState(initialFlag);
   const [value, setValue] = useState(String(content));
   const QuillRef = useRef<ReactQuill>();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-    if (content && !flag) {
+    if (content && !initialFlag) {
+      console.log(initialFlag)
       const parent = document.createElement("div");
       setValue(contentToHTML(content, parent).innerHTML);
     }
-  }, [content]);
+  }, [content, initialFlag]);
+
+  useEffect(() => {
+    if (value.length) {
+      setFlag(true);
+    }
+    const convertToDom = new DOMParser().parseFromString(value, "text/html");
+    const finalContent = HTMLtoContent(
+      convertToDom.querySelector("body")?.childNodes || []
+    );
+
+    finalContent?.length && setContent(finalContent);
+  }, [value]);
+
+  // useEffect(() => {
+  //   if(content && !flag){
+  //     const parent = document.createElement("div");
+  //     setValue(contentToHTML(content, parent).innerHTML);
+  //   }
+  // } , [flag])
 
   const imageHandler = () => {
     const reader = new FileReader();
@@ -136,18 +168,6 @@ export default function QuillEditor({ setContent, content }: Props) {
       }
     };
   };
-
-  useEffect(() => {
-    if (value.length) {
-      setFlag(true);
-    }
-    const convertToDom = new DOMParser().parseFromString(value, "text/html");
-    const finalContent = HTMLtoContent(
-      convertToDom.querySelector("body")?.childNodes || []
-    );
-
-    finalContent?.length && setContent(finalContent);
-  }, [value]);
 
   return (
     <div className="">
