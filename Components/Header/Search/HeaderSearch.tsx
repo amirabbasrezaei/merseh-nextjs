@@ -147,7 +147,7 @@ export default function HeaderSearch() {
                           setSearchTerm("");
                           setShowSearch(false);
                         }}
-                        href={`/products?catId=${item.id}`}
+                        href={`/category/${item.id}/${item.title}`}
                         key={index}
                         className="bg-gray-50 rounded-[8px] gap-3 p-4 flex flex-row items-center"
                       >
