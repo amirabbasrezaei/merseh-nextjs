@@ -92,7 +92,7 @@ export default function ProductsGrid({ title, categoryId }: props) {
         onSwiper={swiperRef}
         spaceBetween={20}
         style={width > 639 ? { paddingRight: 20, paddingLeft: 20 } : {}}
-        slidesPerView={width > 639 ? 2 : 1}
+        slidesPerView={width > 1023 ? 3 :  width > 767 ? 2 : 1}
         direction="horizontal"
         className="w-full h-full sm:border border-[#f3f3f3] rounded-[5px]"
         autoplay={{ delay: 5000, disableOnInteraction: false }}
@@ -137,10 +137,11 @@ export default function ProductsGrid({ title, categoryId }: props) {
                               },
                               close: { y: 20, opacity: 0 },
                             }}
-                            className=" pl-3 py-2 rounded-[5px] flex flex-row items-center justify-around gap-2"
+                            className=" pl-3 py-2 rounded-[5px] flex flex-row items-center justify-between gap-2"
                           >
                             <div className="flex flex-row items-center gap-2">
                               <Image
+                              className="w-[100px] h-[100px] md:w-[110px] xl:w-[180px] lg:h-auto"
                                 width={180}
                                 height={180}
                                 quality={100}
@@ -148,18 +149,18 @@ export default function ProductsGrid({ title, categoryId }: props) {
                                 src={`${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${product.imageNames[0]}`}
                               />
                               <div className="flex flex-col items-start justify-center gap-1">
-                                <h3 className="font-[400] basis-2/4 text-[14px] sm:text-[16px] text-black1 w-fit">
+                                <h3 className="font-[400] basis-2/4 text-[14px] md:text-[13px] lg:text-[12px] text-nowrap xl:text-[14px]  text-black1 w-fit">
                                   {product.name}
                                 </h3>
                                 {product?.ProductVariation?.length ? (
-                                  <span className="font-[400] basis-2/4 text-[12px] sm:text-[13px] text-black1">
+                                  <span className="font-[400] basis-2/4 text-[12px] md:text-[11px] lg:text-[11px] text-nowrap xl:text-[12px] text-black1">
                                     {product.ProductVariation[0].values[0].name}
                                   </span>
                                 ) : null}
                               </div>
                             </div>
                             <div className="flex flex-row items-center gap-1">
-                              <span className="font-normal text-nowrap text-[14px] sm:text-[16px] basis-1/4 text-green1 w-fit">
+                              <span className="font-normal text-nowrap text-[14px] md:text-[14px] lg:text-[11px] xl:text-[15px] basis-1/4 text-green1 w-fit">
                                 {splitNumber(
                                   product?.ProductVariation?.length
                                     ? product.ProductVariation[0].values[0]
@@ -167,7 +168,7 @@ export default function ProductsGrid({ title, categoryId }: props) {
                                     : product.price
                                 )}{" "}
                               </span>
-                              <span className="text-[11px] text-black1">
+                              <span className="lg:text-[12px] text-[10px] text-black1">
                                 تومان{" "}
                               </span>
                             </div>
