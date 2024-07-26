@@ -8,6 +8,7 @@ import {
   Telegram_SVG,
 } from "./SVGS";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Footer() {
   return (
@@ -62,8 +63,12 @@ export default function Footer() {
         </div>
       </div>
       <div className="h-fit flex flex-row items-center gap-8">
-        <Instagram_SVG classname="w-6" />
-        <Telegram_SVG classname="w-6" />
+        <Link href={"https://www.instagram.com/mersehcom"}>
+          <Instagram_SVG classname="w-6" />
+        </Link>
+        <Link href={"https://t.me/mersehcom"}>
+          <Telegram_SVG classname="w-6" />
+        </Link>
       </div>
       <span>
         طراحی شده توسط <span className="font-[700]">Merseh</span>
