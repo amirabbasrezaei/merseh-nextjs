@@ -69,7 +69,6 @@ export function ContentViewer({ contentForView }: Props) {
   );
 }
 
-
 export default function Content({ contentForView }: Props) {
   return (
     <article className="[&_h2]:text-[25px] [&_ul]:list-disc [&_a]:text-[#7ba79a] [&_ul]:list-inside  text-[#525252] [&_h2]:text-[#3e3e3e]   leading-loose [&_h3]:text-[#3e3e3e] [&_h3]:text-[20px] flex flex-col ">
