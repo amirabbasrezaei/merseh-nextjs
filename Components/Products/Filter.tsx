@@ -82,6 +82,7 @@ export default function Filter({ setFilter, filter }: Props) {
       <motion.div
         transition={{ type: "tween", duration: 0.3 }}
         variants={animation}
+            initial={false}
         animate={showFilter ? "open" : "closed"}
         className="sm:basis-3/12 bg-white z-20 p-5 justify-between fixed h-full top-0 right-0 left-0 flex-col gap-10 w-full  flex"
       >
