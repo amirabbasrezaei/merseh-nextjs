@@ -47,8 +47,6 @@ const contentToHTML = (content: contentType[], parent: HTMLElement): any => {
         element.innerHTML = ct.content as string;
         parent.append(element);
       }
-
-
     } else if (ct.type === "a" && typeof ct.content === "string") {
       console.log(ct);
       const element = document.createElement(ct.type);
@@ -119,12 +117,16 @@ export default function QuillEditor({
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
-    if (content && !initialFlag) {
+    !isClient && setIsClient(true);
+    if (content && !flag) {
       const parent = document.createElement("div");
       setValue(contentToHTML(content, parent).innerHTML);
     }
-  }, [content, initialFlag]);
+  }, [content, flag]);
+
+  useEffect(() => {
+    setFlag(initialFlag);
+  }, [initialFlag]);
 
   useEffect(() => {
     if (value.length) {
