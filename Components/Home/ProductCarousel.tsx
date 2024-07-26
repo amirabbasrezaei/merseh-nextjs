@@ -63,7 +63,7 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
 
   return (
     <section className="w-full  flex flex-col items-center gap-5 ">
-      <span className="text-[20px] w-full text-black1 font-normal">{title}</span>
+      <span className="text-[18px] w-full text-black1 font-normal">{title}</span>
       <Swiper
         onSwiper={swiperRef}
         spaceBetween={10}
@@ -93,8 +93,10 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
                       " ",
                       "-"
                     )}`}
-                    className="border pb-4  sm:px-5 h-full  justify-between  gap-3 flex flex-col  items-center sm:justify-center relative   border-[#EDEDED] rounded-[12px]  "
+                    className="flex flex-row     rounded-[12px]  "
                   >
+                    <div className="pb-4  sm:px-5 h-full  justify-between  gap-3 flex flex-col  items-center sm:justify-center relative">
+
                     <div className="w-full h-full flex flex-col items-center justify-center">
                       {product?.imageNames.length ? (
                         <Image
@@ -125,6 +127,8 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
                       </span>
                       <span className="text-[11px] text-black1">تومان</span>
                     </div>
+                    </div>
+                    <div className="border-l border-[#f3f3f3] w--[5px] h-full" />
                   </Link>
                 </motion.div>
               </SwiperSlide>

@@ -87,7 +87,7 @@ export default function ProductsGrid({ title, categoryId }: props) {
 
   return (
     <section className="w-full sm:p-4 flex flex-col items-center gap-5 ">
-      <span className="text-[20px] text-black1 font-normal w-full ">{title}</span>
+      <span className="text-[18px] text-black1 font-normal w-full ">{title}</span>
       <Swiper
         onSwiper={swiperRef}
         spaceBetween={20}
