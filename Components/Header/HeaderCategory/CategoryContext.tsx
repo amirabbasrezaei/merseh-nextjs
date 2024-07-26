@@ -45,7 +45,7 @@ export default function CategoryContext({
                       setShowCategories(false);
                     }}
                     key={subCat.id}
-                    href={`/products?catId=${subCat.id}`}
+                    href={`/category/${subCat.id}/${subCat.title.replaceAll(" ", "-")}`}
                     className="mb-1"
                   >
                     <span className="text-[#4E4E4E] font-[300] text-[13px]">
