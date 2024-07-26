@@ -32,6 +32,7 @@ export default function ProductCard({
       >
         <div className="w-full h-full flex flex-row sm:flex-col items-center">
           <Image
+          title={title.replaceAll(" ", "-")}
             className="sm:w-full w-auto h-full rounded-[12px] sm:h-auto basis-1/4"
             style={{ objectFit: "contain" }}
             src={`${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${imageNames[0]}`}
