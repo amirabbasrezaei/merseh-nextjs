@@ -53,3 +53,30 @@ export const YekanBakh = localFont({
     },
   ],
 });
+
+export const IRANSansXFaNum = localFont({
+  src: [
+    {
+      path: "../public/fonts/Iransans_x_pro/Woff2/IRANSansXFaNum-Thin.woff2",
+      weight: "100",
+      style: "sans",
+
+    },
+    {
+      path: "../public/fonts/Iransans_x_pro/Woff2/IRANSansXFaNum-Light.woff2",
+      weight: "300",
+    },
+    {
+      path: "../public/fonts/Iransans_x_pro/Woff2/IRANSansXFaNum-Medium.woff2",
+      weight: "500",
+    },
+    {
+      path: "../public/fonts/Iransans_x_pro/Woff2/IRANSansXFaNum-Bold.woff2",
+      weight: "bold",
+    },
+    {
+      path: "../public/fonts/Iransans_x_pro/Woff2/IRANSansXFaNum-Regular.woff2",
+      weight: "normal",
+    },
+  ],
+});

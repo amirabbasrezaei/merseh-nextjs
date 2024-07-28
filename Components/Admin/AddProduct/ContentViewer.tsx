@@ -2,7 +2,8 @@ import React, { createElement } from "react";
 import { contentType } from "./QuillEditor";
 import Image from "next/image";
 import Link from "next/link";
-
+import { IRANSansXFaNum } from "../../../app/fonts";
+import classNames from "classnames";
 interface Props {
   contentForView: contentType[];
 }
@@ -36,7 +37,6 @@ export function ContentViewer({ contentForView }: Props) {
               if (node.type === "br") {
                 return <br key={i} />;
               }
-              
 
               return node.content;
             }
@@ -71,7 +71,12 @@ export function ContentViewer({ contentForView }: Props) {
 
 export default function Content({ contentForView }: Props) {
   return (
-    <article className="[&_h2]:text-[25px] [&_ul]:list-disc [&_h2]:font-[500] [&_h3]:font-[500] [&_a]:text-[#7ba79a] [&_ul]:list-inside  text-[#666666] [&_h2]:text-[#3e3e3e]   leading-loose [&_h3]:text-[#3e3e3e] [&_h3]:text-[21px] flex flex-col text-[20px]">
+    <article
+      className={classNames(
+        "[&_h2]:text-[25px] [&_ul]:list-disc [&_h2]:font-[500] [&_h3]:font-[500] [&_a]:text-[#7ba79a] [&_ul]:list-inside  text-[#666666] [&_h2]:text-[#3e3e3e]   leading-loose [&_h3]:text-[#3e3e3e] [&_h3]:text-[21px] flex flex-col text-[20px]",
+        IRANSansXFaNum.className
+      )}
+    >
       <ContentViewer contentForView={contentForView} />
     </article>
   );

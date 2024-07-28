@@ -16,7 +16,7 @@ export default function TRPC_Provider({
       links: [
         httpBatchLink({
           url:
-            process.env.NODE_ENV === "production" || true
+            process.env.NODE_ENV === "production"
               ? "https://merseh.com/api/trpc"
               : "http://localhost:3000/api/trpc",
         }),
