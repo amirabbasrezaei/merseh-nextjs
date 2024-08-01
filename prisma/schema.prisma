@@ -44,6 +44,16 @@ model City {
   podroCode  String?
 }
 
+model Article {
+  id         Int       @id @default(autoincrement())
+  images      String[]
+  title      String
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+  comments   Comment[]
+  content    String
+}
+
 model OrderShipping {
   id                Int              @id @default(autoincrement())
   price             Int
@@ -147,26 +157,25 @@ model Category {
 }
 
 model User {
-  id              String    @id @default(uuid())
-  name            String    @db.VarChar(20)
-  familyName      String?
-  password        String?
-  email           String?   @unique
-  phoneNumber     String    @unique
-  role            role      @default(USER)
-  loginCode       String?
-  isVerified      Boolean   @default(false)
-  credit          Int       @default(0)
-  createdAt       DateTime  @default(now())
-  lastLogin       DateTime?
-  numberOfLogins  Int?      @default(1)
-  Addresses       Address[]
-  order           Order[]
-  Payment         Payment[]
-  Session         Session[]
-  Comment         Comment[] @relation("user_and_comment")
-  Comment_Likes   Comment[] @relation("likes")
-
+  id             String    @id @default(uuid())
+  name           String    @db.VarChar(20)
+  familyName     String?
+  password       String?
+  email          String?   @unique
+  phoneNumber    String    @unique
+  role           role      @default(USER)
+  loginCode      String?
+  isVerified     Boolean   @default(false)
+  credit         Int       @default(0)
+  createdAt      DateTime  @default(now())
+  lastLogin      DateTime?
+  numberOfLogins Int?      @default(1)
+  Addresses      Address[]
+  order          Order[]
+  Payment        Payment[]
+  Session        Session[]
+  Comment        Comment[] @relation("user_and_comment")
+  Comment_Likes  Comment[] @relation("likes")
 }
 
 model Session {
@@ -199,15 +208,16 @@ model Comment {
   id                Int            @id @default(autoincrement())
   User              User           @relation("user_and_comment", fields: [userId], references: [id])
   userId            String
-  Product           Product        @relation(fields: [productId], references: [id])
-  productId         Int
+  Product           Product?       @relation(fields: [productId], references: [id])
+  productId         Int?
   content           String
   child_comments    Comment[]      @relation("child_comments")
   parent_comment    Comment?       @relation("child_comments", fields: [parent_comment_id], references: [id])
   parent_comment_id Int?
   status            Comment_Status @default(NEED_REVIEW)
   likes             User[]         @relation("likes")
-
+  Article           Article?       @relation(fields: [articleId], references: [id])
+  articleId         Int?
 }
 
 enum Comment_Status {

@@ -34,7 +34,7 @@ const productVariation = z.object({
   ),
 });
 
-const content = z.object({
+export const content = z.object({
   content: z
     .string()
     .or(z.object({ src: z.string(), name: z.string(), format: z.string() })),
@@ -134,7 +134,7 @@ export async function getProductController({
         if (e.type === "img") {
           return {
             content: {
-              src: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/articleImages/${e.content.name}`,
+              src: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productArticleImages/${e.content.name}`,
               name: e.content.name,
             },
             type: "img",
@@ -493,7 +493,7 @@ export async function editProductController({
     );
     uploadFile({
       images: filterContentImages,
-      uploadDirectory: "articleImages",
+      uploadDirectory: "productArticleImages",
     });
   } catch (error) {
     console.log(error);
