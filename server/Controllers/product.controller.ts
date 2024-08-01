@@ -134,7 +134,7 @@ export async function getProductController({
         if (e.type === "img") {
           return {
             content: {
-              src: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productArticleImages/${e.content.name}`,
+              src: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/articleImages/${e.content.name}`,
               name: e.content.name,
             },
             type: "img",
@@ -493,7 +493,7 @@ export async function editProductController({
     );
     uploadFile({
       images: filterContentImages,
-      uploadDirectory: "productArticleImages",
+      uploadDirectory: "articleImages",
     });
   } catch (error) {
     console.log(error);
