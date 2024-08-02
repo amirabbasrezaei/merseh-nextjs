@@ -19,6 +19,7 @@ interface Props {
   parentAnimation?: boolean;
   catId: number[];
   setFilter: Dispatch<SetStateAction<filterTypeArgs>>;
+
 }
 
 export default function GetCategories({
@@ -79,15 +80,12 @@ export default function GetCategories({
         ) : null}
         <span
           onClick={() => {
-            // setFilter((state) => ({
-            //   ...state,
-            //   categoryId: cat.id,
-            //   parentCategories: catId,
-            // }));
+            setFilter((state) => ({
+              ...state,
+              categoryId: cat.id,
+              categoryName: cat.title,
+            }));
 
-            router.push(
-              `/category/${String(cat.id)}/${cat.title.replaceAll(" ", "-")}`
-            );
           }}
           style={{ cursor: "pointer" }} // it doesn't work with taiwlind
           className={classNames(

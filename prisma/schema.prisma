@@ -52,6 +52,7 @@ model Article {
   updated_at DateTime?
   comments   Comment[]
   content    String
+  metaDescription String?
 }
 
 model OrderShipping {

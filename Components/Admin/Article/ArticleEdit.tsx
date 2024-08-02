@@ -9,9 +9,10 @@ import Category from "../Category/Category.admin";
 import ContentViewer from "../AddProduct/ContentViewer";
 import Image from "next/image";
 import { EditProductInput } from "@/server/Controllers/product.controller";
+import { EditArticleInput } from "@/server/Controllers/article.controller";
 
 type Props = {
-  productId?: string;
+  articleId?: string;
 };
 
 type imageType = { base64: string; name: string };
@@ -32,7 +33,7 @@ export interface filterTypeArgs {
   parentCategories?: number[];
 }
 
-export default function ArticleEdit({ productId }: Props) {
+export default function ArticleEdit({ articleId }: Props) {
   const [metaDescription, setMetaDescription] = useState("");
   const { mutate: mutateCreateArticle } =
     trpc.article.createArticle.useMutation();
@@ -48,30 +49,27 @@ export default function ArticleEdit({ productId }: Props) {
   const [filter, setFilter] = useState<filterTypeArgs>({});
   const [variations, setVariations] = useState<variation[]>([]);
   const [content, setContent] = useState<contentType[]>([]);
-  const [articleDetails, setArticleDetails] = useState<string[]>([]);
-  const { data } = trpc.product.getproduct.useQuery({
-    productId: Number(productId),
+
+  const { data: articleData } = trpc.article.getArticle.useQuery({
+    articleId: Number(articleId),
   });
-  const { mutateAsync: mutateEditProduct } =
-    trpc.product.editProduct.useMutation();
+  const { mutateAsync: mutateEditArticle } =
+    trpc.article.editArticle.useMutation();
 
   useEffect(() => {
-    if (data?.product) {
-      setName(data.product.name);
-      setEngName(data.product.englishName);
-      setPrice(String(data.product.price));
-      setContent(data.product.content);
-      setArticleDetails(data.product.details);
+    if (articleData?.article) {
+      setName(articleData.article.title);
+      setContent(articleData.article.content);
       seteditProductImages({
-        existingImages: data.product.imageUrls.map((img: any) => ({
+        existingImages: articleData.article.imageUrls.map((img: any) => ({
           url: img,
           name: img.split("/").at(-1) || "",
         })),
       });
-      setMetaDescription(data?.product.metaDescription);
-      setFilter({ categoryId: data.product.mainCategoryId });
+      setMetaDescription(articleData.article.metaDescription || "");
+      // setFilter({ categoryId: data.product.mainCategoryId });
     }
-  }, [data]);
+  }, [articleData]);
 
   useEffect(() => {
     if ((files as any)?.length && !flag) {
@@ -93,7 +91,7 @@ export default function ArticleEdit({ productId }: Props) {
           reader.onloadend = (res) => {
             const promise = new Promise((resolved) => {
               console.log("hi");
-              if (productId) {
+              if (articleId) {
                 seteditProductImages((state) => ({
                   ...state,
                   newImages: state?.newImages?.length
@@ -185,38 +183,31 @@ export default function ArticleEdit({ productId }: Props) {
       onSubmit={(e) => {
         e.preventDefault();
 
-          if (productId) {
-            const convertProductImage = {
-              existingImages: editProductImages?.existingImages.map(
-                (e) => e.name
-              ) || [""],
-              newImages: editProductImages?.newImages || [],
-            };
-            const editProductBody: EditProductInput = {
-              images: convertProductImage,
-              productId: productId,
-              categoryId: String(filter.categoryId),
-              englishName: engName,
-              name,
-              price,
-              productContent: content,
-              parentCategories: filter.parentCategories,
-              productVariations: variations.length ? variations : [],
-              metaDescription: metaDescription,
-              details: articleDetails,
-            };
-            console.log(editProductBody);
-            mutateEditProduct(editProductBody);
-          } else {
-            mutateCreateArticle({
-              content,
-              description: articleDetails,
+        if (articleId) {
+          const convertProductImage = {
+            existingImages: editProductImages?.existingImages.map(
+              (e) => e.name
+            ) || [""],
+            newImages: editProductImages?.newImages || [],
+          };
+          const editProductBody: EditArticleInput = {
+            images: convertProductImage.newImages,
+            articleId: Number(articleId),
 
-              images,
-              title: name,
-            });
-          }
-        
+            title: name,
+            content,
+
+            metaDescription: metaDescription,
+          };
+          mutateEditArticle(editProductBody);
+        } else {
+          mutateCreateArticle({
+            content,
+            metaDescription: metaDescription,
+            images,
+            title: name,
+          });
+        }
       }}
     >
       <div>
@@ -274,16 +265,7 @@ export default function ArticleEdit({ productId }: Props) {
             type="text"
           />
         </div>
-
       </div>
-      <label>ویژگی مقاله</label>
-      <textarea
-        value={articleDetails.join("\r\n")}
-        onChange={(e) => {
-          setArticleDetails(e.target.value.split(/\r?\n/));
-        }}
-        className="bg-gray-50 appearance-none outline-none p-4"
-      />
       <label>توضیحات متا</label>
       <textarea
         value={metaDescription}
@@ -292,7 +274,6 @@ export default function ArticleEdit({ productId }: Props) {
         }}
         className="bg-gray-50 appearance-none outline-none p-4"
       />
-
 
       <Category filter={filter} setFilter={setFilter} />
 

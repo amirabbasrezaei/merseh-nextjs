@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { Context } from "../context";
 import { contentType } from "@/Components/Admin/AddProduct/QuillEditor";
+import { parentCategories } from "../utils/category";
 
 export type ArgsStructure<T = null> = T extends null
   ? {
@@ -13,6 +14,7 @@ export type ArgsStructure<T = null> = T extends null
 
 export async function categoriesController({ ctx }: ArgsStructure) {
   const { prisma } = ctx;
+  
   let categories = await prisma.category.findMany();
   categories = categories.map((e) => ({
     ...e,
@@ -121,7 +123,7 @@ export async function createCategory({
       parentCategoryId: input.parentId,
     },
   });
-  console.log(input);
+
 
   return newCategory;
 }

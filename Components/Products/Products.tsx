@@ -11,11 +11,14 @@ import { AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import Content, { ContentViewer } from "../Admin/AddProduct/ContentViewer";
 import { contentType } from "../Admin/AddProduct/QuillEditor";
+import { useRouter } from "next/navigation";
 
 export type filterTypeArgs = {
   categoryId?: number;
   searchTerm?: string;
   parentCategories?: number[];
+  needRefetch?: boolean;
+  categoryName?: string;
 };
 
 interface Props {
@@ -23,8 +26,12 @@ interface Props {
 }
 
 export default function Products({ categoryId }: Props) {
-  const [filter, setFilter] = useState<filterTypeArgs>({});
+  const [filter, setFilter] = useState<filterTypeArgs>({
+    categoryId,
+    needRefetch: false,
+  });
   const params = useSearchParams();
+  const router = useRouter();
   const [content, setContent] = useState<contentType[]>([]);
 
   const {
@@ -45,11 +52,18 @@ export default function Products({ categoryId }: Props) {
     };
   }, [params]);
 
-  // useEffect(() => {
-  //   if (data?.categoryInfo) {
-  //     setContent(JSON.parse(data?.categoryInfo.content));
-  //   }
-  // }, [data]);
+  useEffect(() => {
+    if (filter.needRefetch) {
+      setFilter((state) => ({ ...state, needRefetch: false }));
+      router.push(
+        `/category/${filter.categoryId}/${filter.categoryName?.replaceAll(
+          " ",
+          "-"
+        )}`
+      );
+      // mutate({ categoryId: filter.categoryId });
+    }
+  }, [filter]);
 
   return (
     <section className="flex sm:gap-0 gap-5 flex-col sm:flex-row w-full mt-4 sm:mt-10 sm:px-10 overflow-visible">
@@ -59,7 +73,7 @@ export default function Products({ categoryId }: Props) {
           <div className="sm:grid grid-cols-4 flex flex-col gap-4 w-full ">
             <AnimatePresence mode="sync">
               {data?.products?.length && !isLoading
-                ? data.products.map((pr, index) => (
+                ? data.products.map((pr: any, index: number) => (
                     <ProductCard
                       key={index}
                       imageNames={pr.imageNames}

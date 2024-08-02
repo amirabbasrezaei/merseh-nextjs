@@ -7,6 +7,7 @@ import path, { dirname } from "path";
 import { ArgsStructure } from "./category.controller";
 import { rimraf } from "rimraf";
 import uploadFile from "../utils/uploadFile";
+import { parentCategories } from "../utils/category";
 const ACCESSKEY = process.env.LIARA_ACCESS_KEY;
 const SECRETKEY = process.env.LIARA_SECRET_KEY;
 const ENDPOINT = process.env.LIARA_ENDPOINT;
@@ -267,7 +268,9 @@ export async function addProductController({
 
   try {
     readProductImageFiles(imagePathFolder);
-
+    const parent_categories = await parentCategories({
+      categoryId: Number(input.categoryId),
+    });
     const newproduct = await prisma.product.create({
       data: {
         imageNames: input.images.map((img) => img.name),
@@ -277,10 +280,10 @@ export async function addProductController({
         mainCategoryId: Number(input.categoryId),
         details: input.details,
         category: {
-          connect: input?.parentCategories?.length
+          connect: parent_categories.length
             ? [
-                ...input.parentCategories.map((catId) => ({
-                  id: Number(catId),
+                ...parent_categories.map((catId) => ({
+                  id: catId,
                 })),
                 { id: Number(input.categoryId) },
               ]
@@ -381,7 +384,7 @@ type TorobScema = {
   old_price: string;
 };
 export async function forTorobProductController({ ctx }: ArgsStructure) {
-  console.log("hi");
+
   const { prisma } = ctx;
   try {
     const products = await prisma.product.findMany({
@@ -460,7 +463,6 @@ export const editProductInputSchema = z.object({
   englishName: z.string(),
   price: z.string(),
   categoryId: z.string(),
-  parentCategories: z.array(z.number()).optional(),
   productVariations: z.array(productVariation).optional(),
   productContent: z.array(content),
   productId: z.string(),
@@ -512,6 +514,10 @@ export async function editProductController({
     }
     return e;
   });
+
+  const parent_categories = await parentCategories({
+    categoryId: Number(input.categoryId),
+  });
   await prisma.product.update({
     where: {
       id: Number(input.productId),
@@ -529,10 +535,10 @@ export async function editProductController({
       mainCategoryId: Number(input.categoryId),
       details: input.details,
       category: {
-        connect: input?.parentCategories?.length
+        connect: parent_categories.length
           ? [
-              ...input.parentCategories.map((catId) => ({
-                id: Number(catId),
+              ...parent_categories.map((catId) => ({
+                id: catId,
               })),
               { id: Number(input.categoryId) },
             ]

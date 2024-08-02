@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { ArgsStructure } from "./category.controller";
 import { TRPCClientError } from "@trpc/client";
+import { childrenCategories, parentCategories } from "../utils/category";
 
 export const FilterProductArgsSchema = z.object({
   categoryId: z.number().optional(),
@@ -15,16 +16,16 @@ export async function filterProductController({
 }: ArgsStructure<FilterProductArgs>) {
   const { prisma } = ctx;
   const { categoryId, searchTerm } = input;
+
   try {
+    const categoryChildrens = await childrenCategories({
+      categoryId: categoryId || -1,
+    });
     const filterProducts = await prisma.product.findMany({
       where: {
         name: { contains: searchTerm },
         category: categoryId
-          ? {
-              some: {
-                id: categoryId,
-              },
-            }
+          ? { some: { id: { in: [categoryId, ...categoryChildrens] } } }
           : {},
       },
       select: {
@@ -39,6 +40,7 @@ export async function filterProductController({
         name: true,
       },
     });
+    
     const category = await prisma.category.findUnique({
       where: {
         id: categoryId,
@@ -48,6 +50,7 @@ export async function filterProductController({
         title: true,
       },
     });
+
     return {
       products: filterProducts,
       categoryInfo: {

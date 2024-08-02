@@ -61,9 +61,11 @@ export default function Category({
     <>
       <div
         onClick={() => {
-          router.push(
-            `/category/${String(catId)}/${name.replaceAll(" ", "-")}`
-          );
+          setFilter((state) => ({
+            ...state,
+            categoryId: catId,
+          }));
+
           setShowCategory((state) => !state);
         }}
         className="flex flex-row items-center gap-1  w-fit  mb-3"
@@ -78,7 +80,7 @@ export default function Category({
             setFilter((state) => ({
               ...state,
               categoryId: catId,
-              parentCategories: [Number(catId)],
+              categoryName: name,
             }))
           }
           className="text-[13px] text-black1 cursor-pointer"
@@ -122,6 +124,7 @@ export default function Category({
             parentAnimation={showCategory}
             catId={[catId]}
             setFilter={setFilter}
+
           />
         ) : null}
       </motion.div>

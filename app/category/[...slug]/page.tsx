@@ -17,7 +17,6 @@ const getCategory = cache(async (categoryId: string) => {
         : "http://localhost:3000"
     }/api/trpc/product.categoryInfo?input={"categoryId":${categoryId}}`
   );
-  console.log(data.result.data);
   return data.result.data;
 });
 
@@ -33,7 +32,7 @@ export async function generateMetadata({
 }: NextPagePropsType): Promise<Metadata> {
   const category = await getCategory(params.slug[0]);
   if (category?.category) {
-    console.log(category)
+
     return {
       title: category.category.title,
       alternates: {

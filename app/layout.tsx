@@ -26,6 +26,9 @@ export const metadata: Metadata = {
   openGraph: {
     locale: "fa_IR",
   },
+  other: {
+    currency: "IRT",
+  },
 };
 
 export default function RootLayout({
