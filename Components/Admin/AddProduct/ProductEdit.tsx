@@ -202,7 +202,6 @@ export default function ProductEdit({ productId }: Props) {
               name,
               price,
               productContent: content,
-              parentCategories: filter.parentCategories,
               productVariations: variations.length ? variations : [],
               metaDescription: metaDescription,
               details: productDetails,

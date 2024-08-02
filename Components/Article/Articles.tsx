@@ -14,6 +14,7 @@ export default function Articles() {
               title={article.title}
               imageUrl={article.images[0]}
               articleId={article.id}
+              key={article.id}
             />
           ))
         : null}

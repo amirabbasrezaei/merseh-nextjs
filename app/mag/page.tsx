@@ -6,7 +6,7 @@ import React from "react";
 export const metadata: Metadata = {
   title: { absolute: "مجله مرسه" },
   description:
-    " مجله مرسه کاربردی ترین و جدیدترین موضوعات مربوط به حوزه سلامتی، محصولات طبیهی و ارگانیک را منتشر می‌کند",
+    " مجله مرسه کاربردی ترین و جدیدترین موضوعات مربوط به حوزه سلامتی، محصولات طبیعی و ارگانیک را منتشر می‌کند",
   alternates: {
     canonical: `${process.env.BASE_URL}/mag`,
   },
