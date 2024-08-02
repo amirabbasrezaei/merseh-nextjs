@@ -14,7 +14,7 @@ export default function Home() {
       <Slider />
       <div className="w-full flex justify-center relative">
         <hr className="w-full" />
-        <h1 className="absolute -top-3 bg-white px-4">فروشگاه مرسه</h1>
+        <h1 className="absolute -top-3 bg-white px-4">مرسه</h1>
       </div>
       <Main_Categories />
       <ProductsGrid categoryId={2} title="روغن های گیاهی" />
