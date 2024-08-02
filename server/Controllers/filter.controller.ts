@@ -40,7 +40,7 @@ export async function filterProductController({
         name: true,
       },
     });
-    
+
     const category = await prisma.category.findUnique({
       where: {
         id: categoryId,
@@ -51,11 +51,16 @@ export async function filterProductController({
       },
     });
 
+    console.log(categoryId);
+
     return {
       products: filterProducts,
       categoryInfo: {
         title: category?.title,
         content: category?.content?.length ? JSON.parse(category.content) : [],
+        categoryParents: await parentCategories({
+          categoryId: categoryId || -1,
+        }),
       },
     };
   } catch (error) {

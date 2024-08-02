@@ -13,13 +13,14 @@ import { Check, Chevron_Down, Plus_Svg } from "../SVGS";
 import { trpc } from "@/utils/trpc";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
+import SquareRadioInput from "../SquareRadioInput";
 
 interface Props {
   data: categoryType[];
   parentAnimation?: boolean;
   catId: number[];
   setFilter: Dispatch<SetStateAction<filterTypeArgs>>;
-
+  filter: filterTypeArgs;
 }
 
 export default function GetCategories({
@@ -27,6 +28,7 @@ export default function GetCategories({
   data,
   parentAnimation = false,
   setFilter,
+  filter,
 }: Props) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -59,16 +61,29 @@ export default function GetCategories({
     return;
   }
 
+
+
   return data.map((cat: categoryType) => (
     <motion.div key={cat.id}>
       <div
         onClick={(e) => {
-          console.log(cat.id);
           setShowSubCategory((state) => (state === cat.id ? 0 : cat.id));
+          setFilter((state) => ({
+            ...state,
+            categoryId: cat.id,
+            categoryName: cat.title,
+            parentCategories: catId,
+          }));
           e.stopPropagation();
         }}
         className="flex flex-row gap-1 items-center  mb-3"
       >
+        <SquareRadioInput
+          isChecked={
+            filter.parentCategories?.find((e) => e === cat.id) !== undefined ||
+            filter.categoryId === cat.id
+          }
+        />
         {cat.subCategories?.length ? (
           <motion.div
             animate={
@@ -79,17 +94,10 @@ export default function GetCategories({
           </motion.div>
         ) : null}
         <span
-          onClick={() => {
-            setFilter((state) => ({
-              ...state,
-              categoryId: cat.id,
-              categoryName: cat.title,
-            }));
-
-          }}
+          onClick={() => {}}
           style={{ cursor: "pointer" }} // it doesn't work with taiwlind
           className={classNames(
-            "text-[13px] text-black1 cursor-poiner",
+            "text-[15px] text-black1 cursor-poiner",
             cat.subCategories?.length ? "" : "mr-3"
           )}
         >
@@ -117,13 +125,32 @@ export default function GetCategories({
 
       {cat.subCategories?.length ? (
         <motion.div
+          initial={false}
           onClick={(e) => {
             e.stopPropagation();
           }}
           animate={{
-            scale: showSubCategory === cat.id ? 1 : 0,
-            opacity: showSubCategory === cat.id ? 1 : 0,
-            height: showSubCategory === cat.id ? "fit-content" : 0,
+            scale:
+              showSubCategory === cat.id ||
+              filter.parentCategories?.find((e) => e === cat.id) !==
+                undefined ||
+              filter.categoryId === cat.id
+                ? 1
+                : 0,
+            opacity:
+              showSubCategory === cat.id ||
+              filter.parentCategories?.find((e) => e === cat.id) !==
+                undefined ||
+              filter.categoryId === cat.id
+                ? 1
+                : 0,
+            height:
+              showSubCategory === cat.id ||
+              filter.parentCategories?.find((e) => e === cat.id) !==
+                undefined ||
+              filter.categoryId === cat.id
+                ? "fit-content"
+                : 0,
           }}
           className="pr-4  flex-col mt-3"
           style={{ originX: 1, originY: 0.5 }}
@@ -133,6 +160,7 @@ export default function GetCategories({
             parentAnimation={parentAnimation}
             catId={[...catId, cat.id]}
             setFilter={setFilter}
+            filter={filter}
           />
         </motion.div>
       ) : null}

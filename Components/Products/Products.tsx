@@ -65,6 +65,16 @@ export default function Products({ categoryId }: Props) {
     }
   }, [filter]);
 
+  useEffect(() => {
+
+    if (data) {
+      setFilter((state) => ({
+        ...state,
+        parentCategories: data.categoryInfo.categoryParents,
+      }));
+    }
+  }, [data]);
+
   return (
     <section className="flex sm:gap-0 gap-5 flex-col sm:flex-row w-full mt-4 sm:mt-10 sm:px-10 overflow-visible">
       <Filter filter={filter} setFilter={setFilter} />

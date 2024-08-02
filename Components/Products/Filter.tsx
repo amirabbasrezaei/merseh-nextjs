@@ -76,7 +76,7 @@ export default function Filter({ setFilter, filter }: Props) {
             className="bg-transparent  h-full placeholder:text-[13px] w-full text-black1 placeholder:text-[#8b8b8b]  pr-2  appearance-none outline-none"
           />
         </div>
-        <Categories setFilter={setFilter} />
+        <Categories filter={filter} setFilter={setFilter} />
         <Button
           onClick={() => {
             setFilter((state) => ({ ...state, needRefetch: true }));
@@ -109,15 +109,25 @@ export default function Filter({ setFilter, filter }: Props) {
               className="bg-transparent  h-full placeholder:text-[13px] w-full text-black1 placeholder:text-[#8b8b8b]  pr-2  appearance-none outline-none"
             />
           </div>
-          <Categories setFilter={setFilter} />
+          <Categories filter={filter} setFilter={setFilter} />
         </div>
         <div className="w-full flex flex-row gap-5">
           <Button
-            className="w-[40%]  text-[#3a3a3a] bg-[#ededed]"
+
+            style={{
+              background: "transparent",
+              color: "#303030",
+
+            }}
             text="بستن"
             onClick={() => setShowFilter(false)}
           />
-          <Button onClick={() => setShowFilter(false)} text="اعمال فیلتر" />
+          <Button
+            onClick={() => {
+              setFilter((state) => ({ ...state, needRefetch: true }));
+            }}
+            text="اعمال فیلتر"
+          />
         </div>
       </motion.div>
     </div>
