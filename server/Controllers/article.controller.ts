@@ -207,6 +207,7 @@ export async function getArticleController({
   try {
     const article = await prisma.article.findUnique({
       where: { id: input.articleId },
+      include: { comments: true },
     });
 
     if (!article) {
@@ -220,6 +221,7 @@ export async function getArticleController({
       ),
       title: article.title,
       metaDescription: article.metaDescription,
+      created_at: article.created_at,
       content: JSON.parse(article.content).map((e: any) => {
         if (e.type === "img") {
           return {
@@ -254,5 +256,47 @@ export async function articlesController({ ctx: { prisma } }: ArgsStructure) {
     return { articles: haveImageArticles, message: null };
   } catch (error) {
     return { articles: null, message: JSON.stringify(error || "{}") };
+  }
+}
+
+export async function recentArticlesController({
+  ctx: { prisma },
+}: ArgsStructure) {
+  try {
+    const [recentArticles, suggestedArticels] = await prisma.$transaction([
+      prisma.article.findMany({
+        orderBy: { created_at: "desc" },
+        take: 4,
+      }),
+      prisma.article.findMany({
+        where: { isSuggested: true },
+        orderBy: { created_at: "desc" },
+        take: 3,
+      }),
+    ]);
+
+    const recentArticlesWithImage = recentArticles.map((article) => ({
+      ...article,
+      images: article.images.map(
+        (img) =>
+          `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/articleMainImages/${img}`
+      ),
+    }));
+
+    const suggestedArticlesWithImage = suggestedArticels.map((article) => ({
+      ...article,
+      images: article.images.map(
+        (img) =>
+          `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/articleMainImages/${img}`
+      ),
+    }));
+
+    return {
+      recentArticles: recentArticlesWithImage,
+      suggestedArticels: suggestedArticlesWithImage,
+      message: null,
+    };
+  } catch (error) {
+    return { recentArticles: null, suggestedArticels: null, message: null };
   }
 }

@@ -8,11 +8,15 @@ import HeaderCategory from "../Header/HeaderCategory/HeaderCategory";
 import Link from "next/link";
 import HeaderSearch from "../Header/Search/HeaderSearch";
 
-export default function Header() {
+interface Props {
+  isMag?: boolean;
+}
+
+export default function Header({ isMag }: Props) {
   return (
     <header className="h-[70px] sm:h-[116px] sm:px-6 w-full sm:gap-10 flex flex-row items-center mb-[-70px] flex-none justify-between">
       <div className="sm:basis-1/12 hidden sm:flex flex-row justify-between gap-5 items-center">
-        <HeaderShoppingCart />
+        {!isMag ? <HeaderShoppingCart /> : null}
         <UserAuth />
       </div>
       <div className="flex items-center justify-between gap-10 sm:basis-11/12  w-full h-full ">
@@ -23,7 +27,7 @@ export default function Header() {
           href={"/"}
         >
           <Merseh_typography classname="sm:h-[25px] h-[20px] fill-[#363636]" />
-          <MersehSvg classname="h-[20px] w-auto" />
+          <MersehSvg classname="h-[26px] w-auto" />
         </Link>
       </div>
     </header>

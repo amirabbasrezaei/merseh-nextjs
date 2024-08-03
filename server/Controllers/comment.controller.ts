@@ -3,18 +3,18 @@ import { ArgsStructure } from "./category.controller";
 import z from "zod";
 import type { Comment } from "@prisma/client";
 
-export const add_comment_schema = z.object({
+export const add_product_comment_schema = z.object({
   productId: z.number(),
   parentCommentId: z.number().optional(),
   content: z.string(),
 });
 
-type AddCommentInput = z.infer<typeof add_comment_schema>;
+type AddProductCommentInput = z.infer<typeof add_product_comment_schema>;
 
-export async function add_comment_controller({
+export async function add_proudct_comment_controller({
   ctx,
   input,
-}: ArgsStructure<AddCommentInput>) {
+}: ArgsStructure<AddProductCommentInput>) {
   const { prisma, user } = ctx;
   try {
     await prisma.comment.create({
@@ -23,6 +23,38 @@ export async function add_comment_controller({
         content: input.content,
         parent_comment_id: input.parentCommentId,
         productId: input.productId,
+      },
+    });
+
+    return { status: "ok" };
+  } catch (error) {
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "خطا در افزودن نظر",
+    });
+  }
+}
+
+export const add_article_comment_schema = z.object({
+  articleId: z.number(),
+  parentCommentId: z.number().optional(),
+  content: z.string(),
+});
+
+type AddArticleCommentInput = z.infer<typeof add_article_comment_schema>;
+
+export async function add_article_comment_controller({
+  ctx,
+  input,
+}: ArgsStructure<AddArticleCommentInput>) {
+  const { prisma, user } = ctx;
+  try {
+    await prisma.comment.create({
+      data: {
+        userId: user.userId,
+        content: input.content,
+        parent_comment_id: input.parentCommentId,
+        articleId: input.articleId,
       },
     });
 
@@ -114,6 +146,58 @@ export async function get_product_comments({
     const comments = await prisma.comment.findMany({
       where: {
         productId: input.productId,
+      },
+      include: {
+        User: {
+          select: {
+            name: true,
+            familyName: true,
+          },
+        },
+        likes: true,
+        parent_comment: {
+          select: {
+            id: true,
+          },
+        },
+        child_comments: {
+          include: {
+            User: {
+              select: {
+                name: true,
+                familyName: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return {
+      comments: generateCommentsTree(comments, undefined, user?.userId),
+    };
+  } catch (error) {
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "خطا در دریافت نظرات",
+    });
+  }
+}
+
+export const article_comments_schema = z.object({
+  articleId: z.number(),
+});
+type ArticleComments = z.infer<typeof article_comments_schema>;
+export async function get_article_comments({
+  ctx,
+  input,
+}: ArgsStructure<ArticleComments>) {
+  const { prisma, user } = ctx;
+  try {
+    const comments = await prisma.comment.findMany({
+      where: {
+        articleId: input.articleId,
+        status: "APPROVED",
       },
       include: {
         User: {

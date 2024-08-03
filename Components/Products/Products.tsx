@@ -66,7 +66,6 @@ export default function Products({ categoryId }: Props) {
   }, [filter]);
 
   useEffect(() => {
-
     if (data) {
       setFilter((state) => ({
         ...state,
@@ -76,7 +75,7 @@ export default function Products({ categoryId }: Props) {
   }, [data]);
 
   return (
-    <section className="flex sm:gap-0 gap-5 flex-col sm:flex-row w-full mt-4 sm:mt-10 sm:px-10 overflow-visible">
+    <section className="flex sm:gap-5 gap-5 flex-col sm:flex-row w-full mt-4 sm:mt-10 sm:px-10 overflow-visible">
       <Filter filter={filter} setFilter={setFilter} />
       <div className="flex flex-col h-full w-sm:basis-9/12">
         <div className="w-full min-h-[500px] flex flex-col gap-4 items-center ">
@@ -102,6 +101,7 @@ export default function Products({ categoryId }: Props) {
             </AnimatePresence>
           </div>
         </div>
+        <hr className="mt-5 border-[#ececec]" />
         <h1 className="text-[18px] text-[#888888] font-[500] mt-[50px] mb-[10px]">
           {data?.categoryInfo?.title}
         </h1>

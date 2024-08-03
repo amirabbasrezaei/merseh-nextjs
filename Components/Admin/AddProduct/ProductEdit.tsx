@@ -219,6 +219,7 @@ export default function ProductEdit({ productId }: Props) {
               productVariations: variations.length ? variations : [],
               productContent: content,
               details: productDetails,
+              metaDescription: metaDescription
             }).then((res) => console.log(res));
           }
         }

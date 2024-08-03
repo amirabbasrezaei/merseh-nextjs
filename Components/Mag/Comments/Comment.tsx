@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { Heart_Filled_SVG, Heart_SVG, Reply_SVG } from "../SVGS";
+import { Heart_Filled_SVG, Heart_SVG, Reply_SVG } from "../../SVGS";
 import { motion } from "framer-motion";
 import { AnimatePresence } from "framer-motion";
-import NewComment from "./NewComment";
 
 import { FinalComments } from "@/server/Controllers/comment.controller";
 import { trpc } from "@/utils/trpc";
+import NewComment from "./NewComment";
 type CommentProps = {
   content: string;
   likes: number;
   authorName: string;
   authorLastName: string;
-  productId: string;
+
   commentId: number;
   childComments: FinalComments[];
   isLiked: boolean;
-
+  articleId: number;
 };
 
 export default function Comment({
@@ -23,10 +23,10 @@ export default function Comment({
   authorName,
   authorLastName,
   likes,
-  productId,
   commentId,
   childComments,
-  isLiked
+  isLiked,
+  articleId,
 }: CommentProps) {
   const [showReply, setShowReply] = useState(false);
   const {
@@ -34,8 +34,8 @@ export default function Comment({
     data: editCommentData,
     isLoading,
   } = trpc.product.likeComment.useMutation();
-  const { refetch: refetchComments } = trpc.product.productComments.useQuery({
-    productId: Number(productId),
+  const { refetch: refetchComments } = trpc.article.comments.useQuery({
+    articleId: Number(articleId),
   });
 
   useEffect(() => {
@@ -91,8 +91,7 @@ export default function Comment({
               <NewComment
                 setShowReply={setShowReply}
                 parentCommentId={commentId}
-                productId={productId}
-
+                articleId={articleId}
               />
             </motion.div>
           )}
@@ -116,7 +115,7 @@ export default function Comment({
                     authorLastName={authorLastName || ""}
                     content={content}
                     likes={likes}
-                    productId={productId}
+                    articleId={articleId}
                     commentId={id}
                     childComments={child_comments}
                     isLiked={isLiked}

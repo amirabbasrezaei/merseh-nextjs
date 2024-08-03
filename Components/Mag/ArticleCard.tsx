@@ -22,12 +22,23 @@ export default function ArticleCard({
           ? process.env.BASE_URL
           : "http://localhost:3000"
       }/mag/${articleId}/${title.replaceAll(" ", "-")}`}
+      className="flex flex-row items-center gap-5 justify-between py-4"
     >
+      <div className="flex flex-col p-2 gap-1">
+        <h2 className="font-[600] text-[20px] text-black1 hover:text-inherit">
+          {title}
+        </h2>
+        <span className="text-[#5e5e5e]">{short_content}</span>
+      </div>
       <Image
-        width={200}
-        height={200}
+        className="w-[150px] h-[150px] rounded-md"
+        width={500}
+        height={500}
+        style={{ objectFit: "cover" }}
+        // fill={true}
         alt={imageUrl.split("/").at(-1) || ""}
         src={imageUrl}
+        quality={100}
       />
     </Link>
   );

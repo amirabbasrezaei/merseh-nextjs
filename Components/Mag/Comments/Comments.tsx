@@ -1,33 +1,34 @@
 import React, { useEffect, useState } from "react";
-import Button from "../Button";
+import Button from "../../Button";
 import { z } from "zod";
 import { trpc } from "@/utils/trpc";
 import Comment from "./Comment";
-type Props = {
-  productId: string;
 
+type Props = {
+  articleId: number;
   commentsRef: React.MutableRefObject<null>;
 };
 
-export default function Comments({ productId, commentsRef }: Props) {
+export default function Comments({ commentsRef, articleId }: Props) {
   const [commentInput, setCommentInput] = useState("");
 
   const {
     data: product_comments_data,
     isLoading: isCommentsLoading,
     refetch,
-  } = trpc.product.productComments.useQuery({
-    productId: Number(productId),
+  } = trpc.article.comments.useQuery({
+    articleId: Number(articleId),
   });
 
   const { data: addCommentData, mutate: mutateAddComment } =
-    trpc.product.addComment.useMutation();
+    trpc.article.addComment.useMutation();
 
   useEffect(() => {
     if (addCommentData?.status === "ok") {
       refetch();
     }
   }, [addCommentData]);
+
   return (
     <div ref={commentsRef} className="flex flex-col gap-5">
       <h3 className="text-[22px] font-[500] text-black1">دیدگاه ها</h3>
@@ -51,7 +52,7 @@ export default function Comments({ productId, commentsRef }: Props) {
                 content={content}
                 key={id}
                 likes={likes}
-                productId={productId}
+                articleId={articleId}
                 commentId={id}
                 childComments={child_comments}
                 isLiked={isLiked}
@@ -79,7 +80,7 @@ export default function Comments({ productId, commentsRef }: Props) {
           onClick={() =>
             mutateAddComment({
               content: commentInput,
-              productId: Number(productId),
+              articleId: Number(articleId),
             })
           }
           isDisabled={commentInput.length < 3 || commentInput.length > 150}

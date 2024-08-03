@@ -70,23 +70,7 @@ export async function generateMetadata({
     return {
       title: { absolute: " قیمت و خرید" + " " + product.product.name },
 
-      description:
-        "خرید اینترنتی" +
-        " " +
-        product.product.name +
-        `${
-          product.product?.variations?.length
-            ? " با " + product.product?.variations[0]?.variationName
-            : ""
-        }` +
-        ` ${
-          product.product?.variations.length
-            ? product.product?.variations[0]?.variations
-                .map((e: any) => e.name)
-                .join(", ")
-            : ""
-        } ` +
-        "به همراه مشخصات، خواص و قیمت امروز محصولات طبیعی و ارگانیک و عطاری در فروشگاه مرسه",
+      description: product.product.metaDescription,
       openGraph: {
         images: product.product.imageUrls.map((e: any) => ({
           url: e,

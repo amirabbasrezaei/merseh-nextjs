@@ -16,7 +16,7 @@ export default function Footer() {
       <hr className="w-full left-0 right-0 absolute top-0 " />
       <div className="w-full flex flex-col sm:flex-row ">
         <div className="basis-1/3 flex flex-col   h-full mt-5 sm:mt-0 justify-evenly items-start ">
-          <Merseh_nastaliq classname="w-20 h-auto mb-8" />
+          <Merseh_nastaliq classname="w-20 h-auto mb-8 fill-gray-800" />
           <span className="text-[20px] font-[500] text-[#515151] mb-5">
             ارتباط با ما
           </span>

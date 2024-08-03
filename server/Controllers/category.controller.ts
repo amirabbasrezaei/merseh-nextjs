@@ -2,6 +2,7 @@ import { z } from "zod";
 import { Context } from "../context";
 import { contentType } from "@/Components/Admin/AddProduct/QuillEditor";
 import { parentCategories } from "../utils/category";
+import { TRPCError } from "@trpc/server";
 
 export type ArgsStructure<T = null> = T extends null
   ? {
@@ -14,7 +15,7 @@ export type ArgsStructure<T = null> = T extends null
 
 export async function categoriesController({ ctx }: ArgsStructure) {
   const { prisma } = ctx;
-  
+
   let categories = await prisma.category.findMany();
   categories = categories.map((e) => ({
     ...e,
@@ -124,7 +125,6 @@ export async function createCategory({
     },
   });
 
-
   return newCategory;
 }
 
@@ -133,6 +133,7 @@ export const EditCategorySchema = z.object({
   englishName: z.string(),
   name: z.string(),
   content: z.string(),
+  metaDescription: z.string(),
 });
 type EditCategory = z.infer<typeof EditCategorySchema>;
 export async function editCategoryController({
@@ -149,6 +150,8 @@ export async function editCategoryController({
         content: input.content,
         englishTitle: input.englishName,
         title: input.name,
+        updated_at: new Date(Date.now()),
+        metaDescription: input.metaDescription,
       },
     });
     return { status: true, error: null, message: "تغییرات با موفقیت انجام شد" };
@@ -171,25 +174,31 @@ export async function categoryInfoController({
       where: {
         id: input.categoryId,
       },
-      select: { title: true, imageName: true },
+      select: { title: true, imageName: true, metaDescription: true },
     });
 
     return {
       category: {
         title: category?.title,
         imageUrl: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/category/${category?.imageName}`,
+        metaDescription: category?.metaDescription || "",
       },
     };
-  } catch (error) {}
+  } catch (error) {
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: JSON.stringify(error || "{}"),
+    });
+  }
 }
 
-export async function flatCategoriesController ({ctx:{prisma}}:ArgsStructure){
-try{
-  const categories = await prisma.category.findMany()
-  return categories
-}
-catch(error) {
-  console.log(error)
-}
-  
+export async function flatCategoriesController({
+  ctx: { prisma },
+}: ArgsStructure) {
+  try {
+    const categories = await prisma.category.findMany();
+    return categories;
+  } catch (error) {
+    console.log(error);
+  }
 }

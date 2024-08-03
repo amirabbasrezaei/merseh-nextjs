@@ -15,6 +15,7 @@ export interface ManageCategory extends filterTypeArgs {
 }
 
 export default function ManageCategory() {
+  const [metaDescription, setMetaDescription] = useState("");
   const [lastCategoryId, setLastCategoryId] = useState<number>();
   const [filter, setFilter] = useState<ManageCategory>({
     name: "",
@@ -74,6 +75,17 @@ export default function ManageCategory() {
             />
           </div>
         </div>
+        <div className="w-full flex flex-col gap-2">
+          <label>توضیحات متا</label>
+
+          <textarea
+            value={metaDescription}
+            onChange={(e) => {
+              setMetaDescription(e.target.value);
+            }}
+            className="bg-gray-50 appearance-none outline-none p-4"
+          />
+        </div>
         <QuillEditor
           initialFlag={filter.categoryId !== lastCategoryId ? false : true}
           content={filter.content}
@@ -92,6 +104,7 @@ export default function ManageCategory() {
               content: JSON.stringify(filter.content),
               englishName: filter.englishName || "",
               name: filter.name || "",
+              metaDescription: metaDescription,
             })
           }
           isLoading={isLoading}

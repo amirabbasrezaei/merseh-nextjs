@@ -120,6 +120,7 @@ export async function getProductController({
       englishName: product.engName,
       price: product.price || 0,
       details: product.details,
+      metaDescription: product.metaDescription,
       variations: product.ProductVariation.map((variation) => ({
         id: variation.id,
         variationName: variation.variateName,
@@ -147,7 +148,6 @@ export async function getProductController({
       discount: product.discount,
       category: product.category,
       mainCategoryId: product.mainCategoryId,
-      metaDescription: product.metaDescription,
     };
     return { product: result, message: "ok" };
   } catch (error) {
@@ -174,6 +174,7 @@ export const AddProductControllerArgSchema = z.object({
   productVariations: z.array(productVariation).optional(),
   productContent: z.array(content),
   details: z.array(z.string()),
+  metaDescription: z.string(),
 });
 
 type AddProductControllerArg = z.infer<typeof AddProductControllerArgSchema>;
@@ -274,6 +275,7 @@ export async function addProductController({
     const newproduct = await prisma.product.create({
       data: {
         imageNames: input.images.map((img) => img.name),
+        metaDescription: input.metaDescription,
         name: input.name,
         price: Number(input.price),
         engName: input.englishName,
@@ -384,7 +386,6 @@ type TorobScema = {
   old_price: string;
 };
 export async function forTorobProductController({ ctx }: ArgsStructure) {
-
   const { prisma } = ctx;
   try {
     const products = await prisma.product.findMany({

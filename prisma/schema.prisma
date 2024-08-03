@@ -45,14 +45,15 @@ model City {
 }
 
 model Article {
-  id         Int       @id @default(autoincrement())
-  images      String[]
-  title      String
-  created_at DateTime  @default(now())
-  updated_at DateTime?
-  comments   Comment[]
-  content    String
+  id              Int       @id @default(autoincrement())
+  images          String[]
+  title           String
+  created_at      DateTime  @default(now())
+  updated_at      DateTime?
+  comments        Comment[]
+  content         String
   metaDescription String?
+  isSuggested     Boolean?
 }
 
 model OrderShipping {
@@ -155,6 +156,8 @@ model Category {
   parentCategory   Category?  @relation("SubCategories", fields: [parentCategoryId], references: [id])
   subCategories    Category[] @relation("SubCategories")
   products         Product[]  @relation("CategoryToProduct")
+  updated_at       DateTime?  @default(now())
+  metaDescription  String     @default("")
 }
 
 model User {

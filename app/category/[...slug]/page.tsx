@@ -32,7 +32,6 @@ export async function generateMetadata({
 }: NextPagePropsType): Promise<Metadata> {
   const category = await getCategory(params.slug[0]);
   if (category?.category) {
-
     return {
       title: category.category.title,
       alternates: {
@@ -40,6 +39,7 @@ export async function generateMetadata({
           category.category.title as string
         )?.replaceAll(" ", "-")}`,
       },
+      description: category.category.metaDescription,
       openGraph: {
         images: category.category.imageUrl,
         type: "article",

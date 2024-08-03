@@ -1,15 +1,14 @@
 import { trpc } from "@/utils/trpc";
 import React, { useEffect, useState } from "react";
-import Button from "../Button";
-import { Send_SVG } from "../SVGS";
+import Button from "../../Button";
+import { Send_SVG } from "../../SVGS";
 
 export default function NewComment({
-  productId,
   parentCommentId,
   setShowReply,
+  articleId,
 }: {
-  productId: string;
-
+  articleId: number;
   parentCommentId: number;
   setShowReply: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
@@ -18,10 +17,10 @@ export default function NewComment({
     data: addCommentData,
     mutate: mutateAddComment,
     isLoading,
-  } = trpc.product.addComment.useMutation();
+  } = trpc.article.addComment.useMutation();
 
-  const { refetch: refetchComments } = trpc.product.productComments.useQuery({
-    productId: Number(productId),
+  const { refetch: refetchComments } = trpc.article.comments.useQuery({
+    articleId: Number(articleId),
   });
 
   useEffect(() => {
@@ -63,7 +62,7 @@ export default function NewComment({
           disabled={value !== null && (value.length < 3 || value.length > 150)}
           onClick={() =>
             mutateAddComment({
-              productId: Number(productId),
+              articleId: Number(articleId),
               content: value || "",
               parentCommentId: parentCommentId,
             })

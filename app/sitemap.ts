@@ -8,22 +8,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(Date.now()),
       changeFrequency: "hourly",
       priority: 1,
-    }
+    },
     //,
-//    {
-//      url: "https://merseh.com/category",
-//      lastModified: new Date(Date.now()),
-//      changeFrequency: "hourly",
-//      priority: 0.8,
- //   },
+    //    {
+    //      url: "https://merseh.com/category",
+    //      lastModified: new Date(Date.now()),
+    //      changeFrequency: "hourly",
+    //      priority: 0.8,
+    //   },
   ];
 
   try {
     const { data } = await axios.get(
       `${process.env.BASE_URL}/api/trpc/product.products`
     );
-    const {data:categoryData} = await axios.get(`${process.env.BASE_URL}/api/trpc/product.flatCategories`)
-    
+    const { data: categoryData } = await axios.get(
+      `${process.env.BASE_URL}/api/trpc/product.flatCategories`
+    );
+
     if (data.result.data?.products?.length) {
       const products = data.result.data.products.map((product: any) => ({
         url: `${
@@ -39,24 +41,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.9,
       }));
 
-      if(categoryData.result.data?.length){
+      if (categoryData.result.data?.length) {
         const categories = categoryData.result.data.map((category: any) => ({
-        url: `${
-          process.env.NODE_ENV === "production"
-            ? process.env.BASE_URL
-            : "http://localhost:3000"
-        }/category/${category.id}/${(category.title as string).replaceAll(
-          " ",
-          "-"
-        )}`,
-        lastModified: new Date(Date.now()),
-        changeFrequency: "daily",
-        priority: 0.9,
-      }));
+          url: `${
+            process.env.NODE_ENV === "production"
+              ? process.env.BASE_URL
+              : "http://localhost:3000"
+          }/category/${category.id}/${(category.title as string).replaceAll(
+            " ",
+            "-"
+          )}`,
+          lastModified: new Date(category.updated_at),
+          changeFrequency: "daily",
+          priority: 0.9,
+        }));
         return [...links, ...products, ...categories];
       }
 
-      
       return [...links, ...products];
     }
     return links;

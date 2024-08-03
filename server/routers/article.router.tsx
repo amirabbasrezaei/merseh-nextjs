@@ -6,8 +6,20 @@ import {
   editArticleInput,
   getArticleController,
   getArticleInput,
+  recentArticlesController,
 } from "../Controllers/article.controller";
-import { adminProtectedProcedure, publicProcedure, router } from "../trpc";
+import {
+  add_article_comment_controller,
+  add_article_comment_schema,
+  article_comments_schema,
+  get_article_comments,
+} from "../Controllers/comment.controller";
+import {
+  adminProtectedProcedure,
+  publicProcedure,
+  router,
+  userProtectedProcedure,
+} from "../trpc";
 
 export const articleRouter = router({
   createArticle: adminProtectedProcedure
@@ -20,4 +32,11 @@ export const articleRouter = router({
     .input(getArticleInput)
     .query(getArticleController),
   articles: publicProcedure.query(articlesController),
+  recentArticles: publicProcedure.query(recentArticlesController),
+  comments: publicProcedure
+    .input(article_comments_schema)
+    .query(get_article_comments),
+  addComment: userProtectedProcedure
+    .input(add_article_comment_schema)
+    .mutation(add_article_comment_controller),
 });

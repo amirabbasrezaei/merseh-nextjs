@@ -1,7 +1,8 @@
-import Articles from "@/Components/Article/Articles";
-import Layout from "@/Components/Layout/Layout";
+
 import { Metadata } from "next";
 import React from "react";
+import MagLayout from "@/Components/Layout/MagLayout";
+import Mag from "@/Components/Mag/Mag";
 
 export const metadata: Metadata = {
   title: { absolute: "مجله مرسه" },
@@ -20,8 +21,8 @@ export const metadata: Metadata = {
 
 export default function page() {
   return (
-    <Layout>
-      <Articles />
-    </Layout>
+    <MagLayout>
+      <Mag />
+    </MagLayout>
   );
 }

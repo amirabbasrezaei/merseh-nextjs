@@ -9,8 +9,8 @@ import {
   flatCategoriesController
 } from "../Controllers/category.controller";
 import {
-  add_comment_controller,
-  add_comment_schema,
+  add_proudct_comment_controller,
+  add_product_comment_schema,
   editCommentController,
   editCommentSchema,
   get_product_comments,
@@ -64,8 +64,8 @@ flatCategories: publicProcedure.query(flatCategoriesController),
     .input(editProductInputSchema)
     .mutation(editProductController),
   addComment: userProtectedProcedure
-    .input(add_comment_schema)
-    .mutation(add_comment_controller),
+    .input(add_product_comment_schema)
+    .mutation(add_proudct_comment_controller),
   productComments: publicProcedure
     .input(product_comments_schema)
     .query(get_product_comments),
