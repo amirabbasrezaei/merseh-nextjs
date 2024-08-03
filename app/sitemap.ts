@@ -18,6 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     //   },
   ];
 
+  
   try {
     const { data } = await axios.get(
       `${process.env.BASE_URL}/api/trpc/product.products`
