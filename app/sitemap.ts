@@ -51,7 +51,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             " ",
             "-"
           )}`,
-          lastModified: new Date(category.updated_at),
+          lastModified: new Date(category.updated_at || Date.now()),
           changeFrequency: "daily",
           priority: 0.9,
         }));
