@@ -75,10 +75,19 @@ export default function Products({ categoryId }: Props) {
   }, [data]);
 
   return (
-    <section className="flex sm:gap-5 gap-5 flex-col sm:flex-row w-full mt-4 sm:mt-10 sm:px-10 overflow-visible">
+    <section className="flex sm:gap-14 gap-5 flex-col sm:flex-row w-full mt-4 sm:px-10 overflow-visible">
       <Filter filter={filter} setFilter={setFilter} />
       <div className="flex flex-col h-full w-sm:basis-9/12">
-        <div className="w-full min-h-[500px] flex flex-col gap-4 items-center ">
+        <div className="h-fit mb-5 flex items-center jus w-full">
+          {data?.categoryInfo?.title ? (
+            <h1 className="text-[18px] text-gray-500 font-[500]  mb-[10px] ">
+              قیمت و خرید {data.categoryInfo.title}
+            </h1>
+          ) : (
+            <div />
+          )}
+        </div>
+        <div className="w-full min-h-[800px] flex flex-col gap-4 items-center ">
           <div className="sm:grid grid-cols-4 flex flex-col gap-4 w-full ">
             <AnimatePresence mode="sync">
               {data?.products?.length && !isLoading
@@ -101,10 +110,8 @@ export default function Products({ categoryId }: Props) {
             </AnimatePresence>
           </div>
         </div>
-        <hr className="mt-5 border-[#ececec]" />
-        <h1 className="text-[18px] text-[#888888] font-[500] mt-[50px] mb-[10px]">
-          {data?.categoryInfo?.title}
-        </h1>
+        <hr className="mt-5 border-[#ececec] mb-10" />
+
         <div className="[&_h2]:text-[17px] text-[13px] [&_ul]:list-disc [&_ul]:list-inside [&_a]:text-[#7ba79a]  text-[#a8a8a8] [&_h2]:text-[#7f7f7f]   leading-loose [&_h3]:text-[#969696] [&_h3]:text-[15px] flex flex-col">
           <ContentViewer contentForView={data?.categoryInfo?.content} />
         </div>

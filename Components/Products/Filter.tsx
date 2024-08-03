@@ -52,17 +52,17 @@ export default function Filter({ setFilter, filter }: Props) {
   );
 
   return (
-    <div className="relative">
+    <div className="relative ">
       <div
         onClick={() => setShowFilter(true)}
-        className="flex sm:hidden flex-row items-center gap-1 bg-gray-50 rounded-[10px] w-fit px-3 py-2"
+        className="flex  sm:hidden flex-row items-center gap-1 bg-gray-50 rounded-[10px] w-fit px-3 py-2"
       >
         <Filter_Svg classname="w-5 stroke-black1 " />
         <span className="text-[12px] text-black1">فیلتر</span>
       </div>
-      <div className="sm:basis-3/12 flex-col gap-10 w-full hidden sm:flex">
-        <div className="  h-[40px] px-5 items-center justify-right w-[80%] flex flex-row bg-[#F6F6F6]  rounded-[10px]">
-          <Magnifier classname="w-[18px] " />
+      <div className="sm:basis-3/12 border border-gray-100 p-5 rounded-lg flex-col gap-10 w-full hidden sm:flex">
+        <div className="  h-[40px] px-5 items-center justify-right w-full flex flex-row bg-[#F6F6F6]  rounded-[10px]">
+          <Magnifier classname="w-[18px] fill-gray-500" />
           <input
             value={filter.searchTerm}
             onChange={(e) => {
@@ -72,7 +72,7 @@ export default function Filter({ setFilter, filter }: Props) {
               );
             }}
             type="text"
-            placeholder="جستجو در میان محصولات زیر"
+            placeholder="جستجو"
             className="bg-transparent  h-full placeholder:text-[13px] w-full text-black1 placeholder:text-[#8b8b8b]  pr-2  appearance-none outline-none"
           />
         </div>
