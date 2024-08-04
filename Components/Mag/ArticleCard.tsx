@@ -9,6 +9,7 @@ interface Props {
   articleId: number;
 }
 
+
 export default function ArticleCard({
   imageUrl,
   short_content,
