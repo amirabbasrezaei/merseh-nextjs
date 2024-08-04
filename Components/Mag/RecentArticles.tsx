@@ -9,7 +9,7 @@ export default function RecentArticles() {
   const { data } = trpc.article.recentArticles.useQuery();
   console.log(data?.suggestedArticels);
   return (
-    <div className="w-full h-full flex flex-row  gap-10 ">
+    <div className="w-full h-full flex flex-col sm:flex-row  gap-10 ">
       {/* choosen articles */}
       <div className="basis-1/2 h-full w-full flex flex-col   gap-3">
         <div className="flex flex-row items-center   mb-4 gap-2 ">
