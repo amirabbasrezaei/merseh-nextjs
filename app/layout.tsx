@@ -25,6 +25,7 @@ export const metadata: Metadata = {
   robots: { follow: true, index: true },
   openGraph: {
     locale: "fa_IR",
+    siteName: "مرسه"
   },
   other: {
     currency: "IRT",
