@@ -15,7 +15,7 @@ export default function Header() {
       </div>
       <div className="flex items-center justify-between gap-10 sm:basis-11/12  w-full h-full ">
         <div className="flex flex-row h-full gap-10 items-center md:justify-evenly sm:flex-row-reverse w-full">
-          <div className="md:grow h-full items-center">
+          <div className="md:grow ">
 
           <MagHeaderSearch />
           </div>
