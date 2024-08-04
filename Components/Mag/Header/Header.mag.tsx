@@ -5,6 +5,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 import UserAuth from "../../UserAuth";
 import Link from "next/link";
 import MagHeaderSearch from "./HeaderSearch.mag";
+import HeaderCategory from "@/Components/Header/HeaderCategory/HeaderCategory";
 
 export default function Header() {
   return (
@@ -13,8 +14,12 @@ export default function Header() {
         <UserAuth />
       </div>
       <div className="flex items-center justify-between gap-10 sm:basis-11/12  w-full h-full ">
-        <div className="flex flex-row h-full gap-10 items-center justify-around sm:flex-row-reverse w-full">
+        <div className="flex flex-row h-full gap-10 items-center md:justify-evenly sm:flex-row-reverse w-full">
+          <div className="md:grow h-full items-center">
+
           <MagHeaderSearch />
+          </div>
+          <HeaderCategory />
           <Link href={"/"} className="h-full flex items-center ">
             <span className="text-[15px] font-[500] text-[#4d4d4d]">
               فروشگاه مرسه
