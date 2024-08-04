@@ -563,3 +563,14 @@ export async function editProductController({
     },
   });
 }
+
+export async function products_for_sitemap({ ctx: { prisma } }: ArgsStructure) {
+  try {
+    const products = await prisma.product.findMany({
+      select: { id: true, name: true, updatedAt: true },
+    });
+    return products;
+  } catch (error) {
+    console.log(error);
+  }
+}

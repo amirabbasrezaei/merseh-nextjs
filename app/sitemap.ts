@@ -26,8 +26,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       `${process.env.BASE_URL}/api/trpc/article.sitemapArticle`
     );
 
-    if (data.result.data?.products?.length) {
-      const products = data.result.data.products.map((product: any) => ({
+    if (data.result.data?.length) {
+      const products = data.result.data.map((product: any) => ({
         url: `${
           process.env.NODE_ENV === "production"
             ? process.env.BASE_URL

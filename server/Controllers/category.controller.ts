@@ -196,7 +196,9 @@ export async function flatCategoriesController({
   ctx: { prisma },
 }: ArgsStructure) {
   try {
-    const categories = await prisma.category.findMany();
+    const categories = await prisma.category.findMany({
+      select: { id: true, title: true, updated_at: true },
+    });
     return categories;
   } catch (error) {
     console.log(error);
