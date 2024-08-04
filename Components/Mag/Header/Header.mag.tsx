@@ -23,9 +23,8 @@ export default function Header() {
           className="basis-1/12 flex-none flex  flex-row gap-2 items-center justify-center"
           href={"/mag"}
         >
-          <Mag_Typography_SVG classname="w-[47px] h-auto fill-[#363636] mt-[7px] ml-1" />
-          <Merseh_typography classname="sm:h-[25px] h-[20px] fill-[#363636]" />
-          <MersehSvg classname="h-[25px] w-auto" />
+          <Mag_Typography_SVG classname="w-[150px] h-auto fill-[#363636]  " />
+          {/* <MersehSvg classname="h-[25px] w-auto" /> */}
         </Link>
       </div>
     </header>
