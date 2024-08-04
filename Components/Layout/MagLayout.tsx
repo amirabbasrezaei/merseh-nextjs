@@ -24,12 +24,12 @@ export default function MagLayout({
     <Suspense fallback={<Loading />}>
       <motion.main
         style={{ direction: "ltr" }}
-        className={`justify-center items-center   flex  bg-white w-screen overflow-x-hidden  sm:mb-0 mb-[100px]  h-screen`}
+        className={`justify-center items-center   flex  bg-white w-screen overflow-x-hidden  md:mb-0 mb-[100px]  h-screen`}
       >
         <div
           style={{ direction: "rtl" }}
           className={classNames(
-            "max-w-[1600px]    gap-16 sm:w-full flex-col  items-center flex overflow-y-visible bg-white h-full ",
+            "max-w-[1600px]    gap-16 md:w-full flex-col  items-center flex overflow-y-visible bg-white h-full ",
             fullWidth ? "w-full" : "w-[90%]"
           )}
         >

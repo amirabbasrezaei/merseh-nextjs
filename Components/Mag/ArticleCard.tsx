@@ -19,7 +19,7 @@ export default function ArticleCard({
   return (
     <Link
       href={`/mag/${articleId}/${title.replaceAll(" ", "-")}`}
-      className="flex flex-row items-center gap-5 justify-between py-4"
+      className="flex flex-col-reverse md:flex-row items-center gap-5 justify-between py-4"
     >
       <div className="flex flex-col p-2 gap-1">
         <h2 className="font-[600] text-[20px] text-black1 hover:text-inherit">
@@ -28,7 +28,7 @@ export default function ArticleCard({
         <span className="text-[#5e5e5e]">{short_content}</span>
       </div>
       <Image
-        className="w-[150px] h-[150px] rounded-md"
+        className="md:w-[150px] md:h-[150px] w-full h-auto rounded-md"
         width={500}
         height={500}
         style={{ objectFit: "cover" }}

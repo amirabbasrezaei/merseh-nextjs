@@ -13,10 +13,10 @@ export default function Article({ articleId }: Props) {
   const commentsRef = useRef(null);
   const { data } = trpc.article.getArticle.useQuery({ articleId });
   return (
-    <section className="flex flex-col gap-10 w-full  px-5">
+    <section className="flex flex-col md:gap-10 gap-5 w-full  md:px-5">
       <div className="w-full flex items-center justify-center">
-        <div className="flex flex-row justify-center  h-full items-end ">
-          <div className="basis-1/3 h-full flex flex-col gap-4 justify-center items-center pb-14">
+        <div className="flex flex-col-reverse md:flex-row justify-center  h-full items-end gap-5">
+          <div className="basis-1/3 h-full flex flex-col gap-4 justify-center items-center md:pb-14">
             <h1 className="text-[25px] font-[600]">{data?.article?.title}</h1>
             <span className="text-[#8c8c8c] text-[13px]">
               {new Date(data?.article?.created_at || 0).toLocaleDateString(
@@ -24,7 +24,7 @@ export default function Article({ articleId }: Props) {
               )}
             </span>
           </div>
-          <div className="basis-2/3">
+          <div className="">
             <Image
               alt={data?.article?.title || ""}
               src={data?.article?.imageUrls[0] || ""}
@@ -38,7 +38,7 @@ export default function Article({ articleId }: Props) {
       </div>
 
       <div className="w-full flex justify-center">
-        <div className="w-[80%] max-w-[1000px] flex flex-col gap-10">
+        <div className="md:w-[80%] w-full max-w-[1000px] flex flex-col gap-10">
           <Content contentForView={data?.article?.content} />
           <Comments commentsRef={commentsRef} articleId={articleId} />
         </div>
