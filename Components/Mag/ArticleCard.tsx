@@ -17,11 +17,7 @@ export default function ArticleCard({
 }: Props) {
   return (
     <Link
-      href={`${
-        process.env.NODE_ENV === "production"
-          ? process.env.BASE_URL
-          : "http://localhost:3000"
-      }/mag/${articleId}/${title.replaceAll(" ", "-")}`}
+      href={`/mag/${articleId}/${title.replaceAll(" ", "-")}`}
       className="flex flex-row items-center gap-5 justify-between py-4"
     >
       <div className="flex flex-col p-2 gap-1">
