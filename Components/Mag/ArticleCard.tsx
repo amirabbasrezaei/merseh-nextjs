@@ -29,13 +29,13 @@ export default function ArticleCard({
       </div>
       <Image
         className="md:w-[150px] md:h-[150px] w-full h-auto rounded-md"
-        width={500}
-        height={500}
+        width={150}
+        height={150}
         style={{ objectFit: "cover" }}
         // fill={true}
         alt={imageUrl.split("/").at(-1) || ""}
         src={imageUrl}
-        quality={100}
+        quality={80}
       />
     </Link>
   );

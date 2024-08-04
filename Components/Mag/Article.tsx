@@ -29,8 +29,8 @@ export default function Article({ articleId }: Props) {
               alt={data?.article?.title || ""}
               src={data?.article?.imageUrls[0] || ""}
               width={700}
-              height={700}
-              quality={100}
+              height={450}
+              quality={80}
               className="rounded-lg"
             />
           </div>
