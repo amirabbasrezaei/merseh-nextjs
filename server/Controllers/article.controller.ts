@@ -300,3 +300,15 @@ export async function recentArticlesController({
     return { recentArticles: null, suggestedArticels: null, message: null };
   }
 }
+
+export async function article_for_sitemap({ ctx: { prisma } }: ArgsStructure) {
+  try {
+    const articles = await prisma.article.findMany({
+      select: { id: true, title: true, updated_at: true },
+    });
+
+    return { articles, message: null };
+  } catch (error) {
+    return { articles: null, message: JSON.stringify(error || "{}") };
+  }
+}

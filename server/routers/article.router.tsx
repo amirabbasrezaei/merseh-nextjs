@@ -1,4 +1,5 @@
 import {
+  article_for_sitemap,
   articlesController,
   createArticleController,
   createArticleInput,
@@ -39,4 +40,5 @@ export const articleRouter = router({
   addComment: userProtectedProcedure
     .input(add_article_comment_schema)
     .mutation(add_article_comment_controller),
+  sitemapArticle: publicProcedure.query(article_for_sitemap),
 });

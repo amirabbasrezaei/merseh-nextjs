@@ -5,26 +5,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const links: MetadataRoute.Sitemap = [
     {
       url: "https://merseh.com",
-      lastModified: new Date(Date.now()),
+      changeFrequency: "daily",
+      priority: 1,
+    },
+    {
+      url: "https://merseh.com/mag",
       changeFrequency: "hourly",
       priority: 1,
     },
-    //,
-    //    {
-    //      url: "https://merseh.com/category",
-    //      lastModified: new Date(Date.now()),
-    //      changeFrequency: "hourly",
-    //      priority: 0.8,
-    //   },
   ];
 
-  
   try {
     const { data } = await axios.get(
       `${process.env.BASE_URL}/api/trpc/product.products`
     );
     const { data: categoryData } = await axios.get(
       `${process.env.BASE_URL}/api/trpc/product.flatCategories`
+    );
+    const { data: articleData } = await axios.get(
+      `${process.env.BASE_URL}/api/trpc/article.sitemapArticle`
     );
 
     if (data.result.data?.products?.length) {
@@ -42,25 +41,40 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.9,
       }));
 
-      if (categoryData.result.data?.length) {
-        const categories = categoryData.result.data.map((category: any) => ({
-          url: `${
-            process.env.NODE_ENV === "production"
-              ? process.env.BASE_URL
-              : "http://localhost:3000"
-          }/category/${category.id}/${(category.title as string).replaceAll(
-            " ",
-            "-"
-          )}`,
-          lastModified: new Date(category.updated_at || Date.now()),
-          changeFrequency: "daily",
-          priority: 0.9,
-        }));
-        return [...links, ...products, ...categories];
-      }
-
-      return [...links, ...products];
+      links.push(...products);
     }
+
+    if (categoryData.result.data?.length) {
+      const categories = categoryData.result.data.map((category: any) => ({
+        url: `${
+          process.env.NODE_ENV === "production"
+            ? process.env.BASE_URL
+            : "http://localhost:3000"
+        }/category/${category.id}/${(category.title as string).replaceAll(
+          " ",
+          "-"
+        )}`,
+        lastModified: new Date(category.updated_at || Date.now()),
+        changeFrequency: "daily",
+        priority: 0.9,
+      }));
+      links.push(...categories);
+    }
+
+    if (articleData.result.data?.articles?.length) {
+      const articles = articleData.result.data.articles.map((article: any) => ({
+        url: `${
+          process.env.NODE_ENV === "production"
+            ? process.env.BASE_URL
+            : "http://localhost:3000"
+        }/mag/${article.id}/${(article.title as string).replaceAll(" ", "-")}`,
+        lastModified: new Date(article.updated_at || Date.now()),
+        changeFrequency: "daily",
+        priority: 0.9,
+      }));
+      links.push(...articles);
+    }
+
     return links;
   } catch (error) {
     console.log(error);
