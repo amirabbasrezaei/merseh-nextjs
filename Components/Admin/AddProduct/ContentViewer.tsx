@@ -73,7 +73,7 @@ export default function Content({ contentForView }: Props) {
   return (
     <article
       className={classNames(
-        "[&_h2]:text-[25px] [&_ul]:list-disc [&_h2]:font-[500] [&_h3]:font-[500] [&_a]:text-[#7ba79a] [&_ul]:list-inside  text-[#797979] [&_h2]:text-[#3e3e3e]   leading-loose [&_h3]:text-[#3e3e3e] [&_h3]:text-[21px] flex flex-col md:text-[18px]",
+        "[&_h2]:text-[25px] [&_ul]:list-disc [&_ol]:list-decimal [&_h2]:font-[500] [&_h3]:font-[500] [&_a]:text-[#7ba79a] [&_ul]:list-inside [&_ol]:list-inside  text-[#797979] [&_h2]:text-[#3e3e3e]   leading-loose [&_h3]:text-[#3e3e3e] [&_h3]:text-[21px] flex flex-col md:text-[18px]",
         IRANSansXFaNum.className
       )}
     >
