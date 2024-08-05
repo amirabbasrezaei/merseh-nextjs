@@ -7,6 +7,7 @@ import Main_Categories from "./Main_Categories";
 import ProductCarousel from "./ProductCarousel";
 
 import ProductsGrid from "./ProductsGrid";
+import MersehMag from "./MersehMag";
 
 export default function Home() {
   return (
@@ -24,6 +25,7 @@ export default function Home() {
         title="محصولات جدید"
         sliderStartDelay={5000}
       />
+      <MersehMag />
     </div>
   );
 }
