@@ -146,6 +146,7 @@ export async function get_product_comments({
     const comments = await prisma.comment.findMany({
       where: {
         productId: input.productId,
+        status: "APPROVED"
       },
       include: {
         User: {
