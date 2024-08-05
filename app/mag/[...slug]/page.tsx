@@ -6,6 +6,7 @@ import axios from "axios";
 import { Metadata } from "next";
 import { redirect } from "next/dist/server/api-utils";
 
+export const revalidate = 3600;
 
 export type NextPagePropsType = {
   params: { slug: string };
