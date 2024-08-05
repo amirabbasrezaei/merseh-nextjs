@@ -51,6 +51,7 @@ export default function Footer() {
             href="https://trustseal.enamad.ir/?id=491421&Code=nWLgfgtO1aZxbPr2nb6vB7LIjve7BrXw"
           >
             <Image
+              aria-label="enamad"
               referrerPolicy="origin"
               src="https://trustseal.enamad.ir/logo.aspx?id=491421&Code=nWLgfgtO1aZxbPr2nb6vB7LIjve7BrXw"
               alt=""
@@ -63,10 +64,16 @@ export default function Footer() {
         </div>
       </div>
       <div className="h-fit flex flex-row items-center gap-8">
-        <Link href={"https://www.instagram.com/mersehcom"}>
+        <Link
+          aria-label="merseh.com instagram page"
+          href={"https://www.instagram.com/mersehcom"}
+        >
           <Instagram_SVG classname="w-6" />
         </Link>
-        <Link href={"https://t.me/mersehcom"}>
+        <Link
+          aria-label="merseh.com telegram channel"
+          href={"https://t.me/mersehcom"}
+        >
           <Telegram_SVG classname="w-6" />
         </Link>
       </div>

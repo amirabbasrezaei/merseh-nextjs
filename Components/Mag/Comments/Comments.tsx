@@ -31,7 +31,7 @@ export default function Comments({ commentsRef, articleId }: Props) {
 
   return (
     <div ref={commentsRef} className="flex flex-col gap-5">
-      <h3 className="text-[22px] font-[500] text-black1">دیدگاه ها</h3>
+      <label htmlFor="mainNewComment" className="text-[22px] font-[500] text-black1">دیدگاه ها</label>
       {isCommentsLoading ? (
         <div></div>
       ) : product_comments_data?.comments?.length ? (
@@ -72,6 +72,7 @@ export default function Comments({ commentsRef, articleId }: Props) {
         className="w-full flex flex-col gap-5"
       >
         <textarea
+        id="mainNewComment"
           value={commentInput}
           onChange={(e) => setCommentInput(e.target.value)}
           className="appearance-none p-4 w-full sm:w-[500px] h-[100px] outline-none rounded-[10px] border border-[#ECECEC] bg-[#F9F9F9] "
