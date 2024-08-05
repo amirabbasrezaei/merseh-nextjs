@@ -7,24 +7,24 @@ export default function MersehMag() {
   const { data } = trpc.article.recentArticles.useQuery();
   return (
     <div className="w-full mt-10 mb-16 md:my-10 flex flex-col items-center justify-between gap-14 relative md:h-[550px] h-fit">
-      <Link
-        href={"/mag"}
-        aria-label="مجله مرسه"
-        className="flex flex-row gap-1 items-center z-10 h-fit"
-      >
-        <svg
-          width="11"
-          height="22"
-          viewBox="0 0 11 22"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <ellipse cx="5.5" cy="11" rx="5.5" ry="11" fill="#00A573" />
-        </svg>
-        <span className="text-[#4a4a4a] font-[800] text-[22px]">مجله مرسه</span>
+      <Link href={"/mag"} aria-label="مجله مرسه" className="h-fit">
+        <div className="flex flex-row gap-1 items-center z-10 py-6 justify-center h-fit">
+          <svg
+            width="11"
+            height="22"
+            viewBox="0 0 11 22"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <ellipse cx="5.5" cy="11" rx="5.5" ry="11" fill="#00A573" />
+          </svg>
+          <span className="text-[#4a4a4a] font-[800] text-[22px]">
+            مجله مرسه
+          </span>
+        </div>
       </Link>
       <div className="grid md:grid-cols-2 md:grid-rows-2 grid-cols-1 w-full h-full z-10 gap-5  relative">
-        <div className="absolute md:rotate-0 md:right-0 md:-bottom-16 rotate-[40deg] w-[1300px] bottom-[150px] -right-[350px] md:w-full md:h-auto  h-auto">
+        <div className="absolute md:rotate-0 md:right-0 md:-bottom-16 rotate-[40deg] w-[1300px] bottom-[150px] -right-[350px] md:w-full md:h-auto  h-auto hidden lg:block">
           <svg
             className="w-full "
             viewBox="0 0 1398 615"
@@ -41,7 +41,7 @@ export default function MersehMag() {
           data.recentArticles.map((article) => (
             <Link
               href={`/mag/${article.id}/${article.title.replaceAll(" ", "-")}`}
-              className="w-full flex-row p-4 justify-between shadow-md bg-white bg-opacity-80 h-full backdrop-blur-lg rounded-[34px] items-center flex  z-10 "
+              className="w-full flex-row p-4 justify-between shadow-lg md:shadow-md bg-white bg-opacity-80 h-full backdrop-blur-lg rounded-[34px] items-center flex  z-10 "
             >
               <h2 className="font-[600] text-[#303030] text-[23px]">
                 {article.title}
