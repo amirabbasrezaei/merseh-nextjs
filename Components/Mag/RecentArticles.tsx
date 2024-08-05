@@ -27,13 +27,14 @@ export default function RecentArticles() {
               }
               title={data.suggestedArticels[0].title}
               image_src={data.suggestedArticels[0].images[0]}
+              createDate={data.suggestedArticels[0]?.created_at}
             />
           </div>
         ) : (
           <div className="bg-slate-100 w-full h-[400px]   rounded-sm" />
         )}
 
-        <div className="h-[200px] flex flex-row gap-3 w-full text-[20px] text-white font-[600]">
+        <div className="h-[200px] flex flex-row gap-3 w-full text-[17px] text-white font-[600]">
           {data?.suggestedArticels?.at(1) ? (
             <div className="basis-1/2 h-full bg-slate-100 rounded-sm">
               <SuggestedArticleCard
@@ -45,6 +46,7 @@ export default function RecentArticles() {
                 }
                 title={data.suggestedArticels[1].title}
                 image_src={data.suggestedArticels[1].images[0]}
+                createDate={data.suggestedArticels[1]?.created_at}
               />
             </div>
           ) : (
@@ -76,7 +78,7 @@ export default function RecentArticles() {
         </div>
         <div className="grid grid-cols-1 divide-y divide-gray-300 divide-opacity-35 ">
           {data?.recentArticles?.length
-            ? data.recentArticles.map((article: any) => (
+            ? data.recentArticles.map((article) => (
                 <ArticleCard
                   short_content={
                     (
