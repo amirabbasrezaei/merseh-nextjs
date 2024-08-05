@@ -20,13 +20,14 @@ export default function Header() {
           <MagHeaderSearch />
           </div>
           <HeaderCategory />
-          <Link href={"/"} className="h-full flex items-center ">
+          <Link aria-label="مرسه" href={"/"} className="h-full flex items-center ">
             <span className="text-[15px] font-[500] text-[#4d4d4d]">
               فروشگاه مرسه
             </span>
           </Link>
         </div>
         <Link
+        aria-label="مجله مرسه"
           className="basis-1/12 flex-none flex  flex-row gap-2 items-center justify-center"
           href={"/mag"}
         >
