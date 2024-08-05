@@ -38,7 +38,8 @@ export default function Article({ articleId }: Props) {
 
           <div className="sm:h-[320px]  rounded-lg bg-gray-100 md:w-[700px] md:h-[450px] w-full h-[250px] relative">
             <Image
-              sizes="(max-width: 500px) 80vw, (max-width: 700px) 50vw, (max-width: 900px) 33vw"
+              priority={true}
+              sizes="(max-width: 320px) 90vw, (max-width: 1200px) 50vw, 33vw"
               alt={data?.article?.title || ""}
               src={data?.article?.imageUrls[0] || placeholder}
               fill
