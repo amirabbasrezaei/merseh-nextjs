@@ -14,21 +14,26 @@ export const metadata: Metadata = {
   title: {
     default: "فروشگاه مرسه",
     template: "%s  -  فروشگاه مرسه",
+
   },
   description: "خرید محصولات کاملا طبیعی و ارگانیک در مرسه",
   alternates: {
     canonical: `${process.env.BASE_URL}`,
+  
   },
   metadataBase: new URL("https://merseh.com"),
   robots: { follow: true, index: true },
   openGraph: {
     locale: "fa_IR",
     siteName: "مرسه",
+    type: "website",
   },
   other: {
     currency: "IRT",
     lang: "fa",
+    "theme-color": "#00A573"
   },
+  
 };
 
 export default function RootLayout({
