@@ -63,6 +63,7 @@ export default function RecentArticles() {
                 }
                 title={data.suggestedArticels[2].title}
                 image_src={data.suggestedArticels[2].images[0]}
+                createDate={data.suggestedArticels[2]?.created_at}
               />
             </div>
           ) : (
