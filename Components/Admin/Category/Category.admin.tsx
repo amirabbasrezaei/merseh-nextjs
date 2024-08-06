@@ -41,7 +41,8 @@ export default function Category({ setFilter, filter }: Props) {
                     categoryId: cat.id,
                     englishName: cat.englishTitle,
                     name: cat.title,
-                    content: cat.content
+                    content: cat.content,
+                    metaDescription: cat.metaDescription
                   });
                   setShowCategory((state) => !state);
                 }}

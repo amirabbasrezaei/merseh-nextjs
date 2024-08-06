@@ -69,7 +69,8 @@ export default function GetCategories({
               parentCategories: catId,
               englishName: cat.englishTitle,
               name: cat.title,
-              content: cat.content || ""
+              content: cat.content || "",
+              metaDescription: cat.metaDescription,
             }));
           }}
           style={{ cursor: "pointer" }} // it doesn't work with taiwlind

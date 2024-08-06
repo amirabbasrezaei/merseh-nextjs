@@ -12,14 +12,15 @@ export interface ManageCategory extends filterTypeArgs {
   name?: string;
   englishName?: string;
   content?: any;
+  metaDescription?: string;
 }
 
 export default function ManageCategory() {
-  const [metaDescription, setMetaDescription] = useState("");
   const [lastCategoryId, setLastCategoryId] = useState<number>();
   const [filter, setFilter] = useState<ManageCategory>({
     name: "",
     englishName: "",
+    metaDescription: "",
     content: [],
   });
 
@@ -79,9 +80,12 @@ export default function ManageCategory() {
           <label>توضیحات متا</label>
 
           <textarea
-            value={metaDescription}
+            value={filter.metaDescription}
             onChange={(e) => {
-              setMetaDescription(e.target.value);
+              setFilter((state) => ({
+                ...state,
+                metaDescription: e.target.value,
+              }));
             }}
             className="bg-gray-50 appearance-none outline-none p-4"
           />
@@ -104,7 +108,7 @@ export default function ManageCategory() {
               content: JSON.stringify(filter.content),
               englishName: filter.englishName || "",
               name: filter.name || "",
-              metaDescription: metaDescription,
+              metaDescription: filter.metaDescription || "",
             })
           }
           isLoading={isLoading}

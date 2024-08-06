@@ -30,6 +30,7 @@ export async function categoriesController({ ctx }: ArgsStructure) {
     imageUrl: string;
     englishTitle: string;
     content: contentType[];
+    metaDescription: string;
   }
 
   interface categoryFinalType extends categoryRawType {

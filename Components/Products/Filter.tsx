@@ -26,6 +26,7 @@ export interface categoryType {
   insertedIntoParent?: boolean | undefined;
   englishTitle: string;
   content: any;
+  metaDescription:string;
 }
 [];
 
