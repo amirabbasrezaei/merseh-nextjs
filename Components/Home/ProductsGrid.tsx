@@ -87,14 +87,26 @@ export default function ProductsGrid({ title, categoryId }: props) {
 
   return (
     <section className="w-full sm:p-4 flex flex-col items-center gap-5 ">
-      <span className="text-[18px] text-black1 font-normal w-full ">{title}</span>
+      <div className="flex flex-row gap-1 items-center justify-center ">
+        <svg
+          className="w-[9px] h-auto"
+          viewBox="0 0 11 22"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <ellipse cx="5.5" cy="11" rx="5.5" ry="11" fill="#00A573" />
+        </svg>
+        <span className="text-[18px] font-[600] text-gray-600  w-full ">
+          {title}
+        </span>
+      </div>
       <Swiper
         onSwiper={swiperRef}
         spaceBetween={20}
         style={width > 639 ? { paddingRight: 20, paddingLeft: 20 } : {}}
-        slidesPerView={width > 1023 ? 3 :  width > 767 ? 2 : 1}
+        slidesPerView={width > 1023 ? 3 : width > 767 ? 2 : 1}
         direction="horizontal"
-        className="w-full h-full sm:border border-[#f3f3f3] rounded-[5px]"
+        className="w-full h-full  border-[#f3f3f3] rounded-[5px]"
         autoplay={{ delay: 5000, disableOnInteraction: false }}
         modules={[Autoplay]}
       >
@@ -114,6 +126,7 @@ export default function ProductsGrid({ title, categoryId }: props) {
                             staggerChildren: 0.3,
                           },
                           opacity: 1,
+                    
                         },
                         close: { opacity: 0 },
                       }}
@@ -135,13 +148,13 @@ export default function ProductsGrid({ title, categoryId }: props) {
                                 transition: { duration: 0.2 },
                                 opacity: 1,
                               },
-                              close: { y: 20, opacity: 0 },
+                              close: { y: 35, opacity: 0 },
                             }}
                             className=" pl-3 py-2 rounded-[5px] flex flex-row items-center justify-between gap-2"
                           >
                             <div className="flex flex-row items-center gap-2">
                               <Image
-                              className="w-[100px] h-[100px] md:w-[110px] xl:w-[180px] lg:h-auto"
+                                className="w-[100px] h-[100px] md:w-[110px] xl:w-[180px] lg:h-auto"
                                 width={180}
                                 height={180}
                                 quality={100}
@@ -149,7 +162,7 @@ export default function ProductsGrid({ title, categoryId }: props) {
                                 src={`${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${product.imageNames[0]}`}
                               />
                               <div className="flex flex-col items-start justify-center gap-1">
-                                <h3 className="font-[400] basis-2/4 text-[14px] md:text-[13px] lg:text-[12px] text-nowrap xl:text-[14px]  text-black1 w-fit">
+                                <h3 className="font-[500] basis-2/4 text-[14px] md:text-[13px] lg:text-[12px] text-nowrap xl:text-[14px]  text-black1 w-fit">
                                   {product.name}
                                 </h3>
                                 {product?.ProductVariation?.length ? (

@@ -18,6 +18,10 @@ export const IRANYekanXFaNum = localFont({
       weight: "500",
     },
     {
+      path: "../public/fonts/Iranyekan_x_pro/Woff2/IRANYekanXFaNum-DemiBold.woff2",
+      weight: "600",
+    },
+    {
       path: "../public/fonts/Iranyekan_x_pro/Woff2/IRANYekanXFaNum-Bold.woff2",
       weight: "bold",
     },

@@ -1,10 +1,33 @@
 import { trpc } from "@/utils/trpc";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
-
+import React, { useEffect, useState } from "react";
+import { useAnimation, motion, AnimationProps } from "framer-motion";
+import { useInView } from "react-intersection-observer";
 export default function MersehMag() {
   const { data } = trpc.article.recentArticles.useQuery();
+  const [ref, inView] = useInView();
+  const controls = useAnimation();
+  const animationVariants: AnimationProps["variants"] = {
+    hidden: {
+      translateY: 200,
+      translateX: 200,
+      transition: { duration: 0.3 },
+      opacity:0
+    },
+    active: {
+      translateY: 0,
+      translateX: 0,
+      transition: { duration: 0.3, type: "spring", bounce: 3, damping:10 },
+      opacity:1
+    },
+  };
+  useEffect(() => {
+    if (inView) {
+      controls.start("active");
+    }
+  }, [inView]);
+
   return (
     <div className="w-full mt-10 mb-16 md:my-10 flex flex-col items-center justify-between gap-14 relative md:h-[550px] h-fit">
       <Link href={"/mag"} aria-label="مجله مرسه" className="h-fit">
@@ -23,8 +46,14 @@ export default function MersehMag() {
           </span>
         </div>
       </Link>
-      <div className="grid md:grid-cols-2 md:grid-rows-2 grid-cols-1 w-full h-full z-10 gap-5  relative">
-        <div className="absolute md:rotate-0 md:right-0 md:-bottom-16 rotate-[40deg] w-[1300px] bottom-[150px] -right-[350px] md:w-full md:h-auto  h-auto hidden lg:block">
+      <motion.div className="grid md:grid-cols-2 md:grid-rows-2 grid-cols-1 w-full h-full z-10 gap-5  relative">
+        <motion.div
+          ref={ref}
+          variants={animationVariants}
+          initial={"hidden"}
+          animate={controls}
+          className="absolute md:rotate-0 md:right-0 md:-bottom-16 rotate-[40deg] w-[1300px] bottom-[150px] -right-[350px] md:w-full md:h-auto  h-auto hidden lg:block"
+        >
           <svg
             className="w-full "
             viewBox="0 0 1398 615"
@@ -36,7 +65,7 @@ export default function MersehMag() {
               fill="#00A573"
             />
           </svg>
-        </div>
+        </motion.div>
         {data?.recentArticles?.length ? (
           data.recentArticles.map((article) => (
             <Link
@@ -59,7 +88,7 @@ export default function MersehMag() {
         ) : (
           <div></div>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }

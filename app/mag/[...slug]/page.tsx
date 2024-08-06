@@ -47,9 +47,7 @@ export async function generateMetadata({
         description: article.article.metaDescription,
         locale: "fa_IR",
         title: article.article.title,
-        
         publishedTime: article.article.created_at,
-
         phoneNumbers: "+982191694827",
       },
       other: {

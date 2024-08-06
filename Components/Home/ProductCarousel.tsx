@@ -62,10 +62,20 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
     trpc.product.productCarousel.useQuery();
 
   return (
-    <section className="w-full  flex flex-col items-center gap-5 ">
-      <span className="text-[18px] w-full text-black1 font-normal">
-        {title}
-      </span>
+    <section className="w-full  flex flex-col items-center gap-10 ">
+      <div className="flex flex-row gap-1 items-center justify-center ">
+        <svg
+          className="w-[9px] h-auto"
+          viewBox="0 0 11 22"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <ellipse cx="5.5" cy="11" rx="5.5" ry="11" fill="#00A573" />
+        </svg>
+        <span className="text-[18px] font-[600] text-gray-600  w-full ">
+          {title}
+        </span>
+      </div>
       <Swiper
         onSwiper={swiperRef}
         spaceBetween={10}
@@ -119,7 +129,7 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
                             blurDataURL="data:image/webp;base64,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"
                           />
                         ) : null}
-                        <h3 className="font-[400] basis-2/4 text-[14px] sm:text-[14px] text-black1 w-fit">
+                        <h3 className="font-[500] basis-2/4 text-[14px] sm:text-[14px] text-black1 w-fit">
                           {product.name}
                         </h3>
                       </div>
