@@ -47,9 +47,9 @@ export async function generateMetadata({
         description: article.article.metaDescription,
         locale: "fa_IR",
         title: article.article.title,
-        authors: "مرسه",
+        
         publishedTime: article.article.created_at,
-        siteName: "مرسه",
+
         phoneNumbers: "+982191694827",
       },
       other: {

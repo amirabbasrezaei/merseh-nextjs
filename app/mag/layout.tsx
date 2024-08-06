@@ -17,7 +17,8 @@ export const metadata: Metadata = {
   openGraph: {
     locale: "fa_IR",
     siteName: "مجله مرسه",
-    type: "article"
+    type: "article",
+    authors: "مجله مرسه",
   },
   other: {
     currency: "IRT",
