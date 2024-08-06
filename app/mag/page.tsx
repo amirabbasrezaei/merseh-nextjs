@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     locale: "fa_IR",
     type: "article",
+    url: `${process.env.BASE_URL}/mag`
   },
 };
 
