@@ -56,21 +56,21 @@ export default function Checkout() {
                         width={160}
                         height={160}
                         src={prOrder.imageUrl || ""}
-                        className="w-[50px] sm:w-[100px]"
+                        className="w-[50px] sm:w-[100px] md:w-[160px]"
                       />
                       <div className="flex flex-row gap-2 items-center">
-                        <span className="text-[#323232] text-[12px]">
+                        <span className="text-[#323232] text-[12px] md:text-[17px]">
                           {prOrder.name}
                         </span>
                         {prOrder.variationValueName?.length ? (
-                          <span className="text-[10px] sm:text-[14px] text-[#616161] font-[500]">
+                          <span className="text-[10px] sm:text-[14px] md:text-[17px] text-[#616161] font-[500]">
                             {`- ${prOrder.variationValueName} `}
                           </span>
                         ) : null}
                       </div>
                     </Link>
                   </td>
-                  <td className="text-center text-[12px] text-[#444444]">
+                  <td className="text-center text-[12px] md:text-[17px] text-[#444444]">
                     {splitNumber(prOrder.price)}
                   </td>
                   <td className="text-center ">
@@ -107,7 +107,7 @@ export default function Checkout() {
                       </div>
                     </div>
                   </td>
-                  <td className="text-center text-[12px] text-[#444444]">
+                  <td className="text-center text-[12px] md:text-[17px] text-[#444444]">
                     {splitNumber(prOrder.price * prOrder.numberOfProduct)}
                   </td>
                 </tr>
