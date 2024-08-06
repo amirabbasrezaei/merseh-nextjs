@@ -144,12 +144,12 @@ export default function ProductsGrid({ title, categoryId }: props) {
                           <motion.div
                             variants={{
                               open: {
-                                y: 0,
+                               
                                 transition: { duration: 0.3 },
                                 opacity: 1,
                                 scale:1
                               },
-                              close: { y: 35, opacity: 0, scale:0.5 },
+                              close: {  opacity: 0, scale:0.5 },
                             }}
                             className=" pl-3 py-2 rounded-[5px] flex flex-row items-center justify-between gap-2"
                           >
