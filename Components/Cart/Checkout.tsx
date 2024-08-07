@@ -74,7 +74,7 @@ export default function Checkout() {
                     {splitNumber(prOrder.price)}
                   </td>
                   <td className="text-center ">
-                    <div className="text-center flex flex-row items-center justify-center gap-2 sm:gap-6">
+                    <div className="text-center  flex flex-row items-center justify-center gap-2 sm:gap-6">
                       <div
                         onClick={() => {
                           incrementProductNumber(
