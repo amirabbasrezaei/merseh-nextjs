@@ -25,6 +25,7 @@ export default function Header({ isMag }: Props) {
         <Link
           className="basis-1/12 flex-none flex  flex-row gap-2 items-center"
           href={"/"}
+          aria-label="merseh"
         >
           <Merseh_typography classname="sm:h-[25px] h-[20px] fill-[#363636]" />
           <MersehSvg classname="h-[26px] w-auto" />

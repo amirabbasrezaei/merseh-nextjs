@@ -78,7 +78,7 @@ export default function MersehMag() {
               <Image
                 className="w-[180px] h-[180px] rounded-[34px]"
                 style={{ objectFit: "cover" }}
-                alt={article.title}
+                alt={article.images[0]?.split('/')?.at(-1)?.split(".")?.at(0) || ""}
                 src={article.images[0]}
                 width={300}
                 height={300}
