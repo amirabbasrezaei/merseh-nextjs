@@ -11,7 +11,7 @@ export default function Main_Categories() {
       <div className="flex flex-row visible sm:hidden justify-between max-w-full">
         <span className="text-[18px]  font-[500] text-black1 ">دسته‌بندی</span>
         <Link href={"/mcategory"}>
-          <span className="text-[#00A573]">سایر دسته‌بندی‌ها</span>
+          <span className="text-[#006645]">سایر دسته‌بندی‌ها</span>
         </Link>
       </div>
 
