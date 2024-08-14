@@ -42,14 +42,14 @@ export async function createPaymentControllerZibal({
         OrderShipping: true,
       },
     });
-    console.log(findOrder?.OrderShipping?.price);
+    
     const body = {
       merchant: process.env.ZIBAL_MERCHANT_CODE as string,
       amount:
         (findOrder?.finalPrice || 0) * 10 +
         (findOrder?.OrderShipping?.price || 0) * 10,
       callbackUrl:
-        process.env.NODE_ENV === "production"
+        process.env.NODE_ENV === "production" 
           ? "https://merseh.com/payment"
           : "http://localhost:3000/payment",
       mobile: user.phoneNumber,
@@ -60,7 +60,8 @@ export async function createPaymentControllerZibal({
     };
 
     const { data } = await axios.post(`${BASE_URL}/v1/request`, body);
-
+    console.log(body);
+    console.log(data);
     if (data) {
       try {
         const updatedPayment = await ctx.prisma.payment.create({
