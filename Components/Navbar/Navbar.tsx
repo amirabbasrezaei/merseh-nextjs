@@ -50,7 +50,7 @@ export default function Navbar() {
             path === "/" ||
               path.includes("products") ||
               path.includes("product")
-              ? " text-green1"
+              ? " text-[#006645]"
               : " text-[#363636]",
             "text-[10px]"
           )}

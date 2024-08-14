@@ -30,7 +30,7 @@ export async function generateMetadata({
   const article = await getArticle(params.slug[0]);
   if (article?.article) {
     return {
-      title: article.article.title,
+      title: {absolute:article.article.title},
       alternates: {
         canonical: `${process.env.BASE_URL}/mag/${params.slug[0]}/${(
           article.article.title as string
