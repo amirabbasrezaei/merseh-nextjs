@@ -6,7 +6,7 @@ import {
   createCategory,
   createCategorySchema,
   editCategoryController,
-  flatCategoriesController
+  flatCategoriesController,
 } from "../Controllers/category.controller";
 import {
   add_proudct_comment_controller,
@@ -30,6 +30,7 @@ import {
   productCarouselController,
   productCartInfoController,
   productsController,
+  short_info_products_controller,
 } from "../Controllers/product.controller";
 import {
   adminProtectedProcedure,
@@ -43,7 +44,7 @@ export const productRouter = router({
     .input(getProductInputSchema)
     .query(getProductController),
   categories: publicProcedure.query(categoriesController),
-flatCategories: publicProcedure.query(flatCategoriesController),
+  flatCategories: publicProcedure.query(flatCategoriesController),
   addProduct: adminProtectedProcedure
     .input(AddProductControllerArgSchema)
     .mutation(addProductController),
@@ -78,4 +79,5 @@ flatCategories: publicProcedure.query(flatCategoriesController),
   categoryInfo: publicProcedure
     .input(categoryInfoSchema)
     .query(categoryInfoController),
+  shortInfoProducts: publicProcedure.query(short_info_products_controller),
 });
