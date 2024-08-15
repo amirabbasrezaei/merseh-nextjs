@@ -146,7 +146,7 @@ export async function get_product_comments({
     const comments = await prisma.comment.findMany({
       where: {
         productId: input.productId,
-        status: "APPROVED"
+        status: "APPROVED",
       },
       include: {
         User: {
@@ -311,4 +311,20 @@ export async function likeCommentController({
     });
     return { message: "liked" };
   } catch (error) {}
+}
+
+export async function comments_controller({ ctx: { prisma } }: ArgsStructure) {
+  try {
+    const comments = await prisma.comment.findMany({
+      include: {
+        User: true,
+        Product: { select: { name: true, id: true } },
+        Article: { select: { title: true, id: true } },
+      },
+    });
+    return { comments, error: null };
+  } catch (error) {
+    console.log(error);
+    return { comments: null, error };
+  }
 }

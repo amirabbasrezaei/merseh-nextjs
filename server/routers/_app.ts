@@ -1,5 +1,6 @@
 import { publicProcedure, router } from "../trpc";
 import { articleRouter } from "./article.router";
+import { commentRouter } from "./comment.router";
 import { filterRouter } from "./filter.router";
 import { orderRouter } from "./order.router";
 import { paymentRouter } from "./payment.router";
@@ -15,6 +16,7 @@ export const appRouter = router({
   shipping: shippingRouter,
   filter: filterRouter,
   article: articleRouter,
+  comment:commentRouter
 });
 // export type definition of API
 export type AppRouter = typeof appRouter;

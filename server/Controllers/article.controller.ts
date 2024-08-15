@@ -304,7 +304,7 @@ export async function recentArticlesController({
 export async function article_for_sitemap({ ctx: { prisma } }: ArgsStructure) {
   try {
     const articles = await prisma.article.findMany({
-      select: { id: true, title: true, updated_at: true },
+      select: { id: true, title: true, updated_at: true, comments: true },
     });
 
     return { articles, message: null };
