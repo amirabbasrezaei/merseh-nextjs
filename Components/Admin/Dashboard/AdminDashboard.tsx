@@ -1,12 +1,13 @@
-"use client"
+"use client";
 import Link from "next/link";
 import React from "react";
+import Products from "./Products";
 
 interface Props {
   route?: string;
 }
 export default function AdminDashboard({ route }: Props) {
-    console.log(route)
+  console.log(route);
   return (
     <section className="flex flex-row w-full p-10 ">
       <div className="bg-gray-100  p-5 w-[200px] rounded-lg flex flex-col items-center ">
@@ -22,6 +23,7 @@ export default function AdminDashboard({ route }: Props) {
           </Link>
         </div>
       </div>
+      <div>{route === "products" ? <Products /> : null}</div>
     </section>
   );
 }

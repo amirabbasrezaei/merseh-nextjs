@@ -1,4 +1,5 @@
-import AdminDashboard from "@/Components/Admin/AdminDashboard";
+
+import AdminDashboard from "@/Components/Admin/Dashboard/AdminDashboard";
 import Layout from "@/Components/Layout/Layout";
 import React from "react";
 
