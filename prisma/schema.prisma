@@ -26,6 +26,7 @@ model Address {
   Order              Order[]
 }
 
+
 model Province {
   id      Int       @id @default(autoincrement())
   name    String
