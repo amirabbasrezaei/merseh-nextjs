@@ -175,7 +175,13 @@ export async function categoryInfoController({
       where: {
         id: input.categoryId,
       },
-      select: { title: true, imageName: true, metaDescription: true },
+      select: {
+        title: true,
+        imageName: true,
+        metaDescription: true,
+        content: true,
+        englishTitle: true,
+      },
     });
 
     return {
@@ -183,6 +189,11 @@ export async function categoryInfoController({
         title: category?.title,
         imageUrl: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/category/${category?.imageName}`,
         metaDescription: category?.metaDescription || "",
+        englishTitle: category?.englishTitle,
+        content: category?.content,
+        parent_categories: await parentCategories({
+          categoryId: input.categoryId,
+        }),
       },
     };
   } catch (error) {

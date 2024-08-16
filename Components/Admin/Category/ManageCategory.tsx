@@ -15,7 +15,11 @@ export interface ManageCategory extends filterTypeArgs {
   metaDescription?: string;
 }
 
-export default function ManageCategory() {
+interface Props {
+  categoryId?: string;
+}
+
+export default function ManageCategory({ categoryId }: Props) {
   const [lastCategoryId, setLastCategoryId] = useState<number>();
   const [filter, setFilter] = useState<ManageCategory>({
     name: "",
@@ -23,12 +27,27 @@ export default function ManageCategory() {
     metaDescription: "",
     content: [],
   });
+  const { isLoading, mutate, data } = trpc.product.editCategory.useMutation();
+  const { data: categoryData } = trpc.product.categoryInfo.useQuery({
+    categoryId: Number(categoryId),
+  });
 
   useEffect(() => {
     setLastCategoryId(filter.categoryId);
   }, [filter.categoryId]);
 
-  const { isLoading, mutate, data } = trpc.product.editCategory.useMutation();
+  useEffect(() => {
+    if (categoryData?.category) {
+      setFilter({
+        categoryId: Number(categoryId),
+        content: categoryData.category.content,
+        name: categoryData.category.title,
+        metaDescription: categoryData.category.metaDescription,
+        englishName: categoryData.category.englishTitle,
+        parentCategories: categoryData.category.parent_categories,
+      });
+    }
+  }, []);
 
   return (
     <section className="flex flex-row items-center h-full w-full px-10 justify-evenly">
