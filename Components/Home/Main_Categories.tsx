@@ -24,7 +24,7 @@ export default function Main_Categories() {
           }}
           initial={"close"}
           animate={"open"}
-          className="sm:h-fit h-fit flex flex-row items-center sm:justify-evenly gap-6 sm:gap-3 overflow-x-scroll"
+          className="sm:h-auto h-fit flex flex-row  items-start sm:justify-evenly gap-6 sm:gap-3 overflow-x-scroll"
           style={{ scrollbarWidth: "none" }}
         >
           {data[0].subCategories.map((category, index) => (
@@ -34,6 +34,7 @@ export default function Main_Categories() {
                 " ",
                 "-"
               )}`}
+              className="w-full h-full"
             >
               <motion.div
                 variants={{
@@ -47,10 +48,11 @@ export default function Main_Categories() {
                     transition: { duration: 0.2 },
                   },
                 }}
-                className="flex w-full h-full flex-col items-center  max-w-none gap-3"
+                className="flex  w-full h-full flex-col items-center   gap-3"
               >
+
                 <Image
-                  className="lg:w-[150px] lg:h-[150px] md:w-[125px] md:h-[125px]   w-[110px]  h-[110px] max-w-none rounded-[30px] lg:rounded-[50px] md:rounded-[40px] "
+                  className="sm:w-full sm:h-full   w-[130px]  h-[130px] max-w-none  rounded-[30px] lg:rounded-[50px] md:rounded-[40px] "
                   src={category.imageUrl}
                   alt={category.imageUrl.split("/").at(-1) || ""}
                   quality={100}
@@ -58,7 +60,7 @@ export default function Main_Categories() {
                   height={200}
                   style={{ objectFit: "contain" }}
                 />
-                <h2 className="text-[14px] sm:text-[18px] text-[#4A4A4A] font-[400] text-nowrap">
+                <h2 className="text-[14px] md:text-[16x] lg:text-[14px] xl:text-[18px] text-[#4A4A4A] font-[400] ">
                   {category.title}
                 </h2>
               </motion.div>
