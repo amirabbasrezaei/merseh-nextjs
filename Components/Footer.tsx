@@ -67,6 +67,13 @@ export default function Footer() {
             >
               <h2 className="text-black1">روغن زیتون بی بو</h2>
             </Link>
+            <Link
+              href={
+                "https://merseh.com/mag"
+              }
+            >
+              <h2 className="text-black1">مجله مرسه</h2>
+            </Link>
           </div>
         </div>
         <div className="basis-1/3 flex flex-col items-center justify-center">
