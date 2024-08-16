@@ -13,13 +13,12 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 export const metadata: Metadata = {
   title: {
     default: "فروشگاه مرسه",
-    template: "%s  -  فروشگاه مرسه",
-
+    template: "%s  - مرسه",
   },
-  description: "خرید محصولات کاملا طبیعی و ارگانیک در مرسه",
+  description:
+    "مرسه تولید کننده انواع محصولات طبیعی شامل روغنهای گیاهی مانند روغن زیتون، روغن کنجد، روغن آفتابگردان، روغن سیاه دانه، کره گیاهی، ارده و ... می‌باشد.",
   alternates: {
     canonical: `${process.env.BASE_URL}`,
-  
   },
   metadataBase: new URL("https://merseh.com"),
   robots: { follow: true, index: true },
@@ -31,9 +30,8 @@ export const metadata: Metadata = {
   other: {
     currency: "IRT",
     lang: "fa",
-    "theme-color": "#00A573"
+    "theme-color": "#00A573",
   },
-  
 };
 
 export default function RootLayout({

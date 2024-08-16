@@ -33,7 +33,7 @@ export async function generateMetadata({
   const category = await getCategory(params.slug[0]);
   if (category?.category) {
     return {
-      title: {absolute:category.category.title},
+      title: { absolute: `قیمت و خرید ${category.category.title}` },
       alternates: {
         canonical: `${process.env.BASE_URL}/category/${params.slug[0]}/${(
           category.category.title as string
