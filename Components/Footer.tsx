@@ -43,7 +43,7 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        <div className="basis-1/3 flex flex-col items-center gap-3">
+        <div className="basis-1/3 flex flex-col items-center justify-center gap-3">
           <div className="flex flex-col gap-2">
             <span className="font-bold text-black1 ">لینک های کاربردی</span>
             <Link
