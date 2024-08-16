@@ -28,7 +28,7 @@ export default function ManageCategory({ categoryId }: Props) {
     content: [],
   });
   const { isLoading, mutate, data } = trpc.product.editCategory.useMutation();
-  const { data: categoryData } = trpc.product.categoryInfo.useQuery({
+  const { data: categoryData, error } = trpc.product.categoryInfo.useQuery({
     categoryId: Number(categoryId),
   });
 
@@ -37,17 +37,23 @@ export default function ManageCategory({ categoryId }: Props) {
   }, [filter.categoryId]);
 
   useEffect(() => {
+    console.log(error)
+    console.log(categoryData)
     if (categoryData?.category) {
       setFilter({
         categoryId: Number(categoryId),
-        content: categoryData.category.content,
+        content: JSON.parse(categoryData.category.content || ""),
         name: categoryData.category.title,
         metaDescription: categoryData.category.metaDescription,
         englishName: categoryData.category.englishTitle,
         parentCategories: categoryData.category.parent_categories,
       });
     }
-  }, []);
+  }, [categoryData]);
+
+  useEffect(() => {
+    console.log(filter);
+  }, [filter]);
 
   return (
     <section className="flex flex-row items-center h-full w-full px-10 justify-evenly">
