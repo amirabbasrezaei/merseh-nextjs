@@ -1,12 +1,15 @@
-import ArticleEdit from '@/Components/Admin/Article/ArticleEdit';
-import React from 'react'
+import ArticleEdit from "@/Components/Admin/Article/ArticleEdit";
+import Layout from "@/Components/Layout/Layout";
+import React from "react";
 
 interface Props {
-    params: { slug: string };
-  }
+  params: { slug: string };
+}
 
-export default function page({params}: Props) {
+export default function page({ params }: Props) {
   return (
-    <ArticleEdit articleId={params.slug} />
-  )
+    <Layout footer={false} header={false}>
+      <ArticleEdit articleId={params.slug} />
+    </Layout>
+  );
 }
