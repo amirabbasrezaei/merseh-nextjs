@@ -43,7 +43,32 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        <div className="basis-1/3 flex flex-col"></div>
+        <div className="basis-1/3 flex flex-col items-center gap-3">
+          <div className="flex flex-col gap-2">
+            <span className="font-bold text-black1 ">لینک های کاربردی</span>
+            <Link
+              href={
+                "https://merseh.com/category/4/%D8%B1%D9%88%D8%BA%D9%86-%D8%B2%DB%8C%D8%AA%D9%88%D9%86"
+              }
+            >
+              <h2 className="text-black1">قیمت روغن زیتون</h2>
+            </Link>
+            <Link
+              href={
+                "https://merseh.com/product/2/%D8%B1%D9%88%D8%BA%D9%86-%D8%B2%DB%8C%D8%AA%D9%88%D9%86-%D8%A8%D8%A7%D8%A8%D9%88"
+              }
+            >
+              <h2 className="text-black1">روغن زیتون اصل 1 لیتری</h2>
+            </Link>
+            <Link
+              href={
+                "https://merseh.com/product/3/%D8%B1%D9%88%D8%BA%D9%86-%D8%B2%DB%8C%D8%AA%D9%88%D9%86-%D8%A8%DB%8C-%D8%A8%D9%88"
+              }
+            >
+              <h2 className="text-black1">روغن زیتون بی بو</h2>
+            </Link>
+          </div>
+        </div>
         <div className="basis-1/3 flex flex-col items-center justify-center">
           <Link
             referrerPolicy="origin"

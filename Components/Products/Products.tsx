@@ -81,7 +81,7 @@ export default function Products({ categoryId }: Props) {
         <div className="h-fit mb-5 flex items-center jus w-full">
           {data?.categoryInfo?.title ? (
             <h1 className="text-[18px] text-gray-500 font-[500]  mb-[10px] ">
-              قیمت و خرید {data.categoryInfo.title}
+              قیمت {data.categoryInfo.title}
             </h1>
           ) : (
             <div />
