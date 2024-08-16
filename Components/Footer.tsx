@@ -44,9 +44,20 @@ export default function Footer() {
           </div>
         </div>
         <div className="basis-1/3 flex flex-col"></div>
-        <div className="basis-1/3 flex flex-col">
-          
-<Link referrerPolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=491421&Code=nWLgfgtO1aZxbPr2nb6vB7LIjve7BrXw'><img   alt="" referrerPolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=491421&Code=nWLgfgtO1aZxbPr2nb6vB7LIjve7BrXw' {...{"code":"nWLgfgtO1aZxbPr2nb6vB7LIjve7BrXw"}} style={{cursor:"pointer"}}  /></Link>
+        <div className="basis-1/3 flex flex-col items-center justify-center">
+          <Link
+            referrerPolicy="origin"
+            target="_blank"
+            href="https://trustseal.enamad.ir/?id=491421&Code=nWLgfgtO1aZxbPr2nb6vB7LIjve7BrXw"
+          >
+            <img
+              alt=""
+              referrerPolicy="origin"
+              src="https://trustseal.enamad.ir/logo.aspx?id=491421&Code=nWLgfgtO1aZxbPr2nb6vB7LIjve7BrXw"
+              {...{ code: "nWLgfgtO1aZxbPr2nb6vB7LIjve7BrXw" }}
+              style={{ cursor: "pointer" }}
+            />
+          </Link>
         </div>
       </div>
       <div className="h-fit flex flex-row items-center gap-8">
