@@ -103,7 +103,7 @@ export default function Products({ categoryId }: Props) {
         </div>
         <div className="w-full min-h-[800px] flex flex-col gap-4 items-center ">
           <div className="sm:grid grid-cols-4 flex flex-col gap-4 w-full ">
-            <AnimatePresence mode="sync">
+        
               {data?.products?.length && !isLoading
                 ? data.products.map((pr: any, index: number) => (
                     <ProductCard
@@ -118,10 +118,13 @@ export default function Products({ categoryId }: Props) {
                       isLoading={true}
                     />
                   ))
-                : Array.from(Array(4)).map((_, i) => (
+                : null}
+              {isLoading
+                ? Array.from(Array(2)).map((_, i) => (
                     <ProductCardSkeleton key={i} />
-                  ))}
-            </AnimatePresence>
+                  ))
+                : null}
+          
           </div>
         </div>
         <hr className="mt-5 border-[#ececec] mb-10" />

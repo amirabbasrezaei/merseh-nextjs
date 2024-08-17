@@ -7,8 +7,9 @@ import RecoilRootProvider from "@/Components/StateManager/RecoilRootProvider";
 import { cookies } from "next/headers";
 import ThemeController from "@/Components/ThemeController";
 import { Toaster } from "react-hot-toast";
-import { GoogleTagManager } from "@next/third-parties/google";
-import { GoogleAnalytics } from "@next/third-parties/google";
+import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google";
+
+import dynamic from "next/dynamic";
 
 export const metadata: Metadata = {
   title: {
@@ -33,6 +34,8 @@ export const metadata: Metadata = {
     "theme-color": "#00A573",
   },
 };
+
+
 
 export default function RootLayout({
   children,

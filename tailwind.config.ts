@@ -25,6 +25,8 @@ const config: Config = {
       },
       fontFamily: {
         yekanbakh: ["YekanBakh"],
+        iranyekan: ["IRANYekanXFaNum"],
+        iransansx: ["IRANSansXFaNum"],
       },
     },
   },
