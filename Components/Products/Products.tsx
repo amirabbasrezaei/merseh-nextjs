@@ -1,12 +1,10 @@
 "use client";
 import { trpc } from "@/utils/trpc";
-
 import React, { useEffect, useState } from "react";
 import Filter from "./Filter";
 import { motion } from "framer-motion";
-import { AnimatePresence } from "framer-motion";
+
 import { useSearchParams } from "next/navigation";
-import { contentType } from "../Admin/AddProduct/QuillEditor";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 

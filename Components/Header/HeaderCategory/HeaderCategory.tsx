@@ -1,11 +1,21 @@
 "use client";
 import { trpc } from "@/utils/trpc";
 import React, { useState } from "react";
-import CategoryItem from "./CategoryItem";
-import CategoryContext from "./CategoryContext";
-import { Bars, Chevron_Down } from "@/Components/SVGS";
+
+import { Bars } from "@/Components/SVGS";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+
+const CategoryContext = dynamic(() => import("./CategoryContext"), {
+  ssr: false,
+});
+
+const CategoryItem = dynamic(() => import("./CategoryItem"), {
+  ssr: false,
+});
+
+
 export default function HeaderCategory() {
   const { data } = trpc.product.categories.useQuery();
   const [selectedCategoryIndex, setSelectedCategoryIndex] = useState<number>(0);
@@ -52,7 +62,7 @@ export default function HeaderCategory() {
           </span>
         </Link>
         <motion.div
-        initial={false}
+          initial={false}
           transition={{ bounce: 0.3, duration: 0.7, type: "spring" }}
           animate={showCategories ? "open" : "hidden"}
           variants={animation}
