@@ -68,7 +68,7 @@ export default function Main_Categories() {
           ))}
         </motion.div>
       ) : (
-        <div className="flex flex-row justify-between">
+        <div className="flex flex-row justify-between gap-6 sm:gap-3">
           {Array.from(Array(7)).map((e, index) => (
             <div
               key={index}
