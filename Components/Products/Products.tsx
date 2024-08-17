@@ -46,7 +46,7 @@ export default function Products({ categoryId }: Props) {
   });
   const params = useSearchParams();
   const router = useRouter();
-  const [content, setContent] = useState<contentType[]>([]);
+
 
   const {
     mutate: mutate,
@@ -102,7 +102,7 @@ export default function Products({ categoryId }: Props) {
           )}
         </div>
         <div className="w-full min-h-[800px] flex flex-col gap-4 items-center ">
-          <div className="sm:grid grid-cols-4 flex flex-col gap-4 w-full ">
+          <div className="sm:grid lg:grid-cols-3 xl:grid-cols-4 flex flex-col gap-4 w-full ">
         
               {data?.products?.length && !isLoading
                 ? data.products.map((pr: any, index: number) => (
@@ -118,13 +118,9 @@ export default function Products({ categoryId }: Props) {
                       isLoading={true}
                     />
                   ))
-                : null}
-              {isLoading
-                ? Array.from(Array(2)).map((_, i) => (
-                    <ProductCardSkeleton key={i} />
-                  ))
-                : null}
-          
+                : Array.from(Array(8)).map((_, i) => (
+                  <ProductCardSkeleton key={i} />
+                ))}
           </div>
         </div>
         <hr className="mt-5 border-[#ececec] mb-10" />
