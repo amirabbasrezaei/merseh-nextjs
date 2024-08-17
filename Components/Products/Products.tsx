@@ -102,7 +102,7 @@ export default function Products({ categoryId }: Props) {
           )}
         </div>
         <div className="w-full min-h-[800px] flex flex-col gap-4 items-center ">
-          <div className="sm:grid lg:grid-cols-3 xl:grid-cols-4 flex flex-col gap-4 w-full ">
+          <div className="sm:grid lg:grid-cols-3  flex flex-col gap-4 w-full ">
         
               {data?.products?.length && !isLoading
                 ? data.products.map((pr: any, index: number) => (
