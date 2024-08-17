@@ -39,6 +39,7 @@ export default function HeaderShoppingCart() {
   return (
     <div className="relative hidden sm:flex">
       <Link
+        aria-label="shoppingCart"
         href={"/cart/checkout"}
         className=" hover:bg-hover1 hover:fill-green1 cursor-pointer rounded-[15px] relative"
       >
