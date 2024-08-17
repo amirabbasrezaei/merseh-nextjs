@@ -69,6 +69,7 @@ export default function MersehMag() {
         {data?.recentArticles?.length ? (
           data.recentArticles.map((article) => (
             <Link
+            key={article.id}
               href={`/mag/${article.id}/${article.title.replaceAll(" ", "-")}`}
               className="w-full flex-row p-4 gap-4 justify-between shadow-lg md:shadow-md bg-white bg-opacity-80 h-full backdrop-blur-lg rounded-[34px] items-center flex  z-10 "
             >

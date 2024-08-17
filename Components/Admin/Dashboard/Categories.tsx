@@ -14,6 +14,8 @@ export default function Categories() {
           {data?.length
             ? data.map((category) => (
                 <Item
+                key={category.id}
+              
                   title={category.title}
                   id={String(category.id)}
                   section="category"

@@ -83,7 +83,7 @@ export default function Footer() {
             href="https://trustseal.enamad.ir/?id=491421&Code=nWLgfgtO1aZxbPr2nb6vB7LIjve7BrXw"
           >
             <img
-              alt=""
+              alt="enamad"
               referrerPolicy="origin"
               src="https://trustseal.enamad.ir/logo.aspx?id=491421&Code=nWLgfgtO1aZxbPr2nb6vB7LIjve7BrXw"
               {...{ code: "nWLgfgtO1aZxbPr2nb6vB7LIjve7BrXw" }}

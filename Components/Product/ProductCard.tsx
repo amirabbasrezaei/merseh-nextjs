@@ -47,7 +47,7 @@ export default function ProductCard({
             {title}
           </h2>
         </div>
-        <span className="font-normal text-nowrap text-[14px] sm:text-[16px] basis-1/4 text-green1 w-full sm:w-fit">
+        <span className="font-normal text-nowrap text-[14px] sm:text-[16px] basis-1/4 text-[#006647] w-full sm:w-fit">
           {splitNumber(price)} <span className="text-[11px] text-black1">تومان</span>
         </span>
       </Link>

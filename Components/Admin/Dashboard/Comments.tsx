@@ -15,6 +15,7 @@ export default function Comments() {
           {data?.comments?.length
             ? data.comments.map((comment) => (
                 <CommentItem
+                key={comment.id}
                   status={comment.status}
                   user_name={comment.User.name}
                   user_lastName={comment.User.familyName || ""}

@@ -9,6 +9,8 @@ export type NextPagePropsType = {
   searchParams: { [key: string]: string | string[] | undefined };
 };
 
+export const revalidate = 3600;
+
 const getCategory = cache(async (categoryId: string) => {
   const { data } = await axios.get(
     `${
@@ -59,5 +61,3 @@ export default function page({ params }: any) {
     </Layout>
   );
 }
-
-export const revalidate = 120;

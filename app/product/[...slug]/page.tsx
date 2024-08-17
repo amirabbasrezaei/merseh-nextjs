@@ -5,7 +5,7 @@ import axios from "axios";
 import { Metadata, NextPage } from "next";
 import { cache } from "react";
 
-export const revalidate = 120;
+export const revalidate = 3600;
 
 export type NextPagePropsType = {
   params: { slug: string };

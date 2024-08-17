@@ -14,6 +14,7 @@ export default function Products() {
           {data?.products?.length
             ? data.products.map((product) => (
                 <Item
+                  key={product.id}
                   title={product.name}
                   id={String(product.id)}
                   section="product"

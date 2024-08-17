@@ -4,6 +4,8 @@ import React from "react";
 import MagLayout from "@/Components/Layout/MagLayout";
 import Mag from "@/Components/Mag/Mag";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: { absolute: "مجله مرسه" },
   description:
