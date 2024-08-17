@@ -51,16 +51,16 @@ export default function RootLayout({
       {process.env.NODE_ENV === "production" ? (
         <>
           <Script
+          id="gtag"
             strategy="afterInteractive"
             src="https://www.googletagmanager.com/gtag/js?id=GTM-T83BTZM4"
           />
-          <Script strategy="afterInteractive">
+          <Script id="gtag1" strategy="afterInteractive">
             {`window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
 
-    gtag('config', 'GTM-T83BTZM4');`}
-
+              gtag('config', 'GTM-T83BTZM4');`}
           </Script>
         </>
       ) : null}
