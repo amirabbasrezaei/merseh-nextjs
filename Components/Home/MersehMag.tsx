@@ -29,7 +29,7 @@ export default function MersehMag() {
   }, [inView]);
 
   return (
-    <div className="w-full mt-10 mb-16 md:my-10 flex flex-col items-center justify-between gap-14 relative md:h-[550px] h-fit">
+    <div className="w-full mt-10 mb-16 md:my-10 flex flex-col items-center justify-between  md:gap-14 relative md:h-[550px] h-fit">
       <Link href={"/mag"} aria-label="مجله مرسه" className="h-fit">
         <div className="flex flex-row gap-1 items-center z-10 py-6 justify-center h-fit">
           <svg
@@ -76,7 +76,7 @@ export default function MersehMag() {
                 {article.title}
               </h2>
               <Image
-                className="w-[180px] h-[180px] rounded-[34px]"
+                className="md:w-[180px] md:h-[180px] h-[100px] w-[100px] rounded-[34px]"
                 style={{ objectFit: "cover" }}
                 alt={article.images[0]?.split('/')?.at(-1)?.split(".")?.at(0) || ""}
                 src={article.images[0]}

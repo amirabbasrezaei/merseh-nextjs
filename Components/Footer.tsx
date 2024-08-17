@@ -12,9 +12,9 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="h-fit  max-w-[1400px] relative w-full items-center justify-around flex flex-col py-16 px-10 gap-10 bg-white   ">
+    <footer className="h-fit  max-w-[1400px] relative w-full items-center justify-around flex flex-col pt-16 px-10 gap-10 bg-white   ">
       <hr className="w-full left-0 right-0 absolute top-0 " />
-      <div className="w-full flex flex-col sm:flex-row ">
+      <div className="w-full flex flex-col sm:flex-row gap-14">
         <div className="basis-1/3 flex flex-col   h-full mt-5 sm:mt-0 justify-evenly items-start ">
           <Merseh_nastaliq classname="w-20 h-auto mb-8 fill-gray-800" />
           <span className="text-[20px] font-[500] text-[#515151] mb-5">
@@ -107,7 +107,7 @@ export default function Footer() {
         </Link>
       </div>
       <span>
-        طراحی شده توسط <span className="font-[700]">Merseh</span>
+        طراحی شده توسط <span className="font-[700]">مرسه</span>
       </span>
     </footer>
   );
