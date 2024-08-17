@@ -19,12 +19,12 @@ export default function CommentItem({
 }: Props) {
   return (
     <div className="border flex flex-row w-full p-5 rounded-md justify-between">
-      <div>
+      <div className="flex flex-row gap-1">
         <span>{user_name}</span>
         <span>{user_lastName}</span>
       </div>
 
-      <div>
+      <div className="flex flex-row gap-1">
         <span>
           {section === "product"
             ? "محصول"
