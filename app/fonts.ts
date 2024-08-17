@@ -31,31 +31,31 @@ export const IRANYekanXFaNum = localFont({
   ],
 }); 
 
-// export const YekanBakh = localFont({
-//   src: [
-//     {
-//       path: "../public/fonts/yekanbakh/woff2/YekanBakhFaNum-Thin.woff2",
-//       weight: "100",
-//       style: "sans",
-//     },
-//     {
-//       path: "../public/fonts/yekanbakh/woff2/yekanbakhfanum-light.woff2",
-//       weight: "300",
-//     },
-//     {
-//       path: "../public/fonts/yekanbakh/woff2/YekanBakhFaNum-SemiBold.woff2",
-//       weight: "600",
-//     },
-//     {
-//       path: "../public/fonts/yekanbakh/woff2/YekanBakhFaNum-Bold.woff2",
-//       weight: "bold",
-//     },
-//     {
-//       path: "../public/fonts/yekanbakh/woff2/YekanBakhFaNum-Regular.woff2",
-//       weight: "normal",
-//     },
-//   ],
-// });
+export const YekanBakh = localFont({
+  src: [
+    // {
+    //   path: "../public/fonts/yekanbakh/woff2/YekanBakhFaNum-Thin.woff2",
+    //   weight: "100",
+    //   style: "sans",
+    // },
+    // {
+    //   path: "../public/fonts/yekanbakh/woff2/yekanbakhfanum-light.woff2",
+    //   weight: "300",
+    // },
+    // {
+    //   path: "../public/fonts/yekanbakh/woff2/YekanBakhFaNum-SemiBold.woff2",
+    //   weight: "600",
+    // },
+    // {
+    //   path: "../public/fonts/yekanbakh/woff2/YekanBakhFaNum-Bold.woff2",
+    //   weight: "bold",
+    // },
+    {
+      path: "../public/fonts/yekanbakh/woff2/YekanBakhFaNum-Regular.woff2",
+      weight: "normal",
+    },
+  ],
+});
 
 export const IRANSansXFaNum = localFont({
   src: [
