@@ -13,10 +13,10 @@ export default function Categories({ setFilter, filter }: Props) {
   const { data } = trpc.product.categories.useQuery();
 
   return (
-    <div>
+    <div className="w-full">
       <span className="text-black1 text-[18px]">دسته‌بندی‌ ها</span>
-      <div className="mt-4">
-        {data?.length &&
+      <div className="mt-4 ">
+        {data?.length  ? (
           data.map((cat, index) => (
             <GetCategories
               setFilter={setFilter}
@@ -25,7 +25,17 @@ export default function Categories({ setFilter, filter }: Props) {
               data={cat.subCategories || []}
               filter={filter}
             />
-          ))}
+          ))
+        ) : (
+          <div className="flex flex-col gap-5 w-full items-center justify-center">
+            {Array.from(Array(10)).map((_, i) => (
+              <div key={i} className="w-full flex flex-row gap-1">
+              <div className="w-6 h-6 bg-gray-100 rounded-md animate-pulse" />
+              <div className="w-28 h-6 bg-gray-100 rounded-md animate-pulse" />
+            </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

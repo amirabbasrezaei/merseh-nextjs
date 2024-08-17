@@ -52,6 +52,7 @@ export default function HeaderCategory() {
           </span>
         </Link>
         <motion.div
+        initial={false}
           transition={{ bounce: 0.3, duration: 0.7, type: "spring" }}
           animate={showCategories ? "open" : "hidden"}
           variants={animation}

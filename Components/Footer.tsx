@@ -3,7 +3,6 @@ import {
   Instagram_SVG,
   Location_Pin,
   Merseh_nastaliq,
-  MersehSvg,
   Phone_SVG,
   Telegram_SVG,
 } from "./SVGS";

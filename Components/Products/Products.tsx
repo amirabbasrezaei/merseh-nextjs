@@ -3,7 +3,7 @@ import { trpc } from "@/utils/trpc";
 
 import React, { useEffect, useState } from "react";
 import Filter from "./Filter";
-
+import { motion } from "framer-motion";
 import { AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import { contentType } from "../Admin/AddProduct/QuillEditor";
@@ -22,22 +22,24 @@ interface Props {
   categoryId: number;
 }
 
-export default function Products({ categoryId }: Props) {
-  const ProductCard = dynamic(() => import("../Product/ProductCard"), {
+const ProductCard = dynamic(() => import("../Product/ProductCard"), {
+  ssr: false,
+});
+
+const ProductCardSkeleton = dynamic(
+  () => import("../Product/ProductCardSkeleton"),
+  {
     ssr: false,
-  });
-  const ProductCardSkeleton = dynamic(
-    () => import("../Product/ProductCardSkeleton"),
-    {
-      ssr: false,
-    }
-  );
-  const ContentViewer = dynamic(
-    () => import("../Admin/AddProduct/ContentViewer"),
-    {
-      ssr: false,
-    }
-  );
+  }
+);
+const ContentViewer = dynamic(
+  () => import("../Admin/AddProduct/ContentViewer"),
+  {
+    ssr: false,
+  }
+);
+
+export default function Products({ categoryId }: Props) {
   const [filter, setFilter] = useState<filterTypeArgs>({
     categoryId,
     needRefetch: false,
@@ -89,14 +91,14 @@ export default function Products({ categoryId }: Props) {
   return (
     <section className="flex sm:gap-14 gap-5 flex-col sm:flex-row w-full mt-4 sm:px-10 overflow-visible">
       <Filter filter={filter} setFilter={setFilter} />
-      <div className="flex flex-col h-full w-sm:basis-9/12">
+      <div className="flex flex-col h-full sm:basis-9/12">
         <div className="h-fit mb-5 flex items-center jus w-full">
           {data?.categoryInfo?.title ? (
             <h1 className="text-[18px] text-gray-500 font-[500]  mb-[10px] ">
               قیمت {data.categoryInfo.title}
             </h1>
           ) : (
-            <div />
+            <div className="bg-gray-100 rounded-[5px] mb-[10px] h-8 w-[200px] animate-pulse" />
           )}
         </div>
         <div className="w-full min-h-[800px] flex flex-col gap-4 items-center ">
@@ -116,7 +118,7 @@ export default function Products({ categoryId }: Props) {
                       isLoading={true}
                     />
                   ))
-                : Array.from(Array(8)).map((_, i) => (
+                : Array.from(Array(4)).map((_, i) => (
                     <ProductCardSkeleton key={i} />
                   ))}
             </AnimatePresence>
@@ -124,11 +126,21 @@ export default function Products({ categoryId }: Props) {
         </div>
         <hr className="mt-5 border-[#ececec] mb-10" />
 
-        <div className="[&_h2]:text-[17px] text-[13px] [&_ul]:list-disc [&_ul]:list-inside [&_a]:text-[#7ba79a]  text-[#a8a8a8] [&_h2]:text-[#7f7f7f]   leading-loose [&_h3]:text-[#969696] [&_h3]:text-[15px] flex flex-col">
-          {data?.categoryInfo?.content ? (
+        {data?.categoryInfo?.content ? (
+          <div className="[&_h2]:text-[17px] text-[13px] [&_ul]:list-disc [&_ul]:list-inside [&_a]:text-[#7ba79a]  text-[#a8a8a8] [&_h2]:text-[#7f7f7f]   leading-loose [&_h3]:text-[#969696] [&_h3]:text-[15px] flex flex-col">
             <ContentViewer contentForView={data?.categoryInfo?.content} />
-          ) : null}
-        </div>
+          </div>
+        ) : (
+          Array.from(Array(4)).map((_, i) => (
+            <motion.div className="flex flex-col gap-3 my-5" key={i}>
+              <div className="bg-gray-100 w-[150px] h-[26px] rounded-[7px]"></div>
+              <div className="bg-gray-100 w-full h-[20px] rounded-[4px]"></div>
+              <div className="bg-gray-100 w-full h-[20px] rounded-[4px]"></div>
+              <div className="bg-gray-100 w-full h-[20px] rounded-[4px]"></div>
+              <div className="bg-gray-100 w-full h-[20px] rounded-[4px]"></div>
+            </motion.div>
+          ))
+        )}
       </div>
     </section>
   );
