@@ -55,7 +55,7 @@ export async function createPaymentControllerZibal({
       mobile: user.phoneNumber,
       description: "",
       feeMode: 2,
-      linkToPay: true,
+      // linkToPay: true,
       orderId: String(input.orderId),
     };
 
