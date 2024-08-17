@@ -8,6 +8,7 @@ import { cookies } from "next/headers";
 import ThemeController from "@/Components/ThemeController";
 import { Toaster } from "react-hot-toast";
 import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google";
+import Script from "next/script";
 
 import dynamic from "next/dynamic";
 
@@ -35,8 +36,6 @@ export const metadata: Metadata = {
   },
 };
 
-
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -50,7 +49,20 @@ export default function RootLayout({
         <meta charSet="utf-8" />
       </head>
       {process.env.NODE_ENV === "production" ? (
-        <GoogleTagManager gtmId="GTM-T83BTZM4" />
+        <>
+          <Script
+            strategy="afterInteractive"
+            src="https://www.googletagmanager.com/gtag/js?id=GTM-T83BTZM4"
+          />
+          <Script strategy="afterInteractive">
+            {`window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'GTM-T83BTZM4');`}
+
+          </Script>
+        </>
       ) : null}
       <body
         className={`overflow-x-hidden  bg-white ${IRANYekanXFaNum.className}`}
