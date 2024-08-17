@@ -6,28 +6,6 @@ import { Shop_Cart } from "../SVGS";
 import Link from "next/link";
 import useShoppingCart from "../useShoppingCart";
 
-const cartAnimation = {
-  closed: {
-    opacity: 0,
-    translateY: -5,
-    translateX: -50,
-    height: 0,
-    scale: 0,
-    transition: {
-      staggerChildren: 0.03,
-      damping: 0,
-    },
-  },
-  open: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.2, damping: 0 },
-
-    translateY: 0,
-    height: 300,
-    scale: 1,
-    translateX: 0,
-  },
-};
 
 export default function HeaderShoppingCart() {
   const { items } = useShoppingCart();
