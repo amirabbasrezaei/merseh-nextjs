@@ -32,6 +32,7 @@ export default function CommentItem({
             ? "مقاله"
             : null}
         </span>
+        <span>:</span>
         <span>{sectionName}</span>
       </div>
       <div></div>
