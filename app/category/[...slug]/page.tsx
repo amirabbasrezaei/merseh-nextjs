@@ -31,7 +31,7 @@ const getCategory = cache(async (categoryId: string) => {
 // };
 
 const Products = dynamic(() => import("@/Components/Products/Products"), {
-  ssr: true,
+  ssr: false,
 });
 
 export async function generateMetadata({

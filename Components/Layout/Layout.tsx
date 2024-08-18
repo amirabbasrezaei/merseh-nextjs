@@ -1,11 +1,9 @@
 "use client";
-import React, { Suspense, useState } from "react";
-import Header from "../Home/Header";
-import Footer from "../Footer";
+import React, { Suspense } from "react";
 import { motion } from "framer-motion";
-import Navbar from "../Navbar/Navbar";
 import classNames from "classnames";
 import Loading from "./Loading";
+import dynamic from "next/dynamic";
 
 interface props {
   children: React.ReactNode;
@@ -14,16 +12,21 @@ interface props {
   fullWidth?: boolean;
 }
 
+
+const Header = dynamic(() => import("../Home/Header"), {ssr: false})
+const Footer = dynamic(() => import("../Footer"), {ssr: false})
+const Navbar = dynamic(() => import("../Navbar/Navbar"), {ssr: false})
+
 export default function Layout({
   children,
   header = true,
   footer = true,
   fullWidth = false,
 }: props) {
-  const [isAnimating, setIsAnimating] = useState(false);
+
 
   return (
-    <Suspense fallback={<Loading />}>
+    <Suspense fallback={<Loading />} >
       <motion.main
         style={{ direction: "ltr" }}
         className={`justify-center items-center   flex  bg-white w-screen overflow-x-hidden  sm:mb-0 mb-[100px]  h-screen`}
