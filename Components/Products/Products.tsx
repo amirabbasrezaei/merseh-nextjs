@@ -19,6 +19,7 @@ export type filterTypeArgs = {
 interface Props {
   categoryId: number;
 }
+export const revalidate = 60;
 
 const ProductCard = dynamic(() => import("../Product/ProductCard"), {
   ssr: false,
@@ -36,6 +37,8 @@ const ContentViewer = dynamic(
     ssr: false,
   }
 );
+
+
 
 export default function Products({ categoryId }: Props) {
   const [filter, setFilter] = useState<filterTypeArgs>({

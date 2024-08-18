@@ -25,7 +25,7 @@ export default function CommentItem({
       </div>
 
       <div className="flex flex-row gap-1">
-        <span>
+        <span className="font-[500]">
           {section === "product"
             ? "محصول"
             : section === "article"

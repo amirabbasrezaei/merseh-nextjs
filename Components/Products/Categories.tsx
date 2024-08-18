@@ -12,7 +12,10 @@ interface Props {
 const GetCategories = dynamic(() => import("./GetCategories"), { ssr: true });
 
 export default function Categories({ setFilter, filter }: Props) {
-  const { data } = trpc.product.categories.useQuery();
+  const { data } = trpc.product.categories.useQuery(undefined, {
+    cacheTime: 60,
+    refetchInterval: 300,
+  });
 
   return (
     <div className="w-full">

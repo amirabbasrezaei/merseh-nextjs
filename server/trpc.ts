@@ -21,7 +21,9 @@ export const publicProcedure = t.procedure.use(async (opts: any) => {
     ctx: {
       ...ctx,
       user: accessTokenPayload ? accessTokenPayload : accessToken,
+
     },
+    
   });
 });
 export const userProtectedProcedure = t.procedure.use(isUserAuthed);
