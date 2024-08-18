@@ -19,7 +19,7 @@ export type filterTypeArgs = {
 interface Props {
   categoryId: number;
 }
-export const revalidate = 60;
+export const revalidate = 300;
 
 const ProductCard = dynamic(() => import("../Product/ProductCard"), {
   ssr: false,
