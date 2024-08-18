@@ -16,11 +16,13 @@ export const metadata: Metadata = {
   title: {
     default: "فروشگاه مرسه",
     template: "%s  - مرسه",
+
   },
   description:
     "مرسه تولید کننده انواع محصولات طبیعی شامل روغنهای گیاهی مانند روغن زیتون، روغن کنجد، روغن آفتابگردان، روغن سیاه دانه، کره گیاهی، ارده و ... می‌باشد.",
   alternates: {
     canonical: `${process.env.BASE_URL}`,
+
   },
   metadataBase: new URL("https://merseh.com"),
   robots: { follow: true, index: true },
@@ -34,6 +36,7 @@ export const metadata: Metadata = {
     lang: "fa",
     "theme-color": "#00A573",
   },
+  
 };
 
 export default function RootLayout({
