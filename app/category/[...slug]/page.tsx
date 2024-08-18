@@ -1,7 +1,8 @@
 import Layout from "@/Components/Layout/Layout";
-import Products from "@/Components/Products/Products";
+
 import axios from "axios";
 import { Metadata } from "next";
+import dynamic from "next/dynamic";
 import React, { cache } from "react";
 
 export type NextPagePropsType = {
@@ -28,6 +29,10 @@ const getCategory = cache(async (categoryId: string) => {
 //     canonical: `${process.env.BASE_URL}/category`,
 //   },
 // };
+
+const Products = dynamic(() => import("@/Components/Products/Products"), {
+  ssr: true,
+});
 
 export async function generateMetadata({
   params,
