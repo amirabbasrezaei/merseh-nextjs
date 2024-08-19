@@ -37,7 +37,7 @@ export default function ProductCard({
             style={{ objectFit: "contain" }}
             src={`${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${imageNames[0]}`}
             alt={title}
-            quality={100}
+            quality={70}
             width={300}
             placeholder="blur"
             height={300}
