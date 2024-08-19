@@ -13,9 +13,9 @@ interface props {
 }
 
 
-const Header = dynamic(() => import("../Home/Header"), {ssr: false})
-const Footer = dynamic(() => import("../Footer"), {ssr: false})
-const Navbar = dynamic(() => import("../Navbar/Navbar"), {ssr: false})
+const Header = dynamic(() => import("../Home/Header"), {ssr: true})
+const Footer = dynamic(() => import("../Footer"), {ssr: true})
+const Navbar = dynamic(() => import("../Navbar/Navbar"), {ssr: true})
 
 export default function Layout({
   children,
