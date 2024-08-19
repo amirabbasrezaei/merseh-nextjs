@@ -1,7 +1,7 @@
 "use client";
 import { trpc } from "@/utils/trpc";
 import React, { useEffect, useState } from "react";
-import Filter from "./Filter";
+
 import { motion } from "framer-motion";
 
 import { useSearchParams } from "next/navigation";
@@ -33,6 +33,12 @@ const ProductCardSkeleton = dynamic(
 );
 const ContentViewer = dynamic(
   () => import("../Admin/AddProduct/ContentViewer"),
+  {
+    ssr: false,
+  }
+);
+const Filter = dynamic(
+  () => import("./Filter"),
   {
     ssr: false,
   }

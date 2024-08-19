@@ -2,7 +2,6 @@ import Image from "next/image";
 import React from "react";
 import splitNumber from "../utils/splitNumber";
 import Link from "next/link";
-import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import { motion } from "framer-motion";
 interface ProductCardProps {
   title: string;

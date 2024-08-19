@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import { filterTypeArgs } from "./Products";
-import { Check, Chevron_Down, Plus_Svg } from "../SVGS";
+import { Check, Chevron_Down } from "../SVGS";
 import { trpc } from "@/utils/trpc";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
