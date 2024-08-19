@@ -37,10 +37,10 @@ export default function ProductCard({
             style={{ objectFit: "contain" }}
             src={`${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${imageNames[0]}`}
             alt={title}
-            quality={70}
-            width={300}
+            quality={50}
+            width={200}
             placeholder="empty"
-            height={300}
+            height={200}
             priority
             sizes="(max-width: 640px) 130px, (max-width: 1024px) 582px, (max-width: 1440px) 280px"
             

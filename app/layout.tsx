@@ -55,10 +55,10 @@ export default function RootLayout({
         <>
           <Script
           id="gtag"
-            strategy="lazyOnload"
+            strategy="afterInteractive"
             src="https://www.googletagmanager.com/gtag/js?id=GTM-T83BTZM4"
           />
-          <Script id="gtag1" strategy="lazyOnload">
+          <Script id="gtag1" strategy="afterInteractive">
             {`window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
