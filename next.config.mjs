@@ -18,7 +18,7 @@ const nextConfig = {
 
           },
         ],
-        deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+        deviceSizes: [640, 750, 828, 1080, 1200],
         imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
       },
       async headers() {
@@ -31,6 +31,7 @@ const nextConfig = {
                     { key: "Access-Control-Allow-Origin", value: "*" }, // replace this your actual origin
                     { key: "Access-Control-Allow-Methods", value: "GET,DELETE,PATCH,POST,PUT" },
                     { key: "Access-Control-Allow-Headers", value: "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" },
+                    { key: "Cache-Control", value: "max-age=3600, must-revalidate" },
                 ]
             }
         ]
