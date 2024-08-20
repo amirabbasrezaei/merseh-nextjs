@@ -57,7 +57,7 @@ export default function ProductImages({ imageUrls }: Props) {
   );
 
   return (
-    <div className="w-full sm:w-[500px] h-[500px]">
+    <div className="w-full sm:w-[500px] h-fit">
       <div ref={sliderRef} className="keen-slider h-full">
         {imageUrls.map((imgUrl, i) => (
           <div
@@ -68,7 +68,7 @@ export default function ProductImages({ imageUrls }: Props) {
             )}
           >
             <Image
-              className="w-[500px] h-[500px]"
+              className="w-[500px] h-fit"
               alt={imgUrl.split("/").at(-1) as string}
               src={imgUrl}
               width={500}
