@@ -15,43 +15,43 @@ export default function Slider() {
 
   const [opacities, setOpacities] = useState<number[]>([]);
   const [opacities1, setOpacities1] = useState<number[]>([]);
-  const [sliderRef, instanceRef] = useKeenSlider(
-    {
-      slides: 2,
-      loop: true,
-      //   mode: "snap",
-      renderMode: "precision",
-      defaultAnimation: { easing: (t: any) => t, duration: 500 },
+  // const [sliderRef, instanceRef] = useKeenSlider(
+  //   {
+  //     slides: 2,
+  //     loop: true,
+  //     //   mode: "snap",
+  //     renderMode: "precision",
+  //     defaultAnimation: { easing: (t: any) => t, duration: 500 },
 
-      created(s) {
-        setTimeout(() => {
-          s.moveToIdx(1, true);
-        }, 3000);
-      },
-      detailsChanged(s) {
-        const newOpacity = s.track.details.slides.map((slide) => slide.portion);
-        setOpacities(newOpacity);
-      },
-      animationEnded(s) {
-        setSliderControl(s.track.details.abs + 1);
-      },
-    },
-    [
-      // add plugins here
-    ]
-  );
+  //     created(s) {
+  //       setTimeout(() => {
+  //         s.moveToIdx(1, true);
+  //       }, 3000);
+  //     },
+  //     detailsChanged(s) {
+  //       const newOpacity = s.track.details.slides.map((slide) => slide.portion);
+  //       setOpacities(newOpacity);
+  //     },
+  //     animationEnded(s) {
+  //       setSliderControl(s.track.details.abs + 1);
+  //     },
+  //   },
+  //   [
+  //     // add plugins here
+  //   ]
+  // );
 
-  useEffect(() => {
-    let timeOut = setTimeout(() => {
-      instanceRef.current?.moveToIdx(
-        instanceRef.current?.track.details.abs + 1,
-        true
-      );
-    }, 8000);
-    return () => {
-      clearTimeout(timeOut);
-    };
-  }, [sliderControl]);
+  // useEffect(() => {
+  //   let timeOut = setTimeout(() => {
+  //     instanceRef.current?.moveToIdx(
+  //       instanceRef.current?.track.details.abs + 1,
+  //       true
+  //     );
+  //   }, 8000);
+  //   return () => {
+  //     clearTimeout(timeOut);
+  //   };
+  // }, [sliderControl]);
 
 
   // const [sliderRef1, instanceRef1] = useKeenSlider(
@@ -94,8 +94,10 @@ export default function Slider() {
 
   return (
     <section className="flex flex-row sm:gap-4 w-full h-[350px] sm:h-[430px]   items-center justify-evenly">
-      <div className="sm:basis-2/3 h-full fader  relative" ref={sliderRef}>
-        <div className={classNames("fader__slide absolute top-0  w-full h-full", instanceRef.current?.track?.details?.rel == 0 ? "z-10" : "z-0")} key={0}>
+      <div className="sm:basis-2/3 h-full fader  relative"
+      //  ref={sliderRef}
+       >
+        {/* <div className={classNames("fader__slide absolute top-0  w-full h-full", instanceRef.current?.track?.details?.rel == 0 ? "z-10" : "z-0")} key={0}>
           <Link className="w-full h-full z-10" href={"https://merseh.com/"}>
             <Image
               className=" w-full h-full absolute rounded-[10px]"
@@ -106,8 +108,12 @@ export default function Slider() {
               priority={true}
             />
           </Link>
-        </div>
-        <div className={classNames("fader__slide absolute top-0  w-full h-full", instanceRef.current?.track?.details?.rel == 1 ? "z-10" : "z-0")} key={1}>
+        </div> */}
+        <div 
+        className={classNames("fader__slide absolute top-0  w-full h-full",
+          //  instanceRef.current?.track?.details?.rel == 1 ? "z-10" : "z-0"
+          )} key={1}
+           >
           <Link href={"https://merseh.com/category/4/%D8%B1%D9%88%D8%BA%D9%86-%D8%B2%DB%8C%D8%AA%D9%88%D9%86"}>
             <Image
               className=" w-full h-full top-0 rounded-[10px]"
