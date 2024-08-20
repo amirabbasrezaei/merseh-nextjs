@@ -26,7 +26,7 @@ export default function Slider() {
       created(s) {
         setTimeout(() => {
           s.moveToIdx(1, true);
-        }, 5000);
+        }, 3000);
       },
       detailsChanged(s) {
         const newOpacity = s.track.details.slides.map((slide) => slide.portion);
@@ -47,7 +47,7 @@ export default function Slider() {
         instanceRef.current?.track.details.abs + 1,
         true
       );
-    }, 10000);
+    }, 8000);
     return () => {
       clearTimeout(timeOut);
     };
