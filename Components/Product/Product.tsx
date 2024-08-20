@@ -13,7 +13,15 @@ import useShoppingCart, { ShoppingCart } from "../useShoppingCart";
 import toast from "react-hot-toast";
 import useWindowSize from "../useWindowSize";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Check, Minus_Svg, Plus_Svg, TrashBin_SVG } from "../SVGS";
+import {
+  Best_SVG,
+  Check,
+  Minus_Svg,
+  Off_SVG,
+  Plus_Svg,
+  TrashBin_SVG,
+  Truck_Courier_SVG,
+} from "../SVGS";
 import Link from "next/link";
 import Content from "../Admin/AddProduct/ContentViewer";
 import Comments from "./Comments";
@@ -119,9 +127,8 @@ export default function Product({ productId }: Props) {
       //   rect.right <=
       //     (window.innerWidth || document.documentElement.clientWidth);
 
-
-    const isVisible = rect.top <= 0 
-      console.log(rect.bottom)
+      const isVisible = rect.top <= 0;
+      console.log(rect.bottom);
       if (isVisible) return true;
       return false;
     }
@@ -130,7 +137,6 @@ export default function Product({ productId }: Props) {
   useEffect(() => {
     const handleScroll = () => {
       if (isElementInView(contentRef)) {
-
         setVisibleSection("article");
       }
       if (isElementInView(commentsRef)) {
@@ -160,12 +166,12 @@ export default function Product({ productId }: Props) {
         id="productSection"
         className="flex sm:px-20 flex-col gap-10 w-full"
       >
-        <div className="sm:h-[450px] h-fit w-full flex flex-col sm:flex-row sm:mt-[85px]">
+        <div className="h-fit sm:h-[500px] w-full flex flex-col sm:flex-row sm:mt-[30px] items-center">
           <div className="h-full w-full sm:basis-4/12 ">
             {productData?.product ? (
               <ProductImages imageUrls={productData.product.imageUrls} />
             ) : (
-              <div className="sm:w-[400px] w-full h-[400px] bg-gray-100 animate-pulse rounded-[8px]"></div>
+              <div className="sm:w-[500px] w-full h-[500px] bg-gray-100 animate-pulse rounded-[8px]"></div>
             )}
           </div>
 
@@ -262,11 +268,11 @@ export default function Product({ productId }: Props) {
               )}
             </div>
             {productData?.product?.details.length ? (
-              <div className="leading-loose text-[#686868] list-disc ">
-                <h2 className="text-[17px] font-[400] mb-1 text-black1">
+              <div className="leading-loose h-full flex flex-col   list-disc ">
+                <h2 className="text-[17px] font-[500] mb-1 text-black1">
                   ویژگی‌ها
                 </h2>
-                <ul className="list-disc  list-inside marker:text-green2">
+                <ul className="list-disc text-[#4c4c4c] font-[400] text-[17px] list-inside marker:text-green2">
                   {productData?.product?.details.map((det, i) => (
                     <li key={i}>{det}</li>
                   ))}
@@ -473,6 +479,35 @@ export default function Product({ productId }: Props) {
                   <span className="text-green2">مشاهده سبد خرید</span>
                 </Link>
               ) : null}
+            </div>
+          </div>
+        </div>
+        <div className="w-full  bg-gray-50  text-[1.4em] font-[500] text-gray-700 h-fit rounded-lg flex items-center flex-col gap-5 md:flex-row justify-evenly">
+          <div className="flex flex-row gap-4 h-[100px] ">
+            <Truck_Courier_SVG classname="fill-green2 w-12" />
+            <div className="flex flex-col justify-center items-start">
+              <span>ارسال سریع</span>
+              <span className="text-[15px] text-gray-600 ">
+                همکاری با پیک + شرکت های پستی
+              </span>
+            </div>
+          </div>
+          <div className="flex flex-row gap-4 h-[100px]">
+            <Off_SVG classname="fill-green2 w-12" />
+            <div className="flex flex-col justify-center items-start">
+              <span>تضمین قیمت</span>
+              <span className="text-[15px] text-gray-600 ">
+                بهترین کیفیت ممکن با کمترین قیمت
+              </span>
+            </div>
+          </div>
+          <div className="flex flex-row gap-4 h-[100px]">
+            <Best_SVG classname="w-12 fill-green2" />
+            <div className="flex flex-col justify-center items-start">
+              <span>تولید مرسه</span>
+              <span className="text-[15px] text-gray-600 ">
+                تولید شده از محصولات درجه یک
+              </span>
             </div>
           </div>
         </div>
