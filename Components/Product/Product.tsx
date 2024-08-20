@@ -487,7 +487,7 @@ export default function Product({ productId }: Props) {
             <Truck_Courier_SVG classname="fill-green2 w-12" />
             <div className="flex flex-col justify-center items-start">
               <span>ارسال سریع</span>
-              <span className="text-[15px] text-gray-600 ">
+              <span className="text-[15px] text-gray-500 ">
                 همکاری با پیک + شرکت های پستی
               </span>
             </div>
@@ -496,7 +496,7 @@ export default function Product({ productId }: Props) {
             <Off_SVG classname="fill-green2 w-12" />
             <div className="flex flex-col justify-center items-start">
               <span>تضمین قیمت</span>
-              <span className="text-[15px] text-gray-600 ">
+              <span className="text-[15px] text-gray-500 ">
                 بهترین کیفیت ممکن با کمترین قیمت
               </span>
             </div>
@@ -505,7 +505,7 @@ export default function Product({ productId }: Props) {
             <Best_SVG classname="w-12 fill-green2" />
             <div className="flex flex-col justify-center items-start">
               <span>تولید مرسه</span>
-              <span className="text-[15px] text-gray-600 ">
+              <span className="text-[15px] text-gray-500 ">
                 تولید شده از محصولات درجه یک
               </span>
             </div>

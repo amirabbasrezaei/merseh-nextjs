@@ -31,7 +31,7 @@ export default function CategoryContext({
             )}`}
           >
             <div>
-              <span className="text-[#4E4E4E] font-[400] text-[15px]">
+              <span className="text-[#2f2f2f] font-[500] text-[17px]">
                 {subCategory.title}
               </span>
             </div>
@@ -48,7 +48,7 @@ export default function CategoryContext({
                     href={`/category/${subCat.id}/${subCat.title.replaceAll(" ", "-")}`}
                     className="mb-1"
                   >
-                    <span className="text-[#4E4E4E] font-[300] text-[13px]">
+                    <span className="text-[#4E4E4E] font-[400] text-[15px]">
                       {subCat.title}
                     </span>
                   </Link>

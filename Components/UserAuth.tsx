@@ -155,7 +155,7 @@ export default function UserAuth() {
             }
             className="flex flex-row justify-center items-center gap-2 hover:bg-hover1  px-4 py-2 rounded-[10px] cursor-pointer w-[160px]"
           >
-            <span className="text-[13px] text-black1 font-[400]">
+            <span className="text-[16px] text-black1 font-[500]">
               ورود | عضویت
             </span>
             <Login_icon classname="w-[15px] h-auto mt-[2px] fill-[#303030]" />

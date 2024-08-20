@@ -57,7 +57,7 @@ export default function HeaderCategory() {
           className="flex flex-row justify-center  items-center gap-2 cursor-pointer"
         >
           <Bars classname="w-[14px]  fill-[#303030]" />
-          <span className="font-[400] text-[#303030] text-[15px] ">
+          <span className="text-[16px] text-black1 font-[500] ">
             دسته‌بندی کالاها
           </span>
         </Link>
