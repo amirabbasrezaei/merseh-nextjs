@@ -36,7 +36,7 @@ export default function CategoryItem({
             : "bg-transparent text-[#4E4E4E]"
         )}
       >
-        <span className=" text-inherit text-[14px] text-nowrap">
+        <span className=" text-inherit text-[16px] text-nowrap">
           {categoryName}
         </span>
       </div>

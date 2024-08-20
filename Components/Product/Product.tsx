@@ -178,7 +178,7 @@ export default function Product({ productId }: Props) {
           <div className="h-full  w-full sm:basis-5/12 p-4 flex flex-col gap-[50px]">
             <div className="flex flex-col gap-10">
               {productData?.product ? (
-                <h1 className="text-[26px] text-black1">
+                <h1 className="text-[33px] font-[600] text-black1">
                   {productData?.product?.name}
                 </h1>
               ) : (
@@ -191,7 +191,7 @@ export default function Product({ productId }: Props) {
                     key={variation.id}
                     className="flex flex-row items-center gap-2"
                   >
-                    <span className="ml-4 text-[18px] text-[#252525]">
+                    <span className="ml-4 text-[18px] text-[#252525] font-[500]">
                       {variation.variationName}
                     </span>
                     <div className="flex flex-col gap-5">
@@ -240,7 +240,7 @@ export default function Product({ productId }: Props) {
                                     discount: variationType.discount,
                                   })
                                 }
-                                className="text-[14px] cursor-pointer text-[#535353]"
+                                className="text-[15px] cursor-pointer text-[#353535] font-[400]"
                               >
                                 {variationType.name}
                               </span>
@@ -319,7 +319,7 @@ export default function Product({ productId }: Props) {
                       </div>
                     ) : null}
                     <div className="flex flex-row items-center justify-center gap-1">
-                      <span className="text-[#3c3c3c] text-[25px] font-[500]">
+                      <span className="text-[#3c3c3c] text-[30px] font-[500]">
                         {selectedProductVariation?.price
                           ? splitNumber(
                               selectedProductVariation.price -
@@ -332,7 +332,7 @@ export default function Product({ productId }: Props) {
                             )
                           : 0}
                       </span>
-                      <span className="text-black1 text-[10px]">تومان</span>
+                      <span className="text-black1 text-[13px]">تومان</span>
                     </div>
                   </div>
                 )}
