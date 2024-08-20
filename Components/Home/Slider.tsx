@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react";
 import Image from "next/image";
@@ -7,6 +7,7 @@ import herbalTea2 from "../../public/Images/Herbal-Tea2.webp";
 import banner2 from "../../public/Images/banner/nothing-is-like-olive-oil.webp";
 import image3 from "../../public/Images/1713952254.webp";
 import Link from "next/link";
+import classNames from "classnames";
 
 export default function Slider() {
   const [sliderControl, setSliderControl] = useState<number>();
@@ -52,6 +53,7 @@ export default function Slider() {
     };
   }, [sliderControl]);
 
+
   // const [sliderRef1, instanceRef1] = useKeenSlider(
   //   {
   //     slides: 2,
@@ -89,30 +91,31 @@ export default function Slider() {
   //     clearTimeout(timeOut);
   //   };
   // }, [sliderControl1]);
+
   return (
     <section className="flex flex-row sm:gap-4 w-full h-[350px] sm:h-[430px]   items-center justify-evenly">
       <div className="sm:basis-2/3 h-full fader  relative" ref={sliderRef}>
-        <Link href={"https://merseh.com"} className="fader__slide w-full h-full bg-transparent ">
-          <Image
-            className="bg-transparent w-full h-full absolute rounded-[10px]"
-            style={{ opacity: opacities[0], objectFit: "cover" }}
-            src={herbalTea2}
-            alt=""
-            quality={100}
-          />
-        </Link>
-        <div className="fader__slide w-full h-full bg-transparent ">
-          <Link
-            href={
-              "https://merseh.com/category/4/%D8%B1%D9%88%D8%BA%D9%86-%D8%B2%DB%8C%D8%AA%D9%88%D9%86"
-            }
-          >
+        <div className={classNames("fader__slide absolute top-0  w-full h-full", instanceRef.current?.track?.details?.rel == 0 ? "z-10" : "z-0")} key={0}>
+          <Link className="w-full h-full z-10" href={"https://merseh.com/"}>
             <Image
-              className="bg-transparent w-full h-full absolute rounded-[10px]"
+              className=" w-full h-full absolute rounded-[10px]"
+              style={{ opacity: opacities[0], objectFit: "cover" }}
+              src={herbalTea2}
+              alt=""
+              quality={100}
+              priority={true}
+            />
+          </Link>
+        </div>
+        <div className={classNames("fader__slide absolute top-0  w-full h-full", instanceRef.current?.track?.details?.rel == 1 ? "z-10" : "z-0")} key={1}>
+          <Link href={"https://merseh.com/category/4/%D8%B1%D9%88%D8%BA%D9%86-%D8%B2%DB%8C%D8%AA%D9%88%D9%86"}>
+            <Image
+              className=" w-full h-full top-0 rounded-[10px]"
               style={{ opacity: opacities[1], objectFit: "cover" }}
               src={banner2}
               alt=""
               quality={100}
+              priority={true}
             />
           </Link>
         </div>
