@@ -56,7 +56,7 @@ export default function HeaderSearch() {
         >
           <input
             value={searchTerm}
-            placeholder="جستجو در میان محصولات"
+            placeholder="جستجو در میان کالاها"
             className="bg-[#F6F6F6] absolute   w-full h-full placeholder:text-[15px] text-black1 placeholder:text-[#8b8b8b] px-5 pr-[50px] grow rounded-[10px] appearance-none outline-none"
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -130,7 +130,7 @@ export default function HeaderSearch() {
               {showSearch ? (
                 <input
                   value={searchTerm}
-                  placeholder="جستجو در میان محصولات"
+                  placeholder="جستجو در میان کالاها"
                   autoFocus
                   className="bg-[#F6F6F6]  z-30  w-[90%] h-[50px]  placeholder:text-[15px] text-black1 placeholder:text-[#8b8b8b] px-5  rounded-[10px] appearance-none outline-none"
                   onChange={(e) => setSearchTerm(e.target.value)}
