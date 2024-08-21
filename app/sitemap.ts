@@ -46,8 +46,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       links.push(...products);
     }
 
-    if (categoryData.result.data?.length) {
-      const categories = categoryData.result.data.map((category: any) => ({
+    if (categoryData.result.data?.categories?.length) {
+      const categories = categoryData.result.data.categories.map((category: any) => ({
         url: `${
           process.env.NODE_ENV === "production"
             ? process.env.BASE_URL
