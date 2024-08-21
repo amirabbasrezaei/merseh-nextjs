@@ -328,3 +328,30 @@ export async function comments_controller({ ctx: { prisma } }: ArgsStructure) {
     return { comments: null, error };
   }
 }
+
+export const ChangeCommentStatusSchema = z.object({
+  commentId: z.string(),
+  status: z.enum(["APPROVED", "NEED_REVIEW", "FAILED", "NOT_SHOWN"]),
+});
+
+type ChangeCommentStatus = z.infer<typeof ChangeCommentStatusSchema>;
+
+export async function change_comment_status({
+  ctx: { prisma },
+  input,
+}: ArgsStructure<ChangeCommentStatus>) {
+  try {
+    
+    await prisma.comment.update({
+      where: { id: Number(input.commentId) },
+      data: { status: input.status },
+    });
+
+  } catch (error) {
+    console.log(error);
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: JSON.stringify(error || "{}"),
+    });
+  }
+}

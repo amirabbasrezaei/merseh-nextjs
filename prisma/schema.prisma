@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      =  env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 model Address {
@@ -147,17 +147,23 @@ model Order {
 }
 
 model Category {
-  id               Int        @id @default(autoincrement())
+  id               Int            @id @default(autoincrement())
   title            String
   parentCategoryId Int?
-  imageName        String     @default("")
-  content          String     @default("")
-  englishTitle     String     @default("")
-  parentCategory   Category?  @relation("SubCategories", fields: [parentCategoryId], references: [id])
-  subCategories    Category[] @relation("SubCategories")
-  products         Product[]  @relation("CategoryToProduct")
-  updated_at       DateTime?  @default(now())
-  metaDescription  String     @default("")
+  imageName        String         @default("")
+  content          String         @default("")
+  englishTitle     String         @default("")
+  parentCategory   Category?      @relation("SubCategories", fields: [parentCategoryId], references: [id])
+  subCategories    Category[]     @relation("SubCategories")
+  products         Product[]      @relation("CategoryToProduct")
+  updated_at       DateTime?      @default(now())
+  metaDescription  String         @default("")
+  status           CategoryStatus @default(ENABLED)
+}
+
+enum CategoryStatus {
+  ENABLED
+  DISABLED
 }
 
 model User {

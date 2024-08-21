@@ -1,8 +1,10 @@
 import {
+  ChangeCategoryStatusSchema,
   EditCategorySchema,
   categoriesController,
   categoryInfoController,
   categoryInfoSchema,
+  change_category_status,
   createCategory,
   createCategorySchema,
   editCategoryController,
@@ -80,4 +82,7 @@ export const productRouter = router({
     .input(categoryInfoSchema)
     .query(categoryInfoController),
   shortInfoProducts: publicProcedure.query(short_info_products_controller),
+  changeCategoryStatus: adminProtectedProcedure
+    .input(ChangeCategoryStatusSchema)
+    .mutation(change_category_status)
 });

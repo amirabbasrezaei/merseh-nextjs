@@ -3,6 +3,8 @@ import { Context } from "../context";
 import { contentType } from "@/Components/Admin/AddProduct/QuillEditor";
 import { parentCategories } from "../utils/category";
 import { TRPCError } from "@trpc/server";
+import { TRPCClientError } from "@trpc/client";
+import { CategoryStatus } from "@prisma/client";
 
 export type ArgsStructure<T = null> = T extends null
   ? {
@@ -209,10 +211,44 @@ export async function flatCategoriesController({
 }: ArgsStructure) {
   try {
     const categories = await prisma.category.findMany({
-      select: { id: true, title: true, updated_at: true },
+      select: { id: true, title: true, updated_at: true, status: true },
     });
-    return categories;
+    return {
+      categories,
+      statusOptions: [
+        { value: "ENABLED", name: "فعال" },
+        { value: "DISABLED", name: "غیرفعال" },
+      ],
+      error: null,
+    };
   } catch (error) {
     console.log(error);
+    return { categories: null, statusOptions: null, error };
+  }
+}
+
+export const ChangeCategoryStatusSchema = z.object({
+  categoryId: z.string(),
+  status: z.enum(["ENABLED", "DISABLED"]),
+});
+
+type ChangeCategoryStatus = z.infer<typeof ChangeCategoryStatusSchema>;
+
+export async function change_category_status({
+  ctx: { prisma },
+  input,
+}: ArgsStructure<ChangeCategoryStatus>) {
+  try {
+    const category = await prisma.category.update({
+      where: { id: Number(input.categoryId) },
+      data: { status: input.status },
+    });
+    return { currentStatus: category.status };
+  } catch (error) {
+    console.log(error);
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: JSON.stringify(error || "{}"),
+    });
   }
 }

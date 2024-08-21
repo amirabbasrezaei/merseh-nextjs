@@ -6,6 +6,7 @@ interface Props {
   id: string;
   section: string;
   commentCount?: number;
+  
 }
 
 export default function Item({ title, id, section, commentCount }: Props) {
@@ -21,6 +22,7 @@ export default function Item({ title, id, section, commentCount }: Props) {
             <Comment_SVG classname="w-6 h-6 fill-black" />
           </div>
         ) : null}
+        
         <Link
           href={`/admin/${section}/${id}`}
           className="bg-gray-100 rounded-full w-7 h-7 flex items-center justify-center"

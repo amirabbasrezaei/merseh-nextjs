@@ -25,9 +25,9 @@ export default function SelectInput(props: Props) {
           {placeholder}
         </option>
         {data?.length
-          ? data.map((province: any, index) => (
-              <option key={index} value={province.id} className="">
-                {province.name}
+          ? data.map((item: any, index) => (
+              <option key={index} value={item.id} className="">
+                {item.name}
               </option>
             ))
           : null}

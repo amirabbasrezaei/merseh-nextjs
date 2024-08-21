@@ -3,7 +3,7 @@ import Link from "next/link";
 import React from "react";
 import Products from "./Products";
 import Articles from "./Articles";
-import Categories from "./Categories";
+import Categories from "./Categories/Categories";
 import Comments from "./Comments";
 import { Merseh_nastaliq } from "@/Components/SVGS";
 import classNames from "classnames";
@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default function AdminDashboard({ route }: Props) {
-  console.log(route);
+ 
   return (
     <section className="flex flex-col w-full p-10 gap-10">
       <div className="flex flex-row items-center gap-4 ">
