@@ -1,6 +1,6 @@
 import { Comment_SVG, Edit_Svg } from "@/Components/SVGS";
 import { trpc } from "@/utils/trpc";
-import Link from "next/link";
+
 import React, { useEffect, useState } from "react";
 interface Props {
   user_name: string;
