@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { trpc } from "@/utils/trpc";
 import { motion } from "framer-motion";
+import CategoryItem from "./CategoryItem.mainCategory";
 
 export default function Main_Categories() {
   const { data, isLoading } = trpc.product.categories.useQuery();
@@ -28,43 +29,12 @@ export default function Main_Categories() {
           style={{ scrollbarWidth: "none" }}
         >
           {data[0].subCategories.map((category, index) => (
-            <Link
-              key={index}
-              href={`/category/${category.id}/${category.title.replaceAll(
-                " ",
-                "-"
-              )}`}
-              className="w-full h-full"
-            >
-              <motion.div
-                variants={{
-                  close: {
-                    scale: 0.8,
-                    opacity: 0,
-                  },
-                  open: {
-                    scale: 1,
-                    opacity: 1,
-                    transition: { duration: 0.2 },
-                  },
-                }}
-                className="flex  w-full h-full flex-col items-center   gap-3"
-              >
-
-                <Image
-                  className="sm:w-full sm:h-full   w-[130px]  h-[130px] max-w-none  rounded-[30px] lg:rounded-[50px] md:rounded-[40px] "
-                  src={category.imageUrl}
-                  alt={category.imageUrl.split("/").at(-1) || ""}
-                  quality={100}
-                  width={200}
-                  height={200}
-                  style={{ objectFit: "contain" }}
-                />
-                <h2 className="text-[14px] md:text-[16x] lg:text-[14px] xl:text-[18px] text-[#4A4A4A] font-[400] ">
-                  {category.title}
-                </h2>
-              </motion.div>
-            </Link>
+            <CategoryItem
+              key={category.id}
+              id={category.id}
+              image_url={category.imageUrl}
+              title={category.title}
+            />
           ))}
         </motion.div>
       ) : (

@@ -7,7 +7,7 @@ import ProductImages from "./ProductImages";
 import Button from "../Button";
 import splitNumber from "../utils/splitNumber";
 import { AnimatePresence, motion } from "framer-motion";
-import ProductCarousel from "../Home/ProductCarousel";
+import ProductCarousel from "../Home/ProductCarousel/ProductCarousel";
 
 import useShoppingCart, { ShoppingCart } from "../useShoppingCart";
 import toast from "react-hot-toast";

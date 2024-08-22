@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from "react";
 import "keen-slider/keen-slider.min.css";
 
-import Image from "next/image";
-import { Chevron_Down_sharp_light } from "../SVGS";
+import { Chevron_Down_sharp_light } from "../../SVGS";
 import { trpc } from "@/utils/trpc";
-import Link from "next/link";
-import splitNumber from "../utils/splitNumber";
 import { Autoplay } from "swiper/modules";
 import "react-multi-carousel/lib/styles.css";
 import { motion } from "framer-motion";
 import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
 
 import "swiper/css";
-import useWindowSize from "../useWindowSize";
+import useWindowSize from "../../useWindowSize";
 import { Product } from "@prisma/client";
+import ProductGridItem from "./ProductGridItem";
 
 interface props {
   title: string;
@@ -117,82 +115,7 @@ export default function ProductsGrid({ title, categoryId }: props) {
               (productSlice: any, index: any) => {
                 return productSlice.length >= 3 ? (
                   <SwiperSlide key={index}>
-                    <motion.div
-                      className="flex flex-col gap-3 h-full "
-                      variants={{
-                        open: {
-                          transition: {
-                            type: "spring",
-                            staggerChildren: 0.4,
-                          },
-                          opacity: 1,
-                    
-                        },
-                        close: { opacity: 0 },
-                      }}
-                      initial="close"
-                      animate={"open"}
-                    >
-                      {productSlice.map((product: any, i: number) => (
-                        <Link
-                          className="relative"
-                          key={product.id}
-                          href={`/product/${
-                            product.id
-                          }/${product.name.replaceAll(" ", "-")}`}
-                        >
-                          <motion.div
-                            variants={{
-                              open: {
-                               
-                                transition: { duration: 0.3 },
-                                opacity: 1,
-                                scale:1
-                              },
-                              close: {  opacity: 0, scale:0.5 },
-                            }}
-                            className=" pl-3 py-2 rounded-[5px] flex flex-row items-center justify-between gap-2"
-                          >
-                            <div className="flex flex-row items-center gap-2">
-                              <Image
-                                className="w-[100px] h-[100px] md:w-[110px] xl:w-[180px] lg:h-auto"
-                                width={180}
-                                height={180}
-                                quality={100}
-                                alt={product.imageNames[0]}
-                                src={`${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${product.imageNames[0]}`}
-                              />
-                              <div className="flex flex-col items-start justify-center gap-1">
-                                <h3 className="font-[500] basis-2/4 text-[14px] md:text-[13px] lg:text-[12px] text-nowrap xl:text-[14px]  text-black1 w-fit">
-                                  {product.name}
-                                </h3>
-                                {product?.ProductVariation?.length ? (
-                                  <span className="font-[400] basis-2/4 text-[12px] md:text-[11px] lg:text-[11px] text-nowrap xl:text-[12px] text-black1">
-                                    {product.ProductVariation[0].values[0].name}
-                                  </span>
-                                ) : null}
-                              </div>
-                            </div>
-                            <div className="flex flex-row items-center gap-1">
-                              <span className="font-normal text-nowrap text-[14px] md:text-[14px] lg:text-[11px] xl:text-[15px] basis-1/4 text-green1 w-fit">
-                                {splitNumber(
-                                  product?.ProductVariation?.length
-                                    ? product.ProductVariation[0].values[0]
-                                        .price
-                                    : product.price
-                                )}{" "}
-                              </span>
-                              <span className="lg:text-[12px] text-[10px] text-black1">
-                                تومان{" "}
-                              </span>
-                            </div>
-                          </motion.div>
-                          {productSlice.length - 1 !== i ? (
-                            <hr className="border-[1x] border-[#f3f3f3] w-[65%] absolute left-0 bottom-0" />
-                          ) : null}
-                        </Link>
-                      ))}
-                    </motion.div>
+                    <ProductGridItem productSlice={productSlice} key={index} />
                   </SwiperSlide>
                 ) : null;
               }
