@@ -321,6 +321,7 @@ export async function comments_controller({ ctx: { prisma } }: ArgsStructure) {
         Product: { select: { name: true, id: true } },
         Article: { select: { title: true, id: true } },
       },
+      orderBy: { id: "desc" },
     });
     return {
       comments,

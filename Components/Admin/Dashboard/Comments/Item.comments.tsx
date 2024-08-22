@@ -1,5 +1,6 @@
 import { Comment_SVG, Edit_Svg } from "@/Components/SVGS";
 import { trpc } from "@/utils/trpc";
+import Link from "next/link";
 
 import React, { useEffect, useState } from "react";
 interface Props {
@@ -38,7 +39,10 @@ export default function CommentItem({
         <span>{user_lastName}</span>
       </div>
 
-      <div className="flex flex-row gap-1">
+      <Link
+        href={`/${section}/${id}/${sectionName.replaceAll(" ", "-")}`}
+        className="flex flex-row gap-1"
+      >
         <span className="font-[500]">
           {section === "product"
             ? "محصول"
@@ -48,8 +52,7 @@ export default function CommentItem({
         </span>
         <span>:</span>
         <span>{sectionName}</span>
-      </div>
-      <div></div>
+      </Link>
 
       <div className="flex flex-row gap-10 items-center">
         <select

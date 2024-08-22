@@ -18,7 +18,9 @@ export type ArgsStructure<T = null> = T extends null
 export async function categoriesController({ ctx }: ArgsStructure) {
   const { prisma } = ctx;
 
-  let categories = await prisma.category.findMany();
+  let categories = await prisma.category.findMany({
+    where: { status: "ENABLED" },
+  });
   categories = categories.map((e) => ({
     ...e,
     imageUrl: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/category/${e.imageName}`,
@@ -212,6 +214,7 @@ export async function flatCategoriesController({
   try {
     const categories = await prisma.category.findMany({
       select: { id: true, title: true, updated_at: true, status: true },
+      where: { status: "ENABLED" },
     });
     return {
       categories,

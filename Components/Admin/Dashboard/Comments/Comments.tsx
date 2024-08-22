@@ -5,7 +5,10 @@ import { motion } from "framer-motion";
 import CommentItem from "./Item.comments";
 
 export default function Comments() {
-  const { data, isLoading } = trpc.comment.comments.useQuery(undefined, {cacheTime:0, networkMode:"online"});
+  const { data, isLoading } = trpc.comment.comments.useQuery(undefined, {
+    cacheTime: 0,
+    networkMode: "online",
+  });
   return (
     <motion.div>
       {isLoading ? (
@@ -15,7 +18,7 @@ export default function Comments() {
           {data?.comments?.length
             ? data.comments.map((comment) => (
                 <CommentItem
-                selectOptions={data.statusOptions}
+                  selectOptions={data.statusOptions}
                   key={comment.id}
                   currentStatus={comment.status}
                   user_name={comment.User.name}
