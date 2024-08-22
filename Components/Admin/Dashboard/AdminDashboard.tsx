@@ -4,9 +4,10 @@ import React from "react";
 import Products from "./Products";
 import Articles from "./Articles";
 import Categories from "./Categories/Categories";
-import Comments from "./Comments";
+
 import { Merseh_nastaliq } from "@/Components/SVGS";
 import classNames from "classnames";
+import Comments from "./Comments/Comments";
 
 interface Props {
   route?: string;

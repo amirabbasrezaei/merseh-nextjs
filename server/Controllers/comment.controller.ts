@@ -322,10 +322,19 @@ export async function comments_controller({ ctx: { prisma } }: ArgsStructure) {
         Article: { select: { title: true, id: true } },
       },
     });
-    return { comments, error: null };
+    return {
+      comments,
+      statusOptions: [
+        { value: "APPROVED", name: "تایید شده" },
+        { value: "NEED_REVIEW", name: "نیاز به بررسی" },
+        { value: "FAILED", name: "عدم تایید" },
+        { value: "NOT_SHOWN", name: "نمایش داده نشود" },
+      ],
+      error: null,
+    };
   } catch (error) {
     console.log(error);
-    return { comments: null, error };
+    return { comments: null, statusOptions: null, error };
   }
 }
 
@@ -341,12 +350,11 @@ export async function change_comment_status({
   input,
 }: ArgsStructure<ChangeCommentStatus>) {
   try {
-    
-    await prisma.comment.update({
+    const comment = await prisma.comment.update({
       where: { id: Number(input.commentId) },
       data: { status: input.status },
     });
-
+    return { currentStatus: comment.status };
   } catch (error) {
     console.log(error);
     throw new TRPCError({

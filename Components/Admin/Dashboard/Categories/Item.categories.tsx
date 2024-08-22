@@ -18,8 +18,18 @@ export default function Item({
   selectOptions,
   currentStatus,
 }: Props) {
-  const { mutate: mutateChangeStatus, isLoading } =
-    trpc.product.changeCategoryStatus.useMutation();
+  const {
+    mutate: mutateChangeStatus,
+    isLoading,
+    data,
+  } = trpc.product.changeCategoryStatus.useMutation();
+
+  const [status, setStatus] = useState(currentStatus);
+  useEffect(() => {
+    if (data?.currentStatus) {
+      setStatus(data.currentStatus);
+    }
+  }, [data]);
 
   return (
     <div className="border flex flex-row w-full p-5 rounded-md justify-between">
@@ -34,7 +44,9 @@ export default function Item({
           </div>
         ) : null}
         <div className="relative">
-          {isLoading ? <div className="absolute top-0 w-full h-full bg-gray-100 animate-pulse" /> : null}
+          {isLoading ? (
+            <div className="absolute top-0 w-full h-full bg-gray-100 animate-pulse" />
+          ) : null}
           <select
             onChange={(e) =>
               mutateChangeStatus({
@@ -45,8 +57,13 @@ export default function Item({
             className="block   w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
           >
             {selectOptions?.length
-              ? selectOptions.map((item: any, index) => (
-                  <option key={item.value} value={item.value} className="">
+              ? selectOptions.map((item: any) => (
+                  <option
+                    selected={item.value === status}
+                    key={item.value}
+                    value={item.value}
+                    className=""
+                  >
                     {item.name}
                   </option>
                 ))

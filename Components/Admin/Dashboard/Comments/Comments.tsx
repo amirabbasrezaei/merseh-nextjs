@@ -1,8 +1,8 @@
 import { trpc } from "@/utils/trpc";
 import React from "react";
 import { motion } from "framer-motion";
-import Item from "./Item";
-import CommentItem from "./CommentItem";
+
+import CommentItem from "./Item.comments";
 
 export default function Comments() {
   const { data, isLoading } = trpc.comment.comments.useQuery();
@@ -15,8 +15,9 @@ export default function Comments() {
           {data?.comments?.length
             ? data.comments.map((comment) => (
                 <CommentItem
-                key={comment.id}
-                  status={comment.status}
+                selectOptions={data.statusOptions}
+                  key={comment.id}
+                  currentStatus={comment.status}
                   user_name={comment.User.name}
                   user_lastName={comment.User.familyName || ""}
                   id={String(comment.id)}
