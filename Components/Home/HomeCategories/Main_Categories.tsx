@@ -4,6 +4,7 @@ import Link from "next/link";
 import { trpc } from "@/utils/trpc";
 import { motion } from "framer-motion";
 import CategoryItem from "./CategoryItem.mainCategory";
+import classNames from "classnames";
 
 export default function Main_Categories() {
   const { data, isLoading } = trpc.product.categories.useQuery();
@@ -28,25 +29,25 @@ export default function Main_Categories() {
           className="sm:h-auto h-fit flex flex-row  items-start sm:justify-evenly gap-6 sm:gap-3 overflow-x-scroll"
           style={{ scrollbarWidth: "none" }}
         >
-          {data[0].subCategories.map((category, index) => (
+          { data !== undefined ? data[0]?.subCategories?.map((category, index) => (
             <CategoryItem
               key={category.id}
               id={category.id}
               image_url={category.imageUrl}
               title={category.title}
             />
-          ))}
+          )) : null}
         </motion.div>
       ) : (
-        <div className="flex flex-row justify-between gap-6 sm:gap-3">
+        <div className="flex flex-row   justify-between box-content   w-full gap-3  max-w-[100%] ">
           {Array.from(Array(5)).map((e, index) => (
+        
             <div
               key={index}
               style={{ width: 160.28 }}
-              className="h-full  flex flex-col items-center gap-3 animate-pulse"
+              className={classNames(`    aspect-square basis-1/2  rounded-[30px] lg:rounded-[50px] md:rounded-[40px]    bg-[#f1f1f1]   animate-pulse`, `duration-[${index}ms]` )}
             >
-              <div className="sm:w-[160px] sm:h-[160px] h-[120px] w-[120px] rounded-[10px] sm:rounded-[50px] bg-[#f1f1f1] "></div>
-              <div className="w-[70%] h-5 bg-[#f1f1f1] rounded-[7px] "></div>
+              
             </div>
           ))}
         </div>

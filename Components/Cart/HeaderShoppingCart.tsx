@@ -23,7 +23,7 @@ export default function HeaderShoppingCart() {
       >
         {items.length && isClient ? (
           <div className=" absolute top-[6px] right-[7px] flex    items-center justify-center">
-            <svg className="fill-green1 w-4 h-4 flex items justify-center animate-pulse">
+            <svg className="fill-green1 w-4 h-4 flex items justify-center animate-bounce duration-[10000ms] ease-in-out">
               <circle r="3" cx="10" cy="10" />
             </svg>
           </div>
