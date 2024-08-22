@@ -17,7 +17,7 @@ export default function Home() {
         <hr className="w-full" />
         <h1 className="absolute -top-3 bg-white px-4">مرسه</h1>
       </div>
-      <Main_Categories />
+      {/* <Main_Categories /> */}
       <ProductsGrid categoryId={2} title="روغن های گیاهی" />
       {/* <ProductsGrid categoryId={6} title="گیاهان خشک شده"/> */}
       <ProductCarousel

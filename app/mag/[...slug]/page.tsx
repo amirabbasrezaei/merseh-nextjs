@@ -59,12 +59,7 @@ export async function generateMetadata({
 }
 
 export default function page({ params }: NextPagePropsType) {
-  // console.log(params?.slug?.length < 2 )
-  // if (params?.slug?.length < 2) {
-  //    return getArticle(params.slug[0]).then((article) =>
-  //     redirect()
-  //   );
-  // }
+
   return (
     <MagLayout>
       <Article articleId={Number(params.slug[0])} />
