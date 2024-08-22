@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import CommentItem from "./Item.comments";
 
 export default function Comments() {
-  const { data, isLoading } = trpc.comment.comments.useQuery();
+  const { data, isLoading } = trpc.comment.comments.useQuery(undefined, {cacheTime:0, networkMode:"online"});
   return (
     <motion.div>
       {isLoading ? (
