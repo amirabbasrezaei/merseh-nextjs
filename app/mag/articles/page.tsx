@@ -1,11 +1,10 @@
-
-import Layout from "@/Components/Layout/Layout";
+import MagLayout from "@/Components/Layout/MagLayout";
 import Articles from "@/Components/Mag/Articles/Articles";
 
 export default function page() {
   return (
-    <Layout>
+    <MagLayout>
       <Articles />
-    </Layout>
+    </MagLayout>
   );
 }

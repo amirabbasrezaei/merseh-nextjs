@@ -70,7 +70,7 @@ export default function RootLayout({
         </>
       ) : null}
       <body
-        className={`overflow-x-hidden  bg-white ${IRANYekanXFaNum.className}`}
+        className={`overflow-x-hidden  ${IRANYekanXFaNum.className}`}
       >
         <Toaster />
         <RecoilRootProvider>
