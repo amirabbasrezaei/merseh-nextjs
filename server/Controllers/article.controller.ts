@@ -243,10 +243,21 @@ export async function getArticleController({
 
 export async function articlesController({ ctx: { prisma } }: ArgsStructure) {
   try {
-    const articles = await prisma.article.findMany({orderBy: {created_at: "desc"}});
+    const articles = await prisma.article.findMany({
+      orderBy: { created_at: "desc" },
+    });
 
     const haveImageArticles = articles.map((article) => ({
       ...article,
+      content:
+        (
+          (JSON.parse(article.content).filter(
+            (e: any) => e.type === "p" && e.childs[0].type === "#text"
+          )[0]?.childs[0]?.content as string) || ""
+        )
+          .split(" ")
+          .slice(0, 25)
+          .join(" ") + "..." || "",
       images: article.images.map(
         (img) =>
           `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/articleMainImages/${img}`
@@ -277,6 +288,15 @@ export async function recentArticlesController({
 
     const recentArticlesWithImage = recentArticles.map((article) => ({
       ...article,
+      content:
+        (
+          (JSON.parse(article.content).filter(
+            (e: any) => e.type === "p" && e.childs[0].type === "#text"
+          )[0]?.childs[0]?.content as string) || ""
+        )
+          .split(" ")
+          .slice(0, 20)
+          .join(" ") + "..." || "",
       images: article.images.map(
         (img) =>
           `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/articleMainImages/${img}`
@@ -285,6 +305,7 @@ export async function recentArticlesController({
 
     const suggestedArticlesWithImage = suggestedArticels.map((article) => ({
       ...article,
+      content: "",
       images: article.images.map(
         (img) =>
           `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/articleMainImages/${img}`

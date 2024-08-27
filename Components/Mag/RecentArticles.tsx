@@ -81,17 +81,7 @@ export default function RecentArticles() {
           {data?.recentArticles?.length
             ? data.recentArticles.map((article) => (
                 <ArticleCard
-                  short_content={
-                    (
-                      (JSON.parse(article.content).filter(
-                        (e: any) =>
-                          e.type === "p" && e.childs[0].type === "#text"
-                      )[0]?.childs[0]?.content as string) || ""
-                    )
-                      .split(" ")
-                      .slice(0, 20)
-                      .join(" ") + "..." || ""
-                  }
+                  short_content={article.content}
                   title={article.title}
                   imageUrl={article.images[0]}
                   articleId={article.id}
