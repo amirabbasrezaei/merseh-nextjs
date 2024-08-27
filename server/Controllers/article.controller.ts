@@ -243,7 +243,7 @@ export async function getArticleController({
 
 export async function articlesController({ ctx: { prisma } }: ArgsStructure) {
   try {
-    const articles = await prisma.article.findMany();
+    const articles = await prisma.article.findMany({orderBy: {created_at: "desc"}});
 
     const haveImageArticles = articles.map((article) => ({
       ...article,

@@ -84,7 +84,7 @@ export default function ProductsGrid({ title, categoryId }: props) {
   }, []);
 
   return (
-    <section className="w-full sm:p-4 flex flex-col items-center gap-5 ">
+    <section className="w-full sm:p-4 flex flex-col items-center gap-1 ">
       <div className="flex flex-row gap-1 items-center justify-center ">
         <svg
           className="w-[9px] h-auto"
@@ -94,6 +94,7 @@ export default function ProductsGrid({ title, categoryId }: props) {
         >
           <ellipse cx="5.5" cy="11" rx="5.5" ry="11" fill="#00A573" />
         </svg>
+
         <span className="text-[18px] font-[600] text-gray-600  w-full ">
           {title}
         </span>

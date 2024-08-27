@@ -30,6 +30,8 @@ export const metadata: Metadata = {
     locale: "fa_IR",
     siteName: "مرسه",
     type: "website",
+    countryName:"IRAN",
+    
   },
   other: {
     currency: "IRT",

@@ -30,7 +30,7 @@ export async function generateMetadata({
   const article = await getArticle(params.slug[0]);
   if (article?.article) {
     return {
-      title: {absolute:article.article.title},
+      title: { absolute: article.article.title },
       alternates: {
         canonical: `${process.env.BASE_URL}/mag/${params.slug[0]}/${(
           article.article.title as string
@@ -46,7 +46,7 @@ export async function generateMetadata({
         )?.replaceAll(" ", "-")}`,
         description: article.article.metaDescription,
         locale: "fa_IR",
-        title: article.article.title,
+        title: { absolute: article.article.title },
         publishedTime: article.article.created_at,
         phoneNumbers: "+982191694827",
       },
@@ -59,7 +59,6 @@ export async function generateMetadata({
 }
 
 export default function page({ params }: NextPagePropsType) {
-
   return (
     <MagLayout>
       <Article articleId={Number(params.slug[0])} />
