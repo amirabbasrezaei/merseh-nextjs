@@ -10,7 +10,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: "https://merseh.com/mag",
-      changeFrequency: "hourly",
+      changeFrequency: "daily",
+      priority: 1,
+    },
+    {
+      url: "https://merseh.com/mag/articles",
+      changeFrequency: "daily",
       priority: 1,
     },
   ];
