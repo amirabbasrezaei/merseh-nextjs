@@ -139,11 +139,11 @@ export default function Products({ categoryId }: Props) {
         ) : (
           Array.from(Array(4)).map((_, i) => (
             <motion.div className="flex flex-col gap-3 my-5" key={i}>
-              <div className="bg-gray-100 w-[150px] h-[26px] rounded-[7px]"></div>
-              <div className="bg-gray-100 w-full h-[20px] rounded-[4px]"></div>
-              <div className="bg-gray-100 w-full h-[20px] rounded-[4px]"></div>
-              <div className="bg-gray-100 w-full h-[20px] rounded-[4px]"></div>
-              <div className="bg-gray-100 w-full h-[20px] rounded-[4px]"></div>
+              <div className="bg-gray-100 w-[150px] h-[26px] rounded-[7px] animate-pulse"></div>
+              <div className="bg-gray-100 w-full h-[20px] rounded-[4px] animate-pulse"></div>
+              <div className="bg-gray-100 w-full h-[20px] rounded-[4px] animate-pulse"></div>
+              <div className="bg-gray-100 w-full h-[20px] rounded-[4px] animate-pulse"></div>
+              <div className="bg-gray-100 w-full h-[20px] rounded-[4px] animate-pulse"></div>
             </motion.div>
           ))
         )}
