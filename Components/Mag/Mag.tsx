@@ -13,9 +13,9 @@ export default function Mag() {
       </div>
       <RecentArticles />
       <div className="w-full flex items-center justify-center ">
-        <div className="bg-gray-100 py-3 px-6 rounded-md cursor-pointer">
+        <link href={`/mag/articles`} className="bg-gray-100 py-3 px-6 rounded-md cursor-pointer">
           <span className="font-[500] text-gray-700">مطالب بیشتر</span>
-        </div>
+        </link>
       </div>
     </section>
   );
