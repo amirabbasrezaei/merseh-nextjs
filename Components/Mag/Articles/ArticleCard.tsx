@@ -18,6 +18,7 @@ export default function ArticleCard({
     <Link href={`/mag/${articleId}/${title.replaceAll(" ", "-")}`}>
       <div className="flex flex-col sm:flex-row-reverse w-full border-b pb-8 md:pb-14 border-b-gray-100 p-5  gap-3 lg:gap-10 justify-center">
         <Image
+          priority
           style={{ objectFit: "contain" }}
           className="rounded-md sm:w-[300px] lg:w-[250px]"
           alt={imageUrl.split("/").at(-1)?.split(".").at(0) || ""}
