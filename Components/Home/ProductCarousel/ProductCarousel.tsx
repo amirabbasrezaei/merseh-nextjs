@@ -73,7 +73,7 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
       <Swiper
         onSwiper={swiperRef}
         spaceBetween={10}
-        slidesPerView={width > 639 ? 5 : 2}
+        slidesPerView={width > 639 ? 5 : 1}
         direction="horizontal"
         className="w-full h-full "
         autoplay={{ delay: 5000, disableOnInteraction: false }}
@@ -83,7 +83,7 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
 
         {productCarouselData?.products.length
           ? productCarouselData.products.map((product) => (
-              <SwiperSlide className="w-fit h-full" key={product.id}>
+              <SwiperSlide className="w-fit h-full " key={product.id}>
                 <ProductCarouselItem
                   id={product.id}
                   imageUrl={`${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${product.imageNames[0]}`}

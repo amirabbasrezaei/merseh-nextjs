@@ -19,7 +19,7 @@ export default function ProductCarouselItem({ id, name, imageUrl, price }: Props
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="flex justify-center  w-fit h-full"
+        className="flex justify-center  w-full h-full "
         onDrag={(e) => e.preventDefault()}
       >
         <Link

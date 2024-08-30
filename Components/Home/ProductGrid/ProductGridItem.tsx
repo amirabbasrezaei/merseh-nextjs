@@ -21,7 +21,7 @@ function ProductSliceItem({
 }: ProductSliceItemProps) {
   return (
     <Link
-      className="relative"
+      className="relative "
       key={id}
       href={`/product/${id}/${name.replaceAll(" ", "-")}`}
     >
@@ -38,7 +38,7 @@ function ProductSliceItem({
       >
         <div className="flex flex-row items-center  gap-4">
           <Image
-            className="w-[60px]  md:w-[110px] lg:w-[80px] xl:h-[200px] lg:h-[200px]"
+            className="h-[190px] w-[100px]  md:w-[110px] lg:w-[80px] xl:h-[200px] lg:h-[200px]"
             width={200}
             height={600}
             quality={100}
