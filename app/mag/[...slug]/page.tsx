@@ -67,6 +67,10 @@ export default async function page({ params }: NextPagePropsType) {
     name: article.article.title,
     image: article.article.imageUrls[0],
     description: article.article.metaDescription,
+    author: "مرسه",
+    headline: article.article.title,
+    datePublished: article.article.created_at,
+    
     
   };
   return (

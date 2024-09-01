@@ -110,6 +110,7 @@ export default async function Page({
   const jsonLd: WithContext<ProductSchema> = {
     "@context": "https://schema.org",
     "@type": "Product",
+    "@id": product.product.id,
     name: product.product.name,
     image: product.product.imageUrls[0],
     description: product.product.metaDescription,
@@ -120,11 +121,16 @@ export default async function Page({
     }/${product.product.name.replaceAll(" ", "-")}`,
     productID: product.product.id,
     offers: {
-      "@type": "OfferForPurchase",
-      "@id": product.product.id,
+      "@type": "AggregateOffer",
       name: product.product.name,
       priceCurrency: "IRT",
-      availability: variationValue?.instock ? "InStock" : "OutOfStock",
+      availability: variation && variationValue
+      ? variationValue.instock
+        ? "InStock"
+        : "OutOfStock"
+      : product.product.instock
+      ? "InStock"
+      : "OutOfStock",
       price:
         variation && variationValue
           ? variationValue.price - variationValue.discount
