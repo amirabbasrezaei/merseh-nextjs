@@ -64,13 +64,16 @@ export default async function page({ params }: NextPagePropsType) {
   const jsonLd: WithContext<ArticleSchema> = {
     "@context": "https://schema.org",
     "@type": "Article",
+    "@id": `${process.env.BASE_URL}/mag/${
+      article.article.id
+    }/${article.article.title.replaceAll(" ", "-")}` ,
     name: article.article.title,
     image: article.article.imageUrls[0],
     description: article.article.metaDescription,
     author: "مرسه",
     headline: article.article.title,
     datePublished: article.article.created_at,
-    
+
     
   };
   return (

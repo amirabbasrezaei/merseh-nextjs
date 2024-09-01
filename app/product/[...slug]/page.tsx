@@ -110,7 +110,9 @@ export default async function Page({
   const jsonLd: WithContext<ProductSchema> = {
     "@context": "https://schema.org",
     "@type": "Product",
-    "@id": product.product.id,
+    "@id": `${process.env.BASE_URL}/product/${
+      product.product.id
+    }/${product.product.name.replaceAll(" ", "-")}`,
     name: product.product.name,
     image: product.product.imageUrls[0],
     description: product.product.metaDescription,
