@@ -101,7 +101,7 @@ export default function ProductsGrid({ title, categoryId }: props) {
       </div>
       <Swiper
         onSwiper={swiperRef}
-        spaceBetween={20}
+        spaceBetween={0}
         style={width > 639 ? { paddingRight: 20, paddingLeft: 20 } : {}}
         slidesPerView={width > 1023 ? 3 : width > 767 ? 2 : 1}
         direction="horizontal"
@@ -116,7 +116,15 @@ export default function ProductsGrid({ title, categoryId }: props) {
               (productSlice: any, index: any) => {
                 return productSlice.length >= 3 ? (
                   <SwiperSlide key={index}>
-                    <ProductGridItem productSlice={productSlice} key={index} />
+                    <div
+                      key={index}
+                      className="flex flex-row w-full gap-0 h-fit"
+                    >
+                      <ProductGridItem productSlice={productSlice} />
+                      {productSlice.length !== index + 1 ? (
+                        <div className="border-l border-[#f3f3f3]  w-[1x]" />
+                      ) : null}
+                    </div>
                   </SwiperSlide>
                 ) : null;
               }

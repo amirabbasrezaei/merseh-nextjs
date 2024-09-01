@@ -107,6 +107,8 @@ export default async function Page({
     (value: any) => value.id == searchParams.variationValue
   );
 
+
+
   const jsonLd: WithContext<ProductSchema> = {
     "@context": "https://schema.org",
     "@type": "Product",

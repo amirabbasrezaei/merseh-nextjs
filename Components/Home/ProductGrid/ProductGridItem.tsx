@@ -10,6 +10,8 @@ interface ProductSliceItemProps {
   imageName: string;
   product_variatios: any;
   price: number;
+  i: number;
+  sliceLength: number;
 }
 
 function ProductSliceItem({
@@ -18,6 +20,8 @@ function ProductSliceItem({
   name,
   product_variatios,
   price,
+  i,
+  sliceLength,
 }: ProductSliceItemProps) {
   return (
     <Link
@@ -34,7 +38,7 @@ function ProductSliceItem({
           },
           close: { opacity: 0, scale: 0.5 },
         }}
-        className=" pl-3 py-5 rounded-[5px] flex flex-row h-full items-center justify-between gap-2"
+        className=" px-5 py-5 rounded-[5px] flex flex-row h-full items-center justify-between gap-2"
       >
         <div className="flex flex-row items-center  gap-4">
           <Image
@@ -68,9 +72,9 @@ function ProductSliceItem({
           <span className="lg:text-[14px] text-[10px] text-black1">تومان </span>
         </div>
       </motion.div>
-      {/* {productSlice.length - 1 !== i ? (
-        <hr className="border-[1x] border-[#f3f3f3] w-[65%] absolute left-0 bottom-0" />
-      ) : null} */}
+      {sliceLength - 1 !== i ? (
+        <hr className="border-[1x] border-[#f3f3f3] w-full absolute left-0 bottom-0" />
+      ) : null}
     </Link>
   );
 }
@@ -84,7 +88,7 @@ export default function ProductGridItem({
 }: ProductGridItemProps) {
   return (
     <motion.div
-      className="flex flex-col divide-y  divide-[#f3f3f3] gap-0 h-full "
+      className="flex flex-col  divide-[#f3f3f3] gap-0 h-full w-full"
       variants={{
         open: {
           transition: {
@@ -100,6 +104,8 @@ export default function ProductGridItem({
     >
       {productSlice.map((product: any, i: number) => (
         <ProductSliceItem
+          i={i}
+          sliceLength={productSlice.length}
           product_variatios={product.ProductVariation}
           key={product.id}
           imageName={product.imageNames[0]}
