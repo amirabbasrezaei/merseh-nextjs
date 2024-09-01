@@ -124,25 +124,31 @@ export default async function Page({
       "@type": "AggregateOffer",
       name: product.product.name,
       priceCurrency: "IRT",
-      availability: variation && variationValue
-      ? variationValue.instock
-        ? "InStock"
-        : "OutOfStock"
-      : product.product.instock
-      ? "InStock"
-      : "OutOfStock",
+      availability:
+        variation && variationValue
+          ? variationValue.instock
+            ? "InStock"
+            : "OutOfStock"
+          : product.product.instock
+          ? "InStock"
+          : "OutOfStock",
       price:
         variation && variationValue
           ? variationValue.price - variationValue.discount
           : product.product.price - product.product.discount,
+      lowPrice:
+        variation && variationValue
+          ? variationValue.price - variationValue.discount
+          : product.product.price - product.product.discount,
+      offerCount: variation?.variations.length || 1,
       url: `${process.env.BASE_URL}/product/${
         product.product.id
       }/${product.product.name.replaceAll(" ", "-")}`,
-      seller:{
+      seller: {
         "@type": "OnlineStore",
         url: process.env.BASE_URL,
-        name: "فروشگاه مرسه"
-      }
+        name: "فروشگاه مرسه",
+      },
     },
   };
 
