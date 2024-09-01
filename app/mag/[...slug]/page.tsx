@@ -1,10 +1,10 @@
 import Article from "@/Components/Mag/Article";
-import Layout from "@/Components/Layout/Layout";
 import MagLayout from "@/Components/Layout/MagLayout";
 import React, { cache } from "react";
 import axios from "axios";
 import { Metadata } from "next";
-import { redirect } from "next/dist/server/api-utils";
+
+import { WithContext, Article as ArticleSchema } from "schema-dts";
 
 export const revalidate = 3600;
 
@@ -58,10 +58,24 @@ export async function generateMetadata({
   return {};
 }
 
-export default function page({ params }: NextPagePropsType) {
+export default async function page({ params }: NextPagePropsType) {
+  const article = await getArticle(params.slug[0]);
+
+  const jsonLd: WithContext<ArticleSchema> = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    name: article.article.title,
+    image: article.article.imageUrls[0],
+    description: article.article.metaDescription,
+    
+  };
   return (
     <MagLayout>
       <Article articleId={Number(params.slug[0])} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
     </MagLayout>
   );
 }

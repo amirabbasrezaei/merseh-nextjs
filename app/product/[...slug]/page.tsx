@@ -1,6 +1,6 @@
 import Layout from "@/Components/Layout/Layout";
 import Product from "@/Components/Product/Product";
-import { trpc } from "@/utils/trpc";
+import { Product as ProductSchema, WithContext } from "schema-dts";
 import axios from "axios";
 import { Metadata, NextPage } from "next";
 import { cache } from "react";
@@ -93,10 +93,60 @@ export async function generateMetadata({
   return {};
 }
 
-export default function Page({ params }: NextPagePropsType) {
+export default async function Page({
+  params,
+  searchParams,
+}: NextPagePropsType) {
+  const product = await getProduct(params.slug[0]);
+
+  const variation = product.product?.variations.find(
+    (vr: any) => vr.id == searchParams.variation
+  );
+
+  const variationValue = variation?.variations?.find(
+    (value: any) => value.id == searchParams.variationValue
+  );
+
+  const jsonLd: WithContext<ProductSchema> = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.product.name,
+    image: product.product.imageUrls[0],
+    description: product.product.metaDescription,
+    countryOfOrigin: "IRAN",
+    brand: "merseh",
+    url: `${process.env.BASE_URL}/product/${
+      product.product.id
+    }/${product.product.name.replaceAll(" ", "-")}`,
+    productID: product.product.id,
+    offers: {
+      "@type": "OfferForPurchase",
+      "@id": product.product.id,
+      name: product.product.name,
+      priceCurrency: "IRT",
+      availability: variationValue?.instock ? "InStock" : "OutOfStock",
+      price:
+        variation && variationValue
+          ? variationValue.price - variationValue.discount
+          : product.product.price - product.product.discount,
+      url: `${process.env.BASE_URL}/product/${
+        product.product.id
+      }/${product.product.name.replaceAll(" ", "-")}`,
+      seller:{
+        "@type": "OnlineStore",
+        url: process.env.BASE_URL,
+        name: "فروشگاه مرسه"
+      }
+    },
+  };
+
   return (
     <Layout>
       <Product productId={params.slug[0]} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
     </Layout>
   );
 }
