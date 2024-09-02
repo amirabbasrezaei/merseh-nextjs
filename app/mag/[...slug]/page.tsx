@@ -1,6 +1,6 @@
 import Article from "@/Components/Mag/Article";
 import MagLayout from "@/Components/Layout/MagLayout";
-import React, { cache } from "react";
+import React, { cache, useEffect } from "react";
 import axios from "axios";
 import { Metadata } from "next";
 
@@ -59,17 +59,24 @@ export async function generateMetadata({
 }
 
 export default async function page({ params }: NextPagePropsType) {
-  const article = await getArticle(params.slug[0]);
+  console.log(params.slug[0]
+
+  )
+  const article = await getArticle(params.slug[0])
 
   const wordCount = () => {
     let counter = 0;
-    JSON.parse(article.article.content)
+    article.article.content
       .filter((e: any) => e.type === "p" && e.childs[0].type === "#text")
       .map((p: any) => {
         counter += ((p?.childs[0]?.content as string) || "").split(" ").length;
       });
     return counter;
   };
+
+  
+
+  
 
   const jsonLd: WithContext<ArticleSchema> = {
     "@context": "https://schema.org",
@@ -78,7 +85,12 @@ export default async function page({ params }: NextPagePropsType) {
       article.article.id
     }/${article.article.title.replaceAll(" ", "-")}`,
     name: article.article.title,
-    image: article.article.imageUrls[0],
+    image: {
+      "@type": "ImageObject",
+      url: article.article.imageUrls[0],
+      width: "1200",
+      height: "800",
+    },
     description: article.article.metaDescription,
     author: {
       "@type": "Person",
