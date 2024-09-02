@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description:
     "مجله مرسه کاربردی ترین و جدیدترین موضوعات مربوط به حوزه سلامتی، محصولات طبیعی و ارگانیک را منتشر می‌کند",
   alternates: {
-    canonical: `${process.env.BASE_URL}`,
+    canonical: `${process.env.BASE_URL}/mag`,
 
   },
   metadataBase: new URL("https://merseh.com/mag"),
