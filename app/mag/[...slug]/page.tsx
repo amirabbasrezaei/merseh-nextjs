@@ -80,7 +80,7 @@ export default async function page({ params }: NextPagePropsType) {
 
   const jsonLd: WithContext<ArticleSchema> = {
     "@context": "https://schema.org",
-    "@type": "TechArticle",
+    "@type": "Article",
     "@id": `${process.env.BASE_URL}/mag/${
       article.article.id
     }/${article.article.title.replaceAll(" ", "-")}`,
