@@ -107,15 +107,14 @@ export default async function Page({
     (value: any) => value.id == searchParams.variationValue
   );
 
-
-
   const jsonLd: WithContext<ProductSchema> = {
     "@context": "https://schema.org",
     "@type": "Product",
     "@id": `${process.env.BASE_URL}/product/${
       product.product.id
     }/${product.product.name.replaceAll(" ", "-")}`,
-    name: product.product.name,
+    name: " قیمت و خرید" + " " + product.product.name,
+
     image: product.product.imageUrls[0],
     description: product.product.metaDescription,
     countryOfOrigin: "IRAN",
