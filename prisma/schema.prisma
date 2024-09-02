@@ -54,6 +54,7 @@ model Article {
   content         String
   metaDescription String?
   isSuggested     Boolean?
+  keywords        String[]
 }
 
 model OrderShipping {
@@ -93,6 +94,7 @@ model Product {
   category         Category[]         @relation("CategoryToProduct")
   details          String[]
   Comments         Comment[]
+  content_keywords String[]
 }
 
 model ProductVariationValue {

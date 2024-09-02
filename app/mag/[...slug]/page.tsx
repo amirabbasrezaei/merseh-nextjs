@@ -61,20 +61,48 @@ export async function generateMetadata({
 export default async function page({ params }: NextPagePropsType) {
   const article = await getArticle(params.slug[0]);
 
+  const wordCount = () => {
+    let counter = 0;
+    JSON.parse(article.article.content)
+      .filter((e: any) => e.type === "p" && e.childs[0].type === "#text")
+      .map((p: any) => {
+        counter += ((p?.childs[0]?.content as string) || "").split(" ").length;
+      });
+    return counter;
+  };
+
   const jsonLd: WithContext<ArticleSchema> = {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "TechArticle",
     "@id": `${process.env.BASE_URL}/mag/${
       article.article.id
-    }/${article.article.title.replaceAll(" ", "-")}` ,
+    }/${article.article.title.replaceAll(" ", "-")}`,
     name: article.article.title,
     image: article.article.imageUrls[0],
     description: article.article.metaDescription,
-    author: "مرسه",
+    author: {
+      "@type": "Person",
+      name: "امیرعباس رضائی",
+    },
+    editor: {
+      "@type": "Person",
+      name: "امیرعباس رضائی",
+    },
+    wordCount: wordCount(),
     headline: article.article.title,
     datePublished: article.article.created_at,
-
-    
+    dateCreated: article.article.created_at,
+    dateModified: article.article.updated_at,
+    publisher: {
+      "@type": "HealthAndBeautyBusiness",
+      name: "مجله مرسه",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://static.merseh.ir/main_images/merseh_mag.png",
+        width: "207",
+        height: "36",
+      },
+    },
   };
   return (
     <MagLayout>

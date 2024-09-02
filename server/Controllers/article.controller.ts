@@ -222,6 +222,7 @@ export async function getArticleController({
       title: article.title,
       metaDescription: article.metaDescription,
       created_at: article.created_at,
+      updated_at:article.updated_at,
       content: JSON.parse(article.content).map((e: any) => {
         if (e.type === "img") {
           return {
