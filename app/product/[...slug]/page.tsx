@@ -148,7 +148,7 @@ export default async function Page({
         product.product.id
       }/${product.product.name.replaceAll(" ", "-")}`,
       seller: {
-        "@type": "OnlineStore",
+        "@type": "HealthAndBeautyBusiness",
         url: process.env.BASE_URL,
         name: "فروشگاه مرسه",
       },
