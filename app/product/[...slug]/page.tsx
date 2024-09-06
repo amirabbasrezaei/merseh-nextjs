@@ -125,7 +125,7 @@ export default async function Page({
     offers: {
       "@type": "AggregateOffer",
       name: product.product.name,
-      priceCurrency: "IRT",
+      priceCurrency: "IRR",
       availability:
         variation && variationValue
           ? variationValue.instock
@@ -136,12 +136,12 @@ export default async function Page({
           : "OutOfStock",
       price:
         variation && variationValue
-          ? variationValue.price - variationValue.discount
-          : product.product.price - product.product.discount,
+          ? (variationValue.price - variationValue.discount) * 10
+          : (product.product.price - product.product.discount) * 10,
       lowPrice:
         variation && variationValue
-          ? variationValue.price - variationValue.discount
-          : product.product.price - product.product.discount,
+          ? (variationValue.price - variationValue.discount) * 10
+          : (product.product.price - product.product.discount) * 10,
       offerCount: variation?.variations.length || 1,
       url: `${process.env.BASE_URL}/product/${
         product.product.id
