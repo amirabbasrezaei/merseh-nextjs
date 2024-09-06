@@ -30,6 +30,7 @@ export function ContentViewer({ contentForView }: Props) {
                       alt={node.content.name || ""}
                       quality={100}
                       priority={false}
+                      key={node?.content?.name || ""}
                     />
                   </div>
                 );

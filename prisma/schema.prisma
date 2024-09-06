@@ -36,7 +36,7 @@ model Province {
 
 model City {
   id         Int       @id @default(autoincrement())
-  name       String
+  name       String 
   engName    String
   provinceId Int
   Address    Address[]

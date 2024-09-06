@@ -114,7 +114,6 @@ export default async function Page({
       product.product.id
     }/${product.product.name.replaceAll(" ", "-")}`,
     name: " قیمت و خرید" + " " + product.product.name,
-
     image: product.product.imageUrls[0],
     description: product.product.metaDescription,
     countryOfOrigin: "IRAN",
