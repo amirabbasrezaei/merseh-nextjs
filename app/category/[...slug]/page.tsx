@@ -59,10 +59,14 @@ export async function generateMetadata({
   return {};
 }
 
-export default function page({ params }: any) {
+export default async function page({ params }: any) {
+  const category = await getCategory(params.slug[0]);
   return (
     <Layout>
-      <Products categoryId={Number(params.slug[0])} />
+      <Products
+        categoryContent={category?.category}
+        categoryId={Number(params.slug[0])}
+      />
     </Layout>
   );
 }
