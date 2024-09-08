@@ -1,35 +1,38 @@
-"use client";
 import { trpc } from "@/utils/trpc";
 import React, { useRef } from "react";
 import Content from "../Admin/AddProduct/ContentViewer";
 import Image from "next/image";
 import Comments from "./Comments/Comments";
 import placeholder from "@/public/Images/article-main-image-placeholder.webp";
-interface Props {
+import { GetServerSideProps } from "next";
+import { getArticle } from "@/app/mag/[...slug]/page";
+type Props = {
+  articleData: any;
   articleId: number;
-}
+};
 
-export default function Article({ articleId }: Props) {
-  const commentsRef = useRef(null);
-  const { data } = trpc.article.getArticle.useQuery({ articleId });
+export default async function Article({ articleData, articleId }: Props) {
+  console.log(articleData?.article);
   return (
     <section className="flex flex-col md:gap-10 gap-5 w-full  md:px-5">
       <div className="w-full flex items-center justify-center">
         <div className="flex flex-col-reverse md:flex-row justify-center  h-full items-end gap-5">
           <div className="basis-1/3 h-full flex flex-col gap-4 justify-center items-center md:pb-14">
-            {data?.article?.title ? (
-              <h1 className="text-[25px] font-[600]">{data?.article?.title}</h1>
+            {articleData?.article?.title ? (
+              <h1 className="text-[25px] font-[600]">
+                {articleData?.article?.title}
+              </h1>
             ) : (
               <div className="flex items-start flex-col gap-4">
                 <div className="h-[30px] w-[200px] rounded-lg bg-gray-100 animate-pulse" />
                 <div className="h-[30px] w-[340px] rounded-lg bg-gray-100 animate-pulse" />
               </div>
             )}
-            {data?.article?.created_at ? (
+            {articleData?.article?.created_at ? (
               <span className="text-[#575757] text-[14px]">
-                {new Date(data.article.created_at || 0).toLocaleDateString(
-                  "fa-IR"
-                )}
+                {new Date(
+                  articleData?.article?.created_at || 0
+                ).toLocaleDateString("fa-IR")}
               </span>
             ) : (
               <div className="h-[25px] w-[100px] rounded-lg bg-gray-100" />
@@ -41,8 +44,8 @@ export default function Article({ articleId }: Props) {
             height={500}
             priority={true}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33v"
-            alt={data?.article?.title || ""}
-            src={data?.article?.imageUrls[0] || placeholder}
+            alt={articleData?.article?.title || ""}
+            src={articleData?.article?.imageUrls[0] || placeholder}
             quality={100}
             className="rounded-lg bg-gray-100 "
             placeholder="blur"
@@ -53,8 +56,8 @@ export default function Article({ articleId }: Props) {
 
       <div className="w-full flex justify-center">
         <div className="md:w-[80%] w-full max-w-[1000px] flex flex-col gap-10">
-          {data?.article?.content ? (
-            <Content contentForView={data?.article?.content} />
+          {articleData?.article?.content ? (
+            <Content contentForView={articleData?.article?.content} />
           ) : (
             Array.from(Array(2)).map((_, i) => (
               <div className="flex flex-col gap-3 my-5" key={i}>
@@ -66,7 +69,7 @@ export default function Article({ articleId }: Props) {
             ))
           )}
 
-          <Comments commentsRef={commentsRef} articleId={articleId} />
+          <Comments  articleId={articleId} />
         </div>
       </div>
     </section>

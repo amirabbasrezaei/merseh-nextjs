@@ -13,7 +13,7 @@ export type NextPagePropsType = {
   searchParams: { [key: string]: string | string[] | undefined };
 };
 
-const getArticle = cache(async (articleId: string) => {
+export const getArticle = cache(async (articleId: string) => {
   const { data } = await axios.get(
     `${
       process.env.NODE_ENV === "production"
@@ -59,10 +59,7 @@ export async function generateMetadata({
 }
 
 export default async function page({ params }: NextPagePropsType) {
-  console.log(params.slug[0]
-
-  )
-  const article = await getArticle(params.slug[0])
+  const article = await getArticle(params.slug[0]);
 
   const wordCount = () => {
     let counter = 0;
@@ -73,10 +70,6 @@ export default async function page({ params }: NextPagePropsType) {
       });
     return counter;
   };
-
-  
-
-  
 
   const jsonLd: WithContext<ArticleSchema> = {
     "@context": "https://schema.org",
@@ -118,7 +111,7 @@ export default async function page({ params }: NextPagePropsType) {
   };
   return (
     <MagLayout>
-      <Article articleId={Number(params.slug[0])} />
+      <Article articleId={Number(params.slug[0])} articleData={article} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

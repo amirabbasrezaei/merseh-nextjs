@@ -1,3 +1,4 @@
+"use client"
 import React, { useEffect, useState } from "react";
 import Button from "../../Button";
 import { z } from "zod";
@@ -6,7 +7,7 @@ import Comment from "./Comment";
 
 type Props = {
   articleId: number;
-  commentsRef: React.MutableRefObject<null>;
+  commentsRef?: React.MutableRefObject<null>;
 };
 
 export default function Comments({ commentsRef, articleId }: Props) {
