@@ -36,7 +36,6 @@ type ProductVariation = {
   discount: number;
   variationValueid: number;
   variationId: number;
-  
 } | null;
 export default function Product({ productId, productData }: Props) {
   const commentsRef = useRef(null);
@@ -56,7 +55,6 @@ export default function Product({ productId, productData }: Props) {
     decrementProductNumber,
     removeProductFromOrder,
   } = useShoppingCart();
-
 
   const initialProduct: ProductVariation = productData?.product?.variations
     ?.length
@@ -152,7 +150,7 @@ export default function Product({ productId, productData }: Props) {
     };
   }, []);
 
-
+  console.log(productData?.product?.variations?.length);
 
   return (
     <>
@@ -283,7 +281,7 @@ export default function Product({ productId, productData }: Props) {
           <div className="h-full flex flex-col items-center gap-4 justify-center w-full sm:basis-3/12 ">
             <div className="w-full py-6 gap-5 border border-[#EAEAEA] rounded-[8px] flex flex-col items-center justify-center ">
               <div className="flex flex-row items-center justify-center  w-[80%]">
-                {productData ? (
+                {!productData ? (
                   <div className="animate-pulse h-8 w-full bg-gray-100" />
                 ) : (
                   <div className="flex flex-col">
@@ -379,7 +377,7 @@ export default function Product({ productId, productData }: Props) {
                   <Button
                     text="افزودن به سبد خرید"
                     className="w-full"
-                    isLoading={productData}
+                    isLoading={!productData}
                     onClick={() =>
                       productData?.product &&
                       addProduct(
@@ -545,9 +543,9 @@ export default function Product({ productId, productData }: Props) {
             </button>
           </div>
           <hr />
-          { productData?.product ? (
+          {productData?.product ? (
             <div className="w-full h-fit" ref={contentRef}>
-              <Content  contentForView={productData?.product.content} />
+              <Content contentForView={productData?.product.content} />
             </div>
           ) : (
             Array.from(Array(2)).map((_, i) => (
