@@ -1,3 +1,4 @@
+
 import React, { createElement } from "react";
 import { contentType } from "./QuillEditor";
 import Image from "next/image";
@@ -7,7 +8,7 @@ import classNames from "classnames";
 interface Props {
   contentForView: contentType[];
 }
-export function ContentViewer({ contentForView }: Props) {
+export  function ContentViewer({ contentForView }: Props) {
   return (
     <>
       {contentForView
@@ -70,7 +71,7 @@ export function ContentViewer({ contentForView }: Props) {
   );
 }
 
-export default function Content({ contentForView }: Props) {
+export default  function Content({ contentForView }: Props) {
   return (
     <article
       className={classNames(

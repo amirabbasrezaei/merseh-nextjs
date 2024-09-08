@@ -28,6 +28,7 @@ import Comments from "./Comments";
 
 type Props = {
   productId: string;
+  productData: any;
 };
 
 type ProductVariation = {
@@ -35,8 +36,9 @@ type ProductVariation = {
   discount: number;
   variationValueid: number;
   variationId: number;
+  
 } | null;
-export default function Product({ productId }: Props) {
+export default function Product({ productId, productData }: Props) {
   const commentsRef = useRef(null);
   const contentRef = useRef(null);
   const [visibleSection, setVisibleSection] = useState("");
@@ -54,13 +56,7 @@ export default function Product({ productId }: Props) {
     decrementProductNumber,
     removeProductFromOrder,
   } = useShoppingCart();
-  const {
-    data: productData,
-    isFetched,
-    isLoading,
-  } = trpc.product.getproduct.useQuery({
-    productId: Number(productId),
-  });
+
 
   const initialProduct: ProductVariation = productData?.product?.variations
     ?.length
@@ -76,7 +72,7 @@ export default function Product({ productId }: Props) {
     useState<ProductVariation>(initialProduct);
 
   useEffect(() => {
-    if (isFetched) {
+    if (productData) {
       setSelectedProductVariation(
         productData?.product?.variations?.length
           ? {
@@ -104,7 +100,7 @@ export default function Product({ productId }: Props) {
           : null
       );
     }
-  }, [isFetched]);
+  }, [productData]);
 
   useEffect(() => {
     if (productData?.product) {
@@ -156,9 +152,7 @@ export default function Product({ productId }: Props) {
     };
   }, []);
 
-  useEffect(() => {
-    console.log(visibleSection);
-  }, [visibleSection]);
+
 
   return (
     <>
@@ -185,7 +179,7 @@ export default function Product({ productId }: Props) {
                 <div className="w-[200px] h-[30px] bg-gray-100 animate-pulse rounded-[4px]"></div>
               )}
 
-              {!isLoading && productData?.product ? (
+              {productData?.product ? (
                 productData?.product?.variations.map((variation: any) => (
                   <div
                     key={variation.id}
@@ -273,12 +267,12 @@ export default function Product({ productId }: Props) {
                   ویژگی‌ها
                 </h2>
                 <ul className="list-disc text-[#4c4c4c] font-[400] text-[17px] list-inside marker:text-green2">
-                  {productData?.product?.details.map((det, i) => (
+                  {productData?.product?.details.map((det: any, i: number) => (
                     <li key={i}>{det}</li>
                   ))}
                 </ul>
               </div>
-            ) : isLoading ? (
+            ) : productData ? (
               <div className="flex flex-col gap-5">
                 <div className="animate-pulse bg-gray-100 w-[200px] h-[20px] rounded-sm" />
                 <div className="animate-pulse bg-gray-100 w-[200px] h-[20px] rounded-sm" />
@@ -289,7 +283,7 @@ export default function Product({ productId }: Props) {
           <div className="h-full flex flex-col items-center gap-4 justify-center w-full sm:basis-3/12 ">
             <div className="w-full py-6 gap-5 border border-[#EAEAEA] rounded-[8px] flex flex-col items-center justify-center ">
               <div className="flex flex-row items-center justify-center  w-[80%]">
-                {isLoading ? (
+                {productData ? (
                   <div className="animate-pulse h-8 w-full bg-gray-100" />
                 ) : (
                   <div className="flex flex-col">
@@ -385,7 +379,7 @@ export default function Product({ productId }: Props) {
                   <Button
                     text="افزودن به سبد خرید"
                     className="w-full"
-                    isLoading={isLoading}
+                    isLoading={productData}
                     onClick={() =>
                       productData?.product &&
                       addProduct(
@@ -551,9 +545,9 @@ export default function Product({ productId }: Props) {
             </button>
           </div>
           <hr />
-          {!isLoading && productData?.product ? (
+          { productData?.product ? (
             <div className="w-full h-fit" ref={contentRef}>
-              <Content contentForView={productData?.product.content} />
+              <Content  contentForView={productData?.product.content} />
             </div>
           ) : (
             Array.from(Array(2)).map((_, i) => (

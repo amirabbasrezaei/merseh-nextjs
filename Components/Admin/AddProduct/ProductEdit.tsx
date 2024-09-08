@@ -10,6 +10,7 @@ import ContentViewer from "./ContentViewer";
 import Image from "next/image";
 import { EditProductInput } from "@/server/Controllers/product.controller";
 import TextArea from "@/Components/TextArea";
+import Content from "./ContentViewer";
 
 type Props = {
   productId?: string;
@@ -179,7 +180,6 @@ export default function ProductEdit({ productId }: Props) {
     setVariations((state) => [...state]);
   };
 
-  console.log(productDetails);
 
   return (
     <form
@@ -412,7 +412,7 @@ export default function ProductEdit({ productId }: Props) {
       <Category filter={filter} setFilter={setFilter} />
 
       <QuillEditor setContent={setContent} content={content} />
-      <ContentViewer contentForView={content} />
+      <Content contentForView={content} />
       <button className="bg-green2 h-10 text-white w-[300px] rounded-[13px]">
         افزودن محصول
       </button>

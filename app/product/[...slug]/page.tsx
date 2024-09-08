@@ -156,7 +156,7 @@ export default async function Page({
 
   return (
     <Layout>
-      <Product productId={params.slug[0]} />
+      <Product productData={product} productId={params.slug[0]} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
