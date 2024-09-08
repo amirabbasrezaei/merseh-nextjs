@@ -13,7 +13,7 @@ export type NextPagePropsType = {
   searchParams: { [key: string]: string | string[] | undefined };
 };
 
-export const getArticle = cache(async (articleId: string) => {
+const getArticle = cache(async (articleId: string) => {
   const { data } = await axios.get(
     `${
       process.env.NODE_ENV === "production"
@@ -109,11 +109,11 @@ export default async function page({ params }: NextPagePropsType) {
       },
     },
   };
-  
+
 
   return (
     <MagLayout>
-      <Article articleId={Number(params.slug[0])} articleData={article} />
+      <Article  articleId={Number(params.slug[0])} articleData={article} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

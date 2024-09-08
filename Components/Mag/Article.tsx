@@ -5,7 +5,7 @@ import Image from "next/image";
 import Comments from "./Comments/Comments";
 import placeholder from "@/public/Images/article-main-image-placeholder.webp";
 import { GetServerSideProps } from "next";
-import { getArticle } from "@/app/mag/[...slug]/page";
+
 type Props = {
   articleData: any;
   articleId: number;
