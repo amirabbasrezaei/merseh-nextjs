@@ -109,6 +109,7 @@ export default async function page({ params }: NextPagePropsType) {
       },
     },
   };
+  
   return (
     <MagLayout>
       <Article articleId={Number(params.slug[0])} articleData={article} />
