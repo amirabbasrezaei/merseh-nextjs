@@ -270,7 +270,7 @@ export default function Product({ productId, productData }: Props) {
                   ))}
                 </ul>
               </div>
-            ) : productData ? (
+            ) : !productData ? (
               <div className="flex flex-col gap-5">
                 <div className="animate-pulse bg-gray-100 w-[200px] h-[20px] rounded-sm" />
                 <div className="animate-pulse bg-gray-100 w-[200px] h-[20px] rounded-sm" />

@@ -13,6 +13,7 @@ export type NextPagePropsType = {
 };
 
 const getProduct = cache(async (productId: string) => {
+  
   const { data } = await axios.get(
     `${
       process.env.NODE_ENV === "production"
@@ -20,6 +21,8 @@ const getProduct = cache(async (productId: string) => {
         : "http://localhost:3000"
     }/api/trpc/product.getproduct?input={"productId":${productId}}`
   );
+
+  
   return data.result.data;
 });
 
@@ -97,6 +100,7 @@ export default async function Page({
   params,
   searchParams,
 }: NextPagePropsType) {
+  // console.log(params.slug[0])
   const product = await getProduct(params.slug[0]);
 
   const variation = product.product?.variations.find(
@@ -106,7 +110,6 @@ export default async function Page({
   const variationValue = variation?.variations?.find(
     (value: any) => value.id == searchParams.variationValue
   );
-
   const jsonLd: WithContext<ProductSchema> = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -163,4 +166,5 @@ export default async function Page({
       />
     </Layout>
   );
+
 }
