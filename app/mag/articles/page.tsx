@@ -19,10 +19,16 @@ export const metadata: Metadata = {
     url: `${process.env.BASE_URL}/mag`
   },
 };
-export default function page() {
+export default async function page() {
+
+  const response = await fetch(
+    `${process.env.BASE_URL}/api/trpc/article.articles`
+  );
+  const {result: {data}} = await response.json();
+
   return (
     <MagLayout>
-      <Articles />
+      <Articles articlesData={data} />
     </MagLayout>
   );
 }

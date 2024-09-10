@@ -49,6 +49,7 @@ export default function SuggestedArticleCard({
           alt={image_alt}
           src={image_src}
           priority
+          quality={100}
         />
 
         <div className="absolute  px-5  w-full h-full top-0 right-0 flex items-center justify-center">

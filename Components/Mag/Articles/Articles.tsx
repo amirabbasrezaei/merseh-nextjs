@@ -3,14 +3,19 @@ import { trpc } from "@/utils/trpc";
 import React from "react";
 import ArticleCard from "./ArticleCard";
 import { motion } from "framer-motion";
-export default function Articles() {
-  const { data: articlesData, isLoading } = trpc.article.articles.useQuery();
+
+interface Props {
+  articlesData: any
+}
+
+export default function Articles({articlesData}: Props) {
+
   return (
     <section className="flex flex-col w-full  items-center md:px-10">
       <h1 className="font-[500] my-5">خواندنی های مجله مرسه</h1>
       <div className="grid  grid-cols-1 grid-rows-none xl:grid-cols-2 gap-8  md:gap-14   justify-between w-full">
-        {articlesData?.articles?.length && !isLoading
-          ? articlesData.articles.map((article) => (
+        {articlesData?.articles?.length
+          ? articlesData.articles.map((article: any) => (
               <ArticleCard
                 imageUrl={article.images[0]}
                 key={article.id}
