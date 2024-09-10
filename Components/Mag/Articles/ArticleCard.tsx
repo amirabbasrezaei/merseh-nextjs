@@ -25,6 +25,7 @@ export default function ArticleCard({
           src={imageUrl}
           width={600}
           height={400}
+          quality={80}
         />
         <div className="flex flex-col gap-3 justify-center">
           <h2 className="font-[600] text-[20px]">{title}</h2>
