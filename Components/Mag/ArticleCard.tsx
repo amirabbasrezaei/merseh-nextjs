@@ -36,7 +36,8 @@ export default function ArticleCard({
         // fill={true}
         alt={imageUrl.split("/").at(-1) || ""}
         src={imageUrl}
-        quality={80}
+        quality={100}
+        priority
       />
     </Link>
   );

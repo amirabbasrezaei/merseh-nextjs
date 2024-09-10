@@ -2,7 +2,7 @@ import React from "react";
 import RecentArticles from "./RecentArticles";
 import Link from "next/link";
 
-export default function Mag() {
+export default async function Mag() {
   return (
     <section className="md:px-10 py-[30px] flex flex-col gap-10">
       <div className="w-full flex justify-center relative">

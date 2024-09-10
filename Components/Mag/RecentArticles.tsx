@@ -9,10 +9,10 @@ export default async function RecentArticles() {
   const response = await fetch(
     `${process.env.BASE_URL}/api/trpc/article.recentArticles`
   );
-  const data = await response.json();
+  const {result: {data}} = await response.json();
 
-  // const { data } = trpc.article.recentArticles.useQuery();
-  // console.log(data?.suggestedArticels);
+ 
+
   return (
     <div className="w-full h-full flex flex-col sm:flex-row  gap-10 ">
       {/* choosen articles */}

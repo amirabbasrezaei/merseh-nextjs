@@ -20,7 +20,7 @@ export default function SuggestedArticleCard({
 }: Props) {
   const [hour, setHour] = useState<number>();
   const [day, setDay] = useState<number>();
-  console.log(Number(createDate) - Date.now());
+  console.log(title);
 
   useEffect(() => {
     if (createDate) {
@@ -48,6 +48,7 @@ export default function SuggestedArticleCard({
           fill
           alt={image_alt}
           src={image_src}
+          priority
         />
 
         <div className="absolute  px-5  w-full h-full top-0 right-0 flex items-center justify-center">
