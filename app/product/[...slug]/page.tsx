@@ -100,7 +100,6 @@ export default async function Page({
   params,
   searchParams,
 }: NextPagePropsType) {
-  // console.log(params.slug[0])
   const product = await getProduct(params.slug[0]);
 
   const variation = product.product?.variations.find(
