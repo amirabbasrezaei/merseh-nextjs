@@ -109,6 +109,7 @@ export default async function Page({
   const variationValue = variation?.variations?.find(
     (value: any) => value.id == searchParams.variationValue
   );
+  
   const jsonLd: WithContext<ProductSchema> = {
     "@context": "https://schema.org",
     "@type": "Product",

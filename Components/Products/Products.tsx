@@ -7,6 +7,8 @@ import { motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import Filter from "./Filter";
+import { ContentViewer } from "../Admin/AddProduct/ContentViewer";
 
 export type filterTypeArgs = {
   categoryId?: number;
@@ -32,15 +34,8 @@ const ProductCardSkeleton = dynamic(
     ssr: false,
   }
 );
-const ContentViewer = dynamic(
-  () => import("../Admin/AddProduct/ContentViewer"),
-  {
-    ssr: false,
-  }
-);
-const Filter = dynamic(() => import("./Filter"), {
-  ssr: false,
-});
+
+
 
 export default function Products({ categoryId, categoryContent }: Props) {
   const [filter, setFilter] = useState<filterTypeArgs>({

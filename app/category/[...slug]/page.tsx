@@ -1,4 +1,5 @@
 import Layout from "@/Components/Layout/Layout";
+import Products from "@/Components/Products/Products";
 
 import axios from "axios";
 import { Metadata } from "next";
@@ -30,9 +31,7 @@ const getCategory = cache(async (categoryId: string) => {
 //   },
 // };
 
-const Products = dynamic(() => import("@/Components/Products/Products"), {
-  ssr: false,
-});
+
 
 export async function generateMetadata({
   params,

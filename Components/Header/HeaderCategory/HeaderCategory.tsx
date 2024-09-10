@@ -6,14 +6,10 @@ import { Bars } from "@/Components/SVGS";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import CategoryItem from "./CategoryItem";
+import CategoryContext from "./CategoryContext";
 
-const CategoryContext = dynamic(() => import("./CategoryContext"), {
-  ssr: false,
-});
 
-const CategoryItem = dynamic(() => import("./CategoryItem"), {
-  ssr: false,
-});
 
 
 export default function HeaderCategory() {
