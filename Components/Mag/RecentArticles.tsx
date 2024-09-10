@@ -1,13 +1,18 @@
-"use client";
+"use server";
 import { trpc } from "@/utils/trpc";
 import React from "react";
 import ArticleCard from "./ArticleCard";
 import SuggestedArticleCard from "./SuggestedArticleCard";
 import { Medal_SVG, Text_SVG } from "../SVGS";
 
-export default function RecentArticles() {
-  const { data } = trpc.article.recentArticles.useQuery();
-  console.log(data?.suggestedArticels);
+export default async function RecentArticles() {
+  const response = await fetch(
+    `${process.env.BASE_URL}/api/trpc/article.recentArticles`
+  );
+  const data = await response.json();
+
+  // const { data } = trpc.article.recentArticles.useQuery();
+  // console.log(data?.suggestedArticels);
   return (
     <div className="w-full h-full flex flex-col sm:flex-row  gap-10 ">
       {/* choosen articles */}
@@ -79,7 +84,7 @@ export default function RecentArticles() {
         </div>
         <div className="grid grid-cols-1 divide-y divide-gray-300 divide-opacity-35 ">
           {data?.recentArticles?.length
-            ? data.recentArticles.map((article) => (
+            ? data.recentArticles.map((article: any) => (
                 <ArticleCard
                   short_content={article.content}
                   title={article.title}
