@@ -125,7 +125,7 @@ export default function Products({ categoryId, categoryContent }: Props) {
 
         {categoryContent?.content !== undefined ? (
           <div className="[&_h2]:text-[17px] text-[13px] [&_ul]:list-disc [&_ul]:list-inside [&_a]:text-[#7ba79a]  text-[#a8a8a8] [&_h2]:text-[#7f7f7f]   leading-loose [&_h3]:text-[#969696] [&_h3]:text-[15px] flex flex-col">
-            <ContentViewer contentForView={JSON.parse(categoryContent?.content)} />
+            <ContentViewer contentForView={JSON.parse(categoryContent?.content || "[]")} />
           </div>
         ) : (
           Array.from(Array(4)).map((_, i) => (
