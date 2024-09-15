@@ -8,13 +8,14 @@ import Categories from "./Categories/Categories";
 import { Merseh_nastaliq } from "@/Components/SVGS";
 import classNames from "classnames";
 import Comments from "./Comments/Comments";
+import Users from "./Users";
+import Orders from "./Orders/Orders";
 
 interface Props {
   route?: string;
 }
 
 export default function AdminDashboard({ route }: Props) {
- 
   return (
     <section className="flex flex-col w-full p-10 gap-10">
       <div className="flex flex-row items-center gap-4 ">
@@ -28,7 +29,9 @@ export default function AdminDashboard({ route }: Props) {
               <span
                 className={classNames(
                   "text-gray-600 ",
-                  route === "products" ? "font-[600] text-green2" : "text-gray-600 font-[500]"
+                  route === "products"
+                    ? "font-[600] text-green2"
+                    : "text-gray-600 font-[500]"
                 )}
               >
                 محصول‌ها
@@ -37,8 +40,9 @@ export default function AdminDashboard({ route }: Props) {
             <Link href={"/admin/articles"}>
               <span
                 className={classNames(
-                  
-                  route === "articles" ? "font-[600] text-green2" : "text-gray-600 font-[500]"
+                  route === "articles"
+                    ? "font-[600] text-green2"
+                    : "text-gray-600 font-[500]"
                 )}
               >
                 مقاله‌ها
@@ -47,8 +51,9 @@ export default function AdminDashboard({ route }: Props) {
             <Link href={"/admin/categories"}>
               <span
                 className={classNames(
-                  
-                  route === "categories" ? "font-[600] text-green2" : "text-gray-600 font-[500]"
+                  route === "categories"
+                    ? "font-[600] text-green2"
+                    : "text-gray-600 font-[500]"
                 )}
               >
                 دسته‌بندی‌ها
@@ -57,11 +62,34 @@ export default function AdminDashboard({ route }: Props) {
             <Link href={"/admin/comments"}>
               <span
                 className={classNames(
-                  
-                  route === "comments" ? "font-[600] text-green2" : "text-gray-600 font-[500]"
+                  route === "comments"
+                    ? "font-[600] text-green2"
+                    : "text-gray-600 font-[500]"
                 )}
               >
                 دیدگاه‌ ها
+              </span>
+            </Link>
+            <Link href={"/admin/users"}>
+              <span
+                className={classNames(
+                  route === "users"
+                    ? "font-[600] text-green2"
+                    : "text-gray-600 font-[500]"
+                )}
+              >
+                کاربران
+              </span>
+            </Link>
+            <Link href={"/admin/orders"}>
+              <span
+                className={classNames(
+                  route === "orders"
+                    ? "font-[600] text-green2"
+                    : "text-gray-600 font-[500]"
+                )}
+              >
+                سفارش ‌ها
               </span>
             </Link>
           </div>
@@ -75,6 +103,10 @@ export default function AdminDashboard({ route }: Props) {
             <Categories />
           ) : route === "comments" ? (
             <Comments />
+          ) : route === "users" ? (
+            <Users />
+          ) : route === "orders" ? (
+            <Orders />
           ) : null}
         </div>
       </div>

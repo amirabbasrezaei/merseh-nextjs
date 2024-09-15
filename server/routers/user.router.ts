@@ -11,7 +11,7 @@ import {
   users,
   verifyLoginCodeController,
 } from "../Controllers/user.controller";
-import { router, publicProcedure, userProtectedProcedure } from "../trpc";
+import { router, publicProcedure, userProtectedProcedure, adminProtectedProcedure } from "../trpc";
 
 export const userRouter = router({
   createUser: publicProcedure
@@ -23,7 +23,7 @@ export const userRouter = router({
   verifyLoginCode: publicProcedure
     .input(VerifyLoginCodeSchema)
     .mutation(verifyLoginCodeController),
-  users: userProtectedProcedure.query(users),
+  users: publicProcedure.query(users),
   logout: userProtectedProcedure
     .output(LogoutPayloadSchema)
     .mutation(logoutController),
