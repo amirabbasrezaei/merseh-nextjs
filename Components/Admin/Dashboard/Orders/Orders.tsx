@@ -1,6 +1,7 @@
 import React from "react";
 import Item from "../Item";
 import { trpc } from "@/utils/trpc";
+import Order_item from "./Order.item";
 
 export default function Orders() {
   const { data } = trpc.order.orders.useQuery();
@@ -8,11 +9,11 @@ export default function Orders() {
     <div>
       {data?.orders?.length
         ? data?.orders?.map((order) => (
-            <Item
+            <Order_item
               key={order.id}
               id={String(order.id)}
               section="users"
-              title={`${order.name} ${user.familyName}`}
+              // title={`${order.name} ${user.familyName}`}
             />
           ))
         : null}

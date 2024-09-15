@@ -2,14 +2,14 @@ import { Comment_SVG, Edit_Svg } from "@/Components/SVGS";
 import Link from "next/link";
 import React from "react";
 interface Props {
-  title: string;
+
   id: string;
   section: string;
   commentCount?: number;
 }
 
 export default function Order_item({
-  title,
+
   id,
   section,
   commentCount,
@@ -17,7 +17,7 @@ export default function Order_item({
   return (
     <div className="border flex flex-row w-full p-5 rounded-md justify-between">
       <Link href={`/${section === "article" ? "mag" : section}/${id}`}>
-        <span>{title}</span>
+        {/* <span>{title}</span> */}
       </Link>
       <div className="flex flex-row gap-10 items-center">
         {commentCount ? (
