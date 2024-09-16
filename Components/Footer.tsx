@@ -11,7 +11,7 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="h-fit  max-w-[1400px] relative w-full items-center justify-around flex flex-col pt-16 px-10 gap-10 bg-white   ">
+    <footer className="h-fit  max-w-[1400px] relative w-full items-center justify-around flex flex-col pt-16 pb-8 px-10 gap-10 bg-white   ">
       <hr className="w-full left-0 right-0 absolute top-0 " />
       <div className="w-full flex flex-col sm:flex-row gap-14">
         <div className="basis-1/3 flex flex-col   h-full mt-5 sm:mt-0 justify-evenly items-start ">
@@ -66,11 +66,7 @@ export default function Footer() {
             >
               <h2 className="text-black1">روغن زیتون بی بو</h2>
             </Link>
-            <Link
-              href={
-                "https://merseh.com/mag"
-              }
-            >
+            <Link href={"https://merseh.com/mag"}>
               <h2 className="text-black1">مجله مرسه</h2>
             </Link>
           </div>
@@ -82,6 +78,8 @@ export default function Footer() {
             href="https://trustseal.enamad.ir/?id=491421&Code=nWLgfgtO1aZxbPr2nb6vB7LIjve7BrXw"
           >
             <img
+              height={150}
+              width={150}
               alt="enamad"
               referrerPolicy="origin"
               src="https://trustseal.enamad.ir/logo.aspx?id=491421&Code=nWLgfgtO1aZxbPr2nb6vB7LIjve7BrXw"
