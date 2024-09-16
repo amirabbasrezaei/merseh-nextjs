@@ -31,8 +31,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       `${process.env.BASE_URL}/api/trpc/article.sitemapArticle`
     );
 
-    
-
     if (data.result.data?.products?.length) {
       const products = data.result.data.products.map((product: any) => ({
         url: `${
@@ -52,19 +50,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
 
     if (categoryData.result.data?.categories?.length) {
-      const categories = categoryData.result.data.categories.map((category: any) => ({
-        url: `${
-          process.env.NODE_ENV === "production"
-            ? process.env.BASE_URL
-            : "http://localhost:3000"
-        }/category/${category.id}/${(category.title as string).replaceAll(
-          " ",
-          "-"
-        )}`,
-        lastModified: new Date(category.updated_at || Date.now()),
-        changeFrequency: "daily",
-        priority: 0.9,
-      }));
+      const categories = categoryData.result.data.categories.map(
+        (category: any) => ({
+          url: `${
+            process.env.NODE_ENV === "production"
+              ? process.env.BASE_URL
+              : "http://localhost:3000"
+          }/category/${category.id}/${(category.title as string).replaceAll(
+            " ",
+            "-"
+          )}`,
+          lastModified: new Date(category.updated_at || Date.now()),
+          changeFrequency: "daily",
+          priority: 0.9,
+        })
+      );
       links.push(...categories);
     }
 
@@ -74,7 +74,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           process.env.NODE_ENV === "production"
             ? process.env.BASE_URL
             : "http://localhost:3000"
-        }/mag/${article.id}/${(article.title as string).replaceAll(" ", "-")}`,
+        }/mag/${article.id}/${(
+          article.englishTitle || article.title
+        ).replaceAll(" ", "-")}`,
         lastModified: new Date(article.updated_at || Date.now()),
         changeFrequency: "daily",
         priority: 0.9,

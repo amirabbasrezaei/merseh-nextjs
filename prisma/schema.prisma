@@ -36,7 +36,7 @@ model Province {
 
 model City {
   id         Int       @id @default(autoincrement())
-  name       String 
+  name       String
   engName    String
   provinceId Int
   Address    Address[]
@@ -48,6 +48,7 @@ model Article {
   id              Int       @id @default(autoincrement())
   images          String[]
   title           String
+  englishTitle    String    @default("")
   created_at      DateTime  @default(now())
   updated_at      DateTime?
   comments        Comment[]

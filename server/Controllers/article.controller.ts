@@ -16,6 +16,7 @@ export const createArticleInput = z.object({
   // parentCategories: z.array(z.number()).optional(),
   content: z.array(content),
   metaDescription: z.string(),
+  englishTitle: z.string(),
 });
 
 type CreateArticle = z.infer<typeof createArticleInput>;
@@ -27,6 +28,7 @@ export async function createArticleController({
     data: {
       content: JSON.stringify(input.content),
       title: input.title,
+      englishTitle: input.englishTitle,
       metaDescription: input.metaDescription,
     },
   });
@@ -105,6 +107,7 @@ export const editArticleInput = z.object({
   // parentCategories: z.array(z.number()).optional(),
   content: z.array(content),
   metaDescription: z.string(),
+  englishTitle: z.string(),
 });
 
 export type EditArticleInput = z.infer<typeof editArticleInput>;
@@ -123,6 +126,7 @@ export async function editArticleController({
         updated_at: new Date(Date.now()),
         title: input.title,
         metaDescription: input.metaDescription,
+        englishTitle: input.englishTitle,
       },
     });
   } catch (error) {
@@ -133,18 +137,20 @@ export async function editArticleController({
   }
 
   try {
-    await uploadFile({
-      images: input.images,
-      uploadDirectory: "articleMainImages",
-    }).then(() => {
-      (async () =>
-        await prisma.article.update({
-          where: { id: input.articleId },
-          data: {
-            images: input.images.map((img) => img.name),
-          },
-        }))();
-    });
+    if (input.images?.length) {
+      await uploadFile({
+        images: input.images,
+        uploadDirectory: "articleMainImages",
+      }).then(() => {
+        (async () =>
+          await prisma.article.update({
+            where: { id: input.articleId },
+            data: {
+              images: input.images.map((img) => img.name),
+            },
+          }))();
+      });
+    }
   } catch (error) {
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
@@ -222,7 +228,7 @@ export async function getArticleController({
       title: article.title,
       metaDescription: article.metaDescription,
       created_at: article.created_at,
-      updated_at:article.updated_at,
+      updated_at: article.updated_at,
       content: JSON.parse(article.content).map((e: any) => {
         if (e.type === "img") {
           return {
@@ -326,7 +332,13 @@ export async function recentArticlesController({
 export async function article_for_sitemap({ ctx: { prisma } }: ArgsStructure) {
   try {
     const articles = await prisma.article.findMany({
-      select: { id: true, title: true, updated_at: true, comments: true },
+      select: {
+        id: true,
+        title: true,
+        englishTitle: true,
+        updated_at: true,
+        comments: true,
+      },
     });
 
     return { articles, message: null };

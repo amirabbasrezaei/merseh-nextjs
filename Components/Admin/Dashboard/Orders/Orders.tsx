@@ -1,5 +1,4 @@
 import React from "react";
-import Item from "../Item";
 import { trpc } from "@/utils/trpc";
 import Order_item from "./Order.item";
 

@@ -5,13 +5,13 @@ import Item from "./Item";
 export default function Users() {
   const { data } = trpc.user.users.useQuery();
   return (
-    <div>
+    <div className="flex flex-col gap-5">
       {data?.map((user) => (
         <Item
           key={user.id}
           id={user.id}
           section="users"
-          title={`${user.name} ${user.familyName}`}
+          title={`${user.name} ${user?.familyName || ""}`}
         />
       ))}
     </div>

@@ -33,7 +33,7 @@ export async function generateMetadata({
       title: { absolute: article.article.title },
       alternates: {
         canonical: `${process.env.BASE_URL}/mag/${params.slug[0]}/${(
-          article.article.title as string
+          article.article.englishTitle || article.article.title
         )?.replaceAll(" ", "-")}`,
       },
       description: article.article.metaDescription,
@@ -42,16 +42,13 @@ export async function generateMetadata({
         images: article.article.imageUrls[0],
         type: "article",
         url: `${process.env.BASE_URL}/mag/${params.slug[0]}/${(
-          article.article.title as string
+          article.article.englishTitle || article.article.title
         )?.replaceAll(" ", "-")}`,
         description: article.article.metaDescription,
         locale: "fa_IR",
         title: { absolute: article.article.title },
         publishedTime: article.article.created_at,
         phoneNumbers: "+982191694827",
-      },
-      other: {
-        currency: "IRT",
       },
     };
   }
@@ -74,9 +71,9 @@ export default async function page({ params }: NextPagePropsType) {
   const jsonLd: WithContext<ArticleSchema> = {
     "@context": "https://schema.org",
     "@type": "Article",
-    "@id": `${process.env.BASE_URL}/mag/${
-      article.article.id
-    }/${article.article.title.replaceAll(" ", "-")}`,
+    "@id": `${process.env.BASE_URL}/mag/${article.article.id}/${(
+      article.article.englishTitle || article.article.title
+    ).replaceAll(" ", "-")}`,
     name: article.article.title,
     image: {
       "@type": "ImageObject",
@@ -110,10 +107,9 @@ export default async function page({ params }: NextPagePropsType) {
     },
   };
 
-
   return (
     <MagLayout>
-      <Article  articleId={Number(params.slug[0])} articleData={article} />
+      <Article articleId={Number(params.slug[0])} articleData={article} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

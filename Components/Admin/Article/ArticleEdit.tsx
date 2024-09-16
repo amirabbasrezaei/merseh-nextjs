@@ -140,43 +140,6 @@ export default function ArticleEdit({ articleId }: Props) {
     }
   }, [currentImageIndex, files]);
 
-  const handleVariationInput = (
-    variationIndex: number,
-    variationName: string
-  ) => {
-    let copy = [...variations];
-    copy[variationIndex].variationName = variationName;
-    setVariations(copy);
-  };
-
-  const handleVariationTypeInput = (
-    variationIndex: number,
-    variationTypeIndex: number,
-    input: { price?: number; name?: string }
-  ) => {
-    const { name, price } = input;
-    let copy = [...variations];
-
-    copy[variationIndex].variations[variationTypeIndex] = {
-      name: name
-        ? name
-        : copy[variationIndex].variations[variationTypeIndex].name,
-      price: price
-        ? price
-        : copy[variationIndex].variations[variationTypeIndex].price,
-    };
-
-    setVariations(copy);
-  };
-
-  const addVariationType = (variationIndex: number) => {
-    variations[variationIndex].variations.push({
-      name: "",
-      price: 0,
-    });
-    setVariations((state) => [...state]);
-  };
-
   return (
     <form
       className="w-full max-w-[1400px] flex flex-col gap-10 px-20 overflow-y-scroll py-10 h-full"
@@ -193,7 +156,7 @@ export default function ArticleEdit({ articleId }: Props) {
           const editProductBody: EditArticleInput = {
             images: convertProductImage.newImages,
             articleId: Number(articleId),
-
+            englishTitle: engName,
             title: name,
             content,
 
@@ -206,6 +169,7 @@ export default function ArticleEdit({ articleId }: Props) {
             metaDescription: metaDescription,
             images,
             title: name,
+            englishTitle: engName,
           });
         }
       }}
