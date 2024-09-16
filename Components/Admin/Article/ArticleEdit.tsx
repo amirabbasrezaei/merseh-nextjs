@@ -60,6 +60,7 @@ export default function ArticleEdit({ articleId }: Props) {
     if (articleData?.article) {
       setName(articleData.article.title);
       setContent(articleData.article.content);
+      setEngName(articleData.article.englishTitle);
       seteditProductImages({
         existingImages: articleData.article.imageUrls.map((img: any) => ({
           url: img,

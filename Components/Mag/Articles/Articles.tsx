@@ -22,6 +22,7 @@ export default function Articles({articlesData}: Props) {
                 description={article.content}
                 title={article.title}
                 articleId={article.id}
+                englishTitle={article?.englishTitle}
               />
             ))
           : Array.from(Array(6)).map((_, i) => (

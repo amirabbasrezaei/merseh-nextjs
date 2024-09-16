@@ -9,9 +9,9 @@ export default async function RecentArticles() {
   const response = await fetch(
     `${process.env.BASE_URL}/api/trpc/article.recentArticles`
   );
-  const {result: {data}} = await response.json();
-
- 
+  const {
+    result: { data },
+  } = await response.json();
 
   return (
     <div className="w-full h-full flex flex-col sm:flex-row  gap-10 ">
@@ -24,9 +24,10 @@ export default async function RecentArticles() {
         {data?.suggestedArticels?.at(0) ? (
           <div className=" w-full h-[400px] text-[27px] text-white font-[600]   rounded-sm">
             <SuggestedArticleCard
-              href={`/mag/${
-                data.suggestedArticels[0].id
-              }/${data?.suggestedArticels[0].title.replaceAll(" ", "-")}`}
+              href={`/mag/${data.suggestedArticels[0].id}/${(
+                data.suggestedArticels[0]?.englishTitle ||
+                data?.suggestedArticels[0].title
+              ).replaceAll(" ", "-")}`}
               image_alt={
                 data.suggestedArticels[0].images[0].split("/").at(-1) || ""
               }
@@ -43,9 +44,10 @@ export default async function RecentArticles() {
           {data?.suggestedArticels?.at(1) ? (
             <div className="basis-1/2 h-full bg-slate-100 rounded-sm">
               <SuggestedArticleCard
-                href={`/mag/${
-                  data.suggestedArticels[1].id
-                }/${data?.suggestedArticels[1].title.replaceAll(" ", "-")}`}
+                href={`/mag/${data.suggestedArticels[1].id}/${(
+                  data.suggestedArticels[1]?.englishTitle ||
+                  data?.suggestedArticels[1].title
+                ).replaceAll(" ", "-")}`}
                 image_alt={
                   data.suggestedArticels[1].images[0]?.split("/").at(-1) || ""
                 }
@@ -60,9 +62,10 @@ export default async function RecentArticles() {
           {data?.suggestedArticels?.at(2) ? (
             <div className="basis-1/2 h-full w-full bg-slate-100 rounded-sm ">
               <SuggestedArticleCard
-                href={`/mag/${
-                  data.suggestedArticels[2].id
-                }/${data?.suggestedArticels[2].title.replaceAll(" ", "-")}`}
+                href={`/mag/${data.suggestedArticels[2].id}/${(
+                  data.suggestedArticels[2]?.englishTitle ||
+                  data?.suggestedArticels[2].title
+                ).replaceAll(" ", "-")}`}
                 image_alt={
                   data.suggestedArticels[2].images[0]?.split("/").at(-1) || ""
                 }
@@ -91,6 +94,7 @@ export default async function RecentArticles() {
                   imageUrl={article.images[0]}
                   articleId={article.id}
                   key={article.id}
+                  englishTitle={article?.englishTitle}
                 />
               ))
             : null}

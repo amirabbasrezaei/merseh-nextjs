@@ -6,6 +6,7 @@ interface Props {
   title: string;
   description: string;
   articleId: number;
+  englishTitle: string;
 }
 
 export default function ArticleCard({
@@ -13,18 +14,21 @@ export default function ArticleCard({
   title,
   description,
   imageUrl,
+  englishTitle,
 }: Props) {
   return (
-    <Link href={`/mag/${articleId}/${title.replaceAll(" ", "-")}`}>
+    <Link
+      href={`/mag/${articleId}/${(englishTitle || title).replaceAll(" ", "-")}`}
+    >
       <div className="flex flex-col sm:flex-row-reverse w-full border-b pb-8 md:pb-14 border-b-gray-100 p-5  gap-3 lg:gap-10 justify-center">
         <Image
           priority
           style={{ objectFit: "contain" }}
-          className="rounded-md sm:w-[300px] lg:w-[250px]"
+          className="rounded-md sm:w-[300px] lg:w-[250px] h-[200px]"
           alt={imageUrl.split("/").at(-1)?.split(".").at(0) || ""}
           src={imageUrl}
           width={600}
-          height={400}
+          height={200}
           quality={80}
         />
         <div className="flex flex-col gap-3 justify-center">

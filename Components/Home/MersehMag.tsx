@@ -70,7 +70,7 @@ export default function MersehMag() {
           data.recentArticles.map((article) => (
             <Link
             key={article.id}
-              href={`/mag/${article.id}/${article.title.replaceAll(" ", "-")}`}
+              href={`/mag/${article.id}/${(article.englishTitle || article.title).replaceAll(" ", "-")}`}
               className="w-full flex-row p-4 gap-4 justify-between shadow-lg md:shadow-md bg-white bg-opacity-80 h-full backdrop-blur-lg rounded-[34px] items-center flex  z-10 "
             >
               <h2 className="font-[600] text-[#303030] text-[16px]  md:text-[18px] xl:text-[22px]">

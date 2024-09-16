@@ -8,6 +8,7 @@ interface Props {
   short_content: string;
   imageUrl: string;
   articleId: number;
+  englishTitle: string
 }
 
 
@@ -16,10 +17,11 @@ export default function ArticleCard({
   short_content,
   title,
   articleId,
+  englishTitle
 }: Props) {
   return (
     <Link
-      href={`/mag/${articleId}/${title.replaceAll(" ", "-")}`}
+      href={`/mag/${articleId}/${(englishTitle || title).replaceAll(" ", "-")}`}
       className="flex flex-col-reverse md:flex-row items-center gap-5 justify-between py-4"
     >
       <div className="flex flex-col p-2 gap-1">

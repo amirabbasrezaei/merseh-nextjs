@@ -9,6 +9,7 @@ interface Props {
   title: string;
   href: string;
   createDate?: string;
+
 }
 
 export default function SuggestedArticleCard({
@@ -17,6 +18,7 @@ export default function SuggestedArticleCard({
   image_alt,
   image_src,
   createDate,
+  
 }: Props) {
   const [hour, setHour] = useState<number>();
   const [day, setDay] = useState<number>();
