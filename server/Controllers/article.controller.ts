@@ -10,10 +10,7 @@ const imageType = z.object({
 
 export const createArticleInput = z.object({
   title: z.string(),
-
   images: z.array(imageType),
-  // categoryId: z.string(),
-  // parentCategories: z.array(z.number()).optional(),
   content: z.array(content),
   metaDescription: z.string(),
   englishTitle: z.string(),

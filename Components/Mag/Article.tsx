@@ -12,7 +12,7 @@ type Props = {
 };
 
 export default async function Article({ articleData, articleId }: Props) {
-  console.log(articleData?.article);
+
   return (
     <section className="flex flex-col md:gap-10 gap-5 w-full  md:px-5">
       <div className="w-full flex items-center justify-center">
