@@ -54,10 +54,10 @@ export default function Footer() {
             </Link>
             <Link
               href={
-                "https://merseh.com/product/2/%D8%B1%D9%88%D8%BA%D9%86-%D8%B2%DB%8C%D8%AA%D9%88%D9%86-%D8%A8%D8%A7%D8%A8%D9%88"
+                "https://merseh.com/product/2/%D8%B1%D9%88%D8%BA%D9%86-%D8%B2%DB%8C%D8%AA%D9%88%D9%86-%D9%81%D8%B1%D8%A7%D8%A8%DA%A9%D8%B1"
               }
             >
-              <h2 className="text-black1">روغن زیتون اصل 1 لیتری</h2>
+              <h2 className="text-black1">روغن زیتون فرابکر اصل 1 لیتری</h2>
             </Link>
             <Link
               href={
