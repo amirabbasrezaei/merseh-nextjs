@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "keen-slider/keen-slider.min.css";
 
-import { Chevron_Down_sharp_light } from "../../SVGS";
+import { Chevron_Down_sharp_light, Shape1_SVG } from "../../SVGS";
 import { trpc } from "@/utils/trpc";
 import { Autoplay } from "swiper/modules";
 import "react-multi-carousel/lib/styles.css";
@@ -84,18 +84,19 @@ export default function ProductsGrid({ title, categoryId }: props) {
   }, []);
 
   return (
-    <section className="w-full sm:p-4 flex flex-col items-center gap-1 ">
-      <div className="flex flex-row gap-1 items-center justify-center ">
-        <svg
+    <section className="w-full sm:p-4 flex flex-col items-center gap-6 ">
+      <div className="flex flex-row gap-1 items-center justify-center relative w-full">
+        {/* <hr className="border-[#0296bb] w-full absolute  " /> */}
+        {/* <svg
           className="w-[9px] h-auto"
           viewBox="0 0 11 22"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
           <ellipse cx="5.5" cy="11" rx="5.5" ry="11" fill="#00A573" />
-        </svg>
-
-        <span className="text-[18px] font-[600] text-gray-600  w-full ">
+        </svg> */}
+        <Shape1_SVG classname="fill-[#007694] mb-1 absolute rotate-[-8deg] w-[170px] " />
+        <span className="text-[20px] font-[600] text-white  z-10">
           {title}
         </span>
       </div>
@@ -122,7 +123,7 @@ export default function ProductsGrid({ title, categoryId }: props) {
                     >
                       <ProductGridItem productSlice={productSlice} />
                       {productSlice.length !== index + 1 ? (
-                        <div className="border-l border-[#f3f3f3]  w-[1x]" />
+                        <div className="md:border-l border-[#e6e6e6]  w-[1x]" />
                       ) : null}
                     </div>
                   </SwiperSlide>

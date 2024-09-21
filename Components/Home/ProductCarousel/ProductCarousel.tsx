@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "keen-slider/keen-slider.min.css";
-import { Chevron_Down_sharp_light } from "../../SVGS";
+import { Chevron_Down_sharp_light, Shape1_SVG } from "../../SVGS";
 import { trpc } from "@/utils/trpc";
 import { Autoplay } from "swiper/modules";
 import "react-multi-carousel/lib/styles.css";
@@ -56,17 +56,18 @@ export default function ProductCarousel({ title, sliderStartDelay }: props) {
   const { data: productCarouselData } = trpc.product.productCarousel.useQuery();
 
   return (
-    <section className="w-full  flex flex-col items-center gap-10 ">
-      <div className="flex flex-row gap-1 items-center justify-center ">
-        <svg
+    <section className="w-full  flex flex-col items-center gap-16 ">
+      <div className="flex flex-row gap-1 items-center justify-center relative ">
+        {/* <svg
           className="w-[9px] h-auto"
           viewBox="0 0 11 22"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
           <ellipse cx="5.5" cy="11" rx="5.5" ry="11" fill="#00A573" />
-        </svg>
-        <span className="text-[18px] font-[600] text-gray-600  w-full ">
+        </svg> */}
+        <Shape1_SVG classname="fill-[#00a58f] mb-1 absolute rotate-[-8deg] w-[170px] " />
+        <span className="text-[20px] font-[600] text-white  w-full z-10">
           {title}
         </span>
       </div>

@@ -61,7 +61,7 @@ export default function ProductCarouselItem({ id, name, imageUrl, price }: Props
               <span className="text-[11px] text-black1">تومان</span>
             </div>
           </div>
-          <div className="border-l border-[#f3f3f3] w--[5px] h-full -order-last:border-l-8" />
+          <div className="md:border-l border-[#f3f3f3] w--[5px] h-full -order-last:border-l-8" />
         </Link>
       </motion.div>
 

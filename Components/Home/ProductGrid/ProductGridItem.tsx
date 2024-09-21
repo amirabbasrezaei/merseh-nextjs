@@ -51,7 +51,7 @@ function ProductSliceItem({
             src={`${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${imageName}`}
           />
           <div className="flex flex-col items-start justify-center gap-1">
-            <h3 className="font-[400] basis-2/4 text-[14px] md:text-[13px] lg:text-[16px] text-nowrap xl:text-[14px]  text-black1 w-fit">
+            <h3 className="font-[500] basis-2/4 text-[14px] md:text-[13px] lg:text-[16px] text-nowrap xl:text-[17px]  text-gray-700 w-fit">
               {name}
             </h3>
             {product_variatios?.length ? (
@@ -73,7 +73,7 @@ function ProductSliceItem({
         </div>
       </motion.div>
       {sliceLength - 1 !== i ? (
-        <hr className="border-[1x] border-[#f3f3f3] w-full absolute left-0 bottom-0" />
+        <hr className="border-[1x] border-[#e6e6e6] w-full absolute left-0 bottom-0" />
       ) : null}
     </Link>
   );
