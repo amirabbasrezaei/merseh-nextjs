@@ -1,16 +1,15 @@
 import { Metadata } from "next";
 
+
 export const metadata: Metadata = {
   title: {
     default: "مجله مرسه",
     template: "%s  -  مجله مرسه",
-
   },
   description:
     "مجله مرسه کاربردی ترین و جدیدترین موضوعات مربوط به حوزه سلامتی، محصولات طبیعی و ارگانیک را منتشر می‌کند",
   alternates: {
     canonical: `${process.env.BASE_URL}/mag`,
-
   },
   metadataBase: new URL("https://merseh.com/mag"),
   robots: { follow: true, index: true },
@@ -23,11 +22,12 @@ export const metadata: Metadata = {
   other: {
     currency: "IRT",
     lang: "fa",
-    "theme-color": "#00A573"
+    "theme-color": "#00A573",
   },
-
 };
 
 export default function MagLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return <>
+  
+  {children}</>;
 }

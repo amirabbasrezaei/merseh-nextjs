@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import classNames from "classnames";
 import Loading from "./Loading";
 import dynamic from "next/dynamic";
+import { AppProgressBar as ProgressBar } from 'next-nprogress-bar';
 
 interface props {
   children: React.ReactNode;
@@ -47,6 +48,7 @@ export default function Layout({
           </div>
         </div>
       </motion.main>
+      <ProgressBar   shallowRouting options={{ showSpinner: false }} height="4px" color="#00A573" />
     </Suspense>
   );
 }

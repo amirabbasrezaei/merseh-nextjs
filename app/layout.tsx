@@ -10,7 +10,7 @@ import { Toaster } from "react-hot-toast";
 import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google";
 import Script from "next/script";
 
-import dynamic from "next/dynamic";
+
 
 export const metadata: Metadata = {
   title: {
@@ -80,6 +80,7 @@ export default function RootLayout({
             </ThemeController>
           </TRPC_Provider>
         </RecoilRootProvider>
+        
       </body>
       {process.env.NODE_ENV === "production" ? (
         <GoogleAnalytics gaId="G-DD1SELQY4Y" />

@@ -16,7 +16,7 @@ export type NextPagePropsType = {
 const getArticle = cache(async (articleId: string) => {
   const { data } = await axios.get(
     `${
-      process.env.NODE_ENV === "production"
+      process.env.NODE_ENV === "production" || true
         ? process.env.BASE_URL
         : "http://localhost:3000"
     }/api/trpc/article.getArticle?input={"articleId":${articleId}}`
@@ -57,6 +57,8 @@ export async function generateMetadata({
 
 export default async function page({ params }: NextPagePropsType) {
   const article = await getArticle(params.slug[0]);
+
+
 
   const wordCount = () => {
     let counter = 0;
