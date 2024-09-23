@@ -73,7 +73,7 @@ function ProductSliceItem({
         </div>
       </motion.div>
       {sliceLength - 1 !== i ? (
-        <hr className="border-[1x] border-[#e6e6e6] w-full absolute left-0 bottom-0" />
+        <hr className="border-[1x] border-[#f3f3f3] w-full absolute left-0 bottom-0" />
       ) : null}
     </Link>
   );

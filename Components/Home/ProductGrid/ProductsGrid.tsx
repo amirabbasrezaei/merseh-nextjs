@@ -123,7 +123,7 @@ export default function ProductsGrid({ title, categoryId }: props) {
                     >
                       <ProductGridItem productSlice={productSlice} />
                       {productSlice.length !== index + 1 ? (
-                        <div className="md:border-l border-[#e6e6e6]  w-[1x]" />
+                        <div className="md:border-l border-[#f3f3f3]  w-[1x]" />
                       ) : null}
                     </div>
                   </SwiperSlide>
