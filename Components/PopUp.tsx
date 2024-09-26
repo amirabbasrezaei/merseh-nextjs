@@ -11,7 +11,7 @@ import { useRecoilState } from "recoil";
 import { themeRecoilStateAtom } from "./ThemeController";
 
 interface Props {
-  children: ReactNode | MotionValue<number> | MotionValue<string>;
+  children: ReactNode ;
   onClose: (e?: any) => void;
 }
 
