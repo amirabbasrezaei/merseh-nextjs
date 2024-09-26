@@ -114,7 +114,7 @@ export default function Comments({ commentsRef, articleId }: Props) {
       {addCommentData?.status === "ok" ? (
         <div className="flex flex-col bg-gray-100 w-fit rounded-md p-5 gap-3">
           <strong className="text-sky-900">
-            {userInfo?.name || ""} عزیز سپاسپذاریم بابت ثبت دیدگاه ارزشمندت :)
+            {userInfo?.name || ""} عزیز سپاسگذاریم بابت ثبت دیدگاه ارزشمندت :)
           </strong>
           <span>نظر شما پس از تائید توسط مدیر نمایش داده می‌شود.</span>
         </div>
