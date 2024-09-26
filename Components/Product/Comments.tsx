@@ -7,6 +7,7 @@ import { AnimatePresence } from "framer-motion";
 import PopUp from "../PopUp";
 import { themeRecoilStateAtom } from "../ThemeController";
 import { useRecoilState } from "recoil";
+import { userInfoStoreAtom } from "../UserAuth";
 type Props = {
   productId: string;
 
@@ -16,6 +17,7 @@ type Props = {
 export default function Comments({ productId, commentsRef }: Props) {
   const [commentInput, setCommentInput] = useState("");
   const [showNotRegisteredPopUp, setShowNotRegisteredPopUp] = useState(false);
+  const [userInfo] = useRecoilState(userInfoStoreAtom);
   const [themeStore, setThemeStore] = useRecoilState(themeRecoilStateAtom);
   const {
     data: product_comments_data,
@@ -76,6 +78,11 @@ export default function Comments({ productId, commentsRef }: Props) {
         className="w-full flex flex-col gap-5"
       >
         <textarea
+          onFocus={() => {
+            if (userInfo === null) {
+              setShowNotRegisteredPopUp(true);
+            }
+          }}
           value={commentInput}
           onChange={(e) => setCommentInput(e.target.value)}
           className="appearance-none p-4 w-full sm:w-[500px] h-[100px] outline-none rounded-[10px] border border-[#ECECEC] bg-[#F9F9F9] "
@@ -94,6 +101,14 @@ export default function Comments({ productId, commentsRef }: Props) {
           text="ارسال نظر"
         />
       </form>
+      {addCommentData?.status === "ok" ? (
+        <div className="flex flex-col bg-gray-100 w-fit rounded-md p-5 gap-3">
+          <strong className="text-sky-900">
+            {userInfo?.name || ""} عزیز سپاسگذاریم بابت ثبت دیدگاه ارزشمندت :)
+          </strong>
+          <span>نظر شما پس از تائید توسط مدیر نمایش داده می‌شود.</span>
+        </div>
+      ) : null}
       <AnimatePresence mode="sync">
         {showNotRegisteredPopUp ? (
           <PopUp onClose={() => setShowNotRegisteredPopUp(false)}>
