@@ -1,9 +1,11 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from "react";
 import Button from "../../Button";
 import { z } from "zod";
 import { trpc } from "@/utils/trpc";
 import Comment from "./Comment";
+import { useRecoilState } from "recoil";
+import { userInfoStoreAtom } from "@/Components/UserAuth";
 
 type Props = {
   articleId: number;
@@ -12,6 +14,9 @@ type Props = {
 
 export default function Comments({ commentsRef, articleId }: Props) {
   const [commentInput, setCommentInput] = useState("");
+  const [userInfo] = useRecoilState(userInfoStoreAtom);
+
+  console.log(userInfo);
 
   const {
     data: product_comments_data,
@@ -32,7 +37,12 @@ export default function Comments({ commentsRef, articleId }: Props) {
 
   return (
     <div ref={commentsRef} className="flex flex-col gap-5">
-      <label htmlFor="mainNewComment" className="text-[22px] font-[500] text-black1">دیدگاه ها</label>
+      <label
+        htmlFor="mainNewComment"
+        className="text-[22px] font-[500] text-black1"
+      >
+        دیدگاه ها
+      </label>
       {isCommentsLoading ? (
         <div></div>
       ) : product_comments_data?.comments?.length ? (
@@ -73,7 +83,7 @@ export default function Comments({ commentsRef, articleId }: Props) {
         className="w-full flex flex-col gap-5"
       >
         <textarea
-        id="mainNewComment"
+          id="mainNewComment"
           value={commentInput}
           onChange={(e) => setCommentInput(e.target.value)}
           className="appearance-none p-4 w-full sm:w-[500px] h-[100px] outline-none rounded-[10px] border border-[#ECECEC] bg-[#F9F9F9] "
@@ -92,6 +102,14 @@ export default function Comments({ commentsRef, articleId }: Props) {
           text="ارسال نظر"
         />
       </form>
+      {addCommentData?.status === "ok" ? (
+        <div className="flex flex-col bg-gray-100 w-fit rounded-md p-5 gap-3">
+          <strong className="text-sky-900">
+            {userInfo?.name || ""} عزیز سپاسپذاریم بابت ثبت دیدگاه ارزشمندت :)
+          </strong>
+          <span>نظر شما پس از تائید توسط مدیر نمایش داده می‌شود.</span>
+        </div>
+      ) : null}
     </div>
   );
 }
