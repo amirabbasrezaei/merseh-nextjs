@@ -15,6 +15,7 @@ type Props = {
 export default function Comments({ commentsRef, articleId }: Props) {
   const [commentInput, setCommentInput] = useState("");
   const [userInfo] = useRecoilState(userInfoStoreAtom);
+  const [showNotRegisteredPopUp, setShowNotRegisteredPopUp] = useState(false);
 
   console.log(userInfo);
 
@@ -34,6 +35,8 @@ export default function Comments({ commentsRef, articleId }: Props) {
       refetch();
     }
   }, [addCommentData]);
+
+
 
   return (
     <div ref={commentsRef} className="flex flex-col gap-5">
@@ -83,6 +86,11 @@ export default function Comments({ commentsRef, articleId }: Props) {
         className="w-full flex flex-col gap-5"
       >
         <textarea
+          onFocus={() => {
+            if (userInfo === null) {
+              setShowNotRegisteredPopUp(true);
+            }
+          }}
           id="mainNewComment"
           value={commentInput}
           onChange={(e) => setCommentInput(e.target.value)}
