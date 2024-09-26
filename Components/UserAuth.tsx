@@ -179,7 +179,18 @@ export default function UserAuth() {
                       }}
                       className="w-full h-full z-20  flex items-center justify-center fixed left-0 right-0  top-0 bottom-0 "
                     >
-                      <Auth setShowAuthModal={setThemeStore} isModal={true} />
+                      <motion.div
+                        initial={{ translateY: 100 }}
+                        animate={{ translateY: 0 }}
+                        exit={{ translateY: -50 }}
+                        transition={{
+                          duration: 0.5,
+                          type: "spring",
+                          bounce: 0.3,
+                        }}
+                      >
+                        <Auth setShowAuthModal={setThemeStore} isModal={true} />
+                      </motion.div>
                     </motion.div>
                   )}
                 </AnimatePresence>,

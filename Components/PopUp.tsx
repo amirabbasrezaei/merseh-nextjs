@@ -1,25 +1,66 @@
-import React from "react";
-import { motion, AnimationProps, AnimationControls } from "framer-motion";
+import React, { Component, ReactNode } from "react";
+import {
+  motion,
+  AnimationProps,
+  AnimationControls,
+  MotionValue,
+} from "framer-motion";
+import { createPortal } from "react-dom";
+import { XMark_Svg } from "./SVGS";
+import { useRecoilState } from "recoil";
+import { themeRecoilStateAtom } from "./ThemeController";
 
 const animation = {
-  open: {},
-  closed: {},
+  open: { translateY: 0 },
+  closed: { translateY: 100 },
 };
+interface Props {
+  children: ReactNode | MotionValue<number> | MotionValue<string>;
+  onClose: (e?: any) => void;
+}
 
-
-
-export default function PopUp() {
+export default function PopUp({ children, onClose }: Props) {
   return (
     <>
-      {process?.browser ? (
-        <motion.div
-          initial={false}
-          animate={animation.open}
-          exit={animation.closed}
-        >
-          PopUp
-        </motion.div>
-      ) : null}
+      {process?.browser
+        ? createPortal(
+            <motion.div
+              onClick={() => onClose()}
+              animate={{
+                opacity: 1,
+                backdropFilter: "blur(2px) brightness(90%)",
+              }}
+              exit={{
+                opacity: 0,
+                backdropFilter: "blur(0px) brightness(100%)",
+              }}
+              initial={false}
+              transition={{ duration: 0.3 }}
+              className="fixed w-full h-screen left-0 top-0 right-0 bottom-0 z-40 flex items-center justify-center"
+            >
+              <motion.div
+                initial={animation.closed}
+                animate={animation.open}
+                exit={animation.closed}
+                transition={{
+                  duration: 0.5,
+                  type: "spring",
+                  bounce: 0.3,
+                }}
+                className="w-fit h-fit bg-white p-5 relative pt-14 rounded-lg shadow-md"
+              >
+                <div
+                  className="absolute top-2 right-2 cursor-pointer"
+                  onClick={() => onClose()}
+                >
+                  <XMark_Svg classname="w-6 h-6  fill-black1" />
+                </div>
+                {children}
+              </motion.div>
+            </motion.div>,
+            document.body
+          )
+        : null}
     </>
   );
 }
