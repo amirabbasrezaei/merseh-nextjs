@@ -10,10 +10,6 @@ import { XMark_Svg } from "./SVGS";
 import { useRecoilState } from "recoil";
 import { themeRecoilStateAtom } from "./ThemeController";
 
-const animation = {
-  open: { translateY: 0 },
-  closed: { translateY: 100 },
-};
 interface Props {
   children: ReactNode | MotionValue<number> | MotionValue<string>;
   onClose: (e?: any) => void;
@@ -39,9 +35,9 @@ export default function PopUp({ children, onClose }: Props) {
               className="fixed w-full h-screen left-0 top-0 right-0 bottom-0 z-40 flex items-center justify-center"
             >
               <motion.div
-                initial={animation.closed}
-                animate={animation.open}
-                exit={animation.closed}
+                initial={{ translateY: 100 }}
+                animate={{ translateY: 0 }}
+                exit={{ translateY: -50 }}
                 transition={{
                   duration: 0.5,
                   type: "spring",

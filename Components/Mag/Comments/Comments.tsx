@@ -8,6 +8,7 @@ import { useRecoilState } from "recoil";
 import { userInfoStoreAtom } from "@/Components/UserAuth";
 import PopUp from "@/Components/PopUp";
 import { themeRecoilStateAtom } from "@/Components/ThemeController";
+import { AnimatePresence } from "framer-motion";
 
 type Props = {
   articleId: number;
@@ -118,26 +119,27 @@ export default function Comments({ commentsRef, articleId }: Props) {
           <span>نظر شما پس از تائید توسط مدیر نمایش داده می‌شود.</span>
         </div>
       ) : null}
-
-      {showNotRegisteredPopUp ? (
-        <PopUp onClose={() => setShowNotRegisteredPopUp(false)}>
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="bg-white w-fit h-fit flex flex-col items-center justify-center gap-5 py-3"
-          >
-            <span>لطفا برای ثبت دیدگاه وارد حساب کاربری خود شوید.</span>
+      <AnimatePresence mode="sync">
+        {showNotRegisteredPopUp ? (
+          <PopUp onClose={() => setShowNotRegisteredPopUp(false)}>
             <div
-              onClick={() => {
-                setShowNotRegisteredPopUp(false);
-                setThemeStore((state) => ({ ...state, openAuthModal: true }));
-              }}
-              className=" px-4 py-2 rounded-md cursor-pointer hover:bg-gray-100"
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white w-fit h-fit flex flex-col items-center justify-center gap-5 py-3"
             >
-              <span className="text-green2 font-[600]">ورود | ثبت نام</span>
+              <span>لطفا برای ثبت دیدگاه وارد حساب کاربری خود شوید.</span>
+              <div
+                onClick={() => {
+                  setShowNotRegisteredPopUp(false);
+                  setThemeStore((state) => ({ ...state, openAuthModal: true }));
+                }}
+                className=" px-4 py-2 rounded-md cursor-pointer hover:bg-gray-100"
+              >
+                <span className="text-green2 font-[600]">ورود | ثبت نام</span>
+              </div>
             </div>
-          </div>
-        </PopUp>
-      ) : null}
+          </PopUp>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 }
