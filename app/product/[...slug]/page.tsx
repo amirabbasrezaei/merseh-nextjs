@@ -26,7 +26,6 @@ const getProduct = cache(async (productId: string) => {
   return data.result.data;
 });
 
-
 export async function generateMetadata({
   params,
   searchParams,
