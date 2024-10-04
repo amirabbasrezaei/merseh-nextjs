@@ -27,7 +27,7 @@ export  function ContentViewer({ contentForView }: Props) {
                           : node.content.src
                       }
                       width={1000}
-                      height={1000}
+                      height={700}
                       alt={node.content.name || ""}
                       quality={100}
                       priority={false}

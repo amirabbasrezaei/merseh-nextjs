@@ -2,6 +2,11 @@ import { trpc } from "@/utils/trpc";
 import React, { useEffect, useState } from "react";
 import Button from "../Button";
 import { Send_SVG } from "../SVGS";
+import { AnimatePresence } from "framer-motion";
+import PopUp from "../PopUp";
+import { useRecoilState } from "recoil";
+import { userInfoStoreAtom } from "../UserAuth";
+import { themeRecoilStateAtom } from "../ThemeController";
 
 export default function NewComment({
   productId,
@@ -14,6 +19,9 @@ export default function NewComment({
   setShowReply: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [value, setValue] = useState<string | null>(null);
+  const [showNotRegisteredPopUp, setShowNotRegisteredPopUp] = useState(false);
+  const [userInfo] = useRecoilState(userInfoStoreAtom);
+  const [themeStore, setThemeStore] = useRecoilState(themeRecoilStateAtom);
   const {
     data: addCommentData,
     mutate: mutateAddComment,
@@ -32,6 +40,9 @@ export default function NewComment({
   }, [addCommentData]);
 
   return (
+    <>
+    
+    
     <form
       onSubmit={(e) => {
         e.preventDefault();
@@ -39,6 +50,11 @@ export default function NewComment({
       className="w-full flex flex-col gap-5"
     >
       <textarea
+      onFocus={() => {
+        if (userInfo === null) {
+          setShowNotRegisteredPopUp(true);
+        }
+      }}
         value={value || ""}
         onChange={(e) => setValue(e.target.value || "")}
         className="appearance-none p-4 w-full sm:w-[500px] h-[100px] outline-none rounded-[10px] border border-[#ECECEC] bg-[#F9F9F9] "
@@ -80,5 +96,36 @@ export default function NewComment({
         </button>
       </div>
     </form>
+    {addCommentData?.status === "ok" ? (
+        <div className="flex flex-col bg-gray-100 w-fit rounded-md p-5 gap-3">
+          <strong className="text-sky-900">
+            {userInfo?.name || ""} عزیز سپاسگذاریم بابت ثبت دیدگاه ارزشمندت :)
+          </strong>
+          <span>نظر شما پس از تائید توسط مدیر نمایش داده می‌شود.</span>
+        </div>
+      ) : null}
+      <AnimatePresence mode="sync">
+        {showNotRegisteredPopUp ? (
+          <PopUp onClose={() => setShowNotRegisteredPopUp(false)}>
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white w-fit h-fit flex flex-col items-center justify-center gap-5 py-3"
+            >
+              <span>لطفا برای ثبت دیدگاه وارد حساب کاربری خود شوید.</span>
+              <div
+                onClick={() => {
+                  setShowNotRegisteredPopUp(false);
+                  setThemeStore((state) => ({ ...state, openAuthModal: true }));
+                }}
+                className=" px-4 py-2 rounded-md cursor-pointer hover:bg-gray-100"
+              >
+                <span className="text-green2 font-[600]">ورود | ثبت نام</span>
+              </div>
+            </div>
+          </PopUp>
+        ) : null}
+      </AnimatePresence>
+    </>
+
   );
 }
