@@ -5,8 +5,10 @@ import { trpc } from "@/utils/trpc";
 
 export default function SelectProduct() {
   const [isOpen, setIsOpen] = useState(false);
-  const { data } = trpc.product.detailedProductList.useQuery();
-  console.log((data as any) );
+  const { data } = trpc.product.detailedProductList.useQuery(undefined, {
+    cacheTime: 0,
+  });
+  console.log(data);
   return (
     <div>
       {isOpen && process.browser
@@ -33,8 +35,17 @@ export default function SelectProduct() {
                   type: "spring",
                   bounce: 0.3,
                 }}
-                className="bg-white "
-              ></motion.div>
+                className="bg-white h-[200px] w-[200px] "
+              >
+                <div className="w-full h-full">
+                  {data?.productSchema?.length
+                    ? data.productSchema.map((pr) => (
+                        <span key={pr.product_id}>{pr.product_name}</span>
+                      ))
+                    : null}
+                </div>
+                <span>{data?.productSchema?.length}</span>
+              </motion.div>
             </motion.div>,
             document.body
           )

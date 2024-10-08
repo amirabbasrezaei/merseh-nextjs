@@ -451,10 +451,10 @@ export async function detailedProductList({ ctx }: ArgsStructure) {
       });
     });
 
-    return productSchema;
+    return { productSchema, error: null };
   } catch (error) {
     console.log(error);
-    return error;
+    return { productSchema: null, error };
   }
 }
 
