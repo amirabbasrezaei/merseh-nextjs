@@ -124,6 +124,7 @@ export default function SelectProduct({ setValue }: Props) {
                           )}/*ctap/</p>`
                       );
                       setSelectedProducts([])
+                      setIsOpen(false);
                     }}
                     className="bg-green1 px-4 py-2 rounded-md text-white"
                   >
