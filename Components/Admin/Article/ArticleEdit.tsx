@@ -175,29 +175,37 @@ export default function ArticleEdit({ articleId }: Props) {
         }
       }}
     >
-      <div>
-        {editProductImages?.existingImages.map((image, i) => (
-          <Image
-            key={i}
-            src={image.url}
-            alt={image.name}
-            width={200}
-            height={200}
-          />
-        ))}
+      <div className="w-full flex justify-end">
+        <button className="bg-green2 h-10 text-white w-[300px] rounded-[13px]">
+          {articleId ? "ویرایش" : "افزودن"}
+        </button>
       </div>
-      <div>
-        <input
-          onChange={(e) => {
-            setCurrentImageIndex(0);
-            setImages([]);
-            setFlag(false);
-            setFiles((e.target as any).files);
-          }}
-          multiple
-          type="file"
-          accept="image/*"
-        />
+      <div className="bg-blue-100 flex flex-col gap-5 rounded-md p-5">
+        <div>
+          <h2 className="text-[20px]">تصویر شاخص</h2>
+          {editProductImages?.existingImages.map((image, i) => (
+            <Image
+              key={i}
+              src={image.url}
+              alt={image.name}
+              width={200}
+              height={200}
+            />
+          ))}
+        </div>
+        <div>
+          <input
+            onChange={(e) => {
+              setCurrentImageIndex(0);
+              setImages([]);
+              setFlag(false);
+              setFiles((e.target as any).files);
+            }}
+            multiple
+            type="file"
+            accept="image/*"
+          />
+        </div>
       </div>
       <div className="flex flex-wrap -mx-3 mb-6">
         <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
@@ -240,13 +248,10 @@ export default function ArticleEdit({ articleId }: Props) {
         className="bg-gray-50 appearance-none outline-none p-4"
       />
 
-      <Category filter={filter} setFilter={setFilter} />
+      {/* <Category filter={filter} setFilter={setFilter} /> */}
 
       <QuillEditor setContent={setContent} content={content} />
       <ContentViewer contentForView={content} />
-      <button className="bg-green2 h-10 text-white w-[300px] rounded-[13px]">
-        افزودن
-      </button>
     </form>
   );
 }

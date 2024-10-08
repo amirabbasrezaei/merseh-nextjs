@@ -12,6 +12,9 @@ import styles from "./MyComponent.module.css";
 
 import { IRANYekanXFaNum } from "@/app/fonts";
 import { Image_Svg } from "@/Components/SVGS";
+import SelectProduct from "../Article/SelectProduct";
+
+
 
 export type contentType = {
   type: Node["nodeName"];
@@ -173,10 +176,11 @@ export default function QuillEditor({
 
   return (
     <div className="">
-      <header className="mb-5">
+      <header className="mb-5 flex flex-row gap-5">
         <div onClick={() => imageHandler()}>
           <Image_Svg classname="w-6 h-6 cursor-pointer fill-lightBlack hover:fill-green1" />
         </div>
+        <SelectProduct />
       </header>
       <div
         className={`[&_.ql-editor]:text-right [&_.ql-editor]:min-h-[360px] [&_.ql-editor]:h-[800px] [&_img]:w-3/4  [&_p]:text-lg [&_.ql-container]:font-normal`}

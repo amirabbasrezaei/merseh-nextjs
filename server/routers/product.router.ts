@@ -24,6 +24,7 @@ import {
   AddProductControllerArgSchema,
   ProductCartInfoInputSchema,
   addProductController,
+  detailedProductList,
   editProductController,
   editProductInputSchema,
   forTorobProductController,
@@ -60,6 +61,7 @@ export const productRouter = router({
   productCarousel: publicProcedure.query(productCarouselController),
   products: publicProcedure.query(productsController),
   productsForTorob: publicProcedure.query(forTorobProductController),
+  detailedProductList: publicProcedure.query(detailedProductList),
   editCategory: adminProtectedProcedure
     .input(EditCategorySchema)
     .mutation(editCategoryController),
@@ -84,5 +86,5 @@ export const productRouter = router({
   shortInfoProducts: publicProcedure.query(short_info_products_controller),
   changeCategoryStatus: adminProtectedProcedure
     .input(ChangeCategoryStatusSchema)
-    .mutation(change_category_status)
+    .mutation(change_category_status),
 });

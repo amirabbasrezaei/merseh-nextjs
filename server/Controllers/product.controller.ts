@@ -1,9 +1,8 @@
-import { Product } from "@prisma/client";
 import { Context } from "../context";
 import { z } from "zod";
 import fs from "fs";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import path, { dirname } from "path";
+import path from "path";
 import { ArgsStructure } from "./category.controller";
 import { rimraf } from "rimraf";
 import uploadFile from "../utils/uploadFile";
@@ -378,6 +377,87 @@ export async function productsController({ ctx }: ArgsStructure) {
     return { products: [], error };
   }
 }
+
+type DetailedProductScema = {
+  product_id: string;
+  product_name: string;
+  page_url: string;
+  variationId?: number;
+  variationValueId?: number;
+  variationValueName?: string;
+  price: number;
+};
+
+export async function detailedProductList({ ctx }: ArgsStructure) {
+  const { prisma } = ctx;
+  try {
+    const products = await prisma.product.findMany({
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        quantity: true,
+        discount: true,
+        ProductVariation: {
+          select: {
+            values: {
+              select: {
+                name: true,
+                discount: true,
+                price: true,
+                id: true,
+                quantity: true,
+              },
+            },
+            id: true,
+          },
+        },
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+    const productSchema: DetailedProductScema[] = [];
+
+    products.map((pr) => {
+      if (pr.ProductVariation.length) {
+        pr.ProductVariation.map((prValues) => {
+          prValues.values.map((variationValue) => {
+            productSchema.push({
+              price: variationValue.price - variationValue.discount,
+              page_url: `${process.env.BASE_URL}/product/${
+                pr.id
+              }/${pr.name.replaceAll(" ", "-")}?variation=${
+                prValues.id
+              }&variationValue=${variationValue.id}`,
+              product_id: `${pr.id}_${prValues.id}_${variationValue.id}`,
+              variationId: prValues.id,
+              variationValueId: variationValue.id,
+              variationValueName: variationValue.name,
+              product_name: pr.name,
+            });
+          });
+        });
+        return;
+      }
+
+      productSchema.push({
+        price: pr.price - pr.discount,
+        page_url: `${process.env.BASE_URL}/product/${
+          pr.id
+        }/${pr.name.replaceAll(" ", "-")}`,
+        product_id: String(pr.id),
+        product_name: pr.name,
+      });
+    });
+
+    return productSchema;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+}
+
 type TorobScema = {
   product_id: string;
   page_url: string;
