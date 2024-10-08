@@ -140,6 +140,8 @@ export default function QuillEditor({
       convertToDom.querySelector("body")?.childNodes || []
     );
 
+
+    console.log( value)
     finalContent?.length && setContent(finalContent);
   }, [value]);
 
@@ -180,7 +182,7 @@ export default function QuillEditor({
         <div onClick={() => imageHandler()}>
           <Image_Svg classname="w-6 h-6 cursor-pointer fill-lightBlack hover:fill-green1" />
         </div>
-        <SelectProduct />
+        <SelectProduct setValue={setValue} />
       </header>
       <div
         className={`[&_.ql-editor]:text-right [&_.ql-editor]:min-h-[360px] [&_.ql-editor]:h-[800px] [&_img]:w-3/4  [&_p]:text-lg [&_.ql-container]:font-normal`}

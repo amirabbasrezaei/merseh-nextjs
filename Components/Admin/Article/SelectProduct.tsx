@@ -1,30 +1,53 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { createPortal } from "react-dom";
 import { trpc } from "@/utils/trpc";
+import classNames from "classnames";
 
-export default function SelectProduct() {
+type ProductCallToAction = {
+  productId: string;
+  variationId?: number | null;
+  variationValueId?: number | null;
+};
+
+interface Props {
+  setValue: (e: any) => void;
+}
+
+export default function SelectProduct({ setValue }: Props) {
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedProducts, setSelectedProducts] = useState<
+    ProductCallToAction[]
+  >([]);
   const { data } = trpc.product.detailedProductList.useQuery(undefined, {
     cacheTime: 0,
   });
-  console.log(data);
+
+  //   useEffect(() => {
+  //     console.log(selectedProducts);
+  //   }, [selectedProducts]);
+
   return (
     <div>
       {isOpen && process.browser
         ? createPortal(
             <motion.div
               key="portal"
-              initial={{ opacity: 0, backdropFilter: "blur(0px)", zIndex: 30 }}
-              animate={{ opacity: 1, backdropFilter: "blur(2px)", zIndex: 30 }}
-              exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+              animate={{
+                opacity: 1,
+                backdropFilter: "blur(2px) brightness(90%)",
+              }}
+              exit={{
+                opacity: 0,
+                backdropFilter: "blur(0px) brightness(100%)",
+              }}
+              initial={false}
               transition={{ duration: 0.3 }}
+              className="fixed w-full h-screen left-0 top-0 right-0 bottom-0 z-40 flex items-center justify-center"
               onClick={(e) => {
-                e.stopPropagation();
                 setIsOpen(false);
               }}
               style={{ zIndex: 20 }}
-              className="w-full h-fit sm:h-full   flex items-center justify-center absolute sm:fixed left-0 right-0  top-0 bottom-0 "
             >
               <motion.div
                 initial={{ translateY: 100 }}
@@ -35,16 +58,77 @@ export default function SelectProduct() {
                   type: "spring",
                   bounce: 0.3,
                 }}
-                className="bg-white h-[200px] w-[200px] "
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                className="bg-white rounded-md p-5"
               >
-                <div className="w-full h-full">
+                <div className="w-full h-full grid  grid-cols-4 gap-5 p-10">
                   {data?.productSchema?.length
-                    ? data.productSchema.map((pr) => (
-                        <span key={pr.product_id}>{pr.product_name}</span>
+                    ? data.productSchema.map((pr, i) => (
+                        <div
+                          className={classNames(
+                            " rounded-md p-3 cursor-pointer",
+                            selectedProducts.find(
+                              (e) => e.productId === pr.product_id
+                            )
+                              ? "bg-green1"
+                              : "bg-gray-100"
+                          )}
+                          key={i}
+                          onClick={() => {
+                            const isInList = selectedProducts.find(
+                              (e) =>
+                                e.productId === pr.product_id ||
+                                (e.productId === pr.product_id &&
+                                  e.variationValueId === pr.variationValueId)
+                            );
+                            if (isInList) {
+                              setSelectedProducts((state) =>
+                                state.filter((e) => {
+                                  if (isInList.variationValueId) {
+                                    return isInList.productId !== e.productId;
+                                  }
+                                })
+                              );
+                              return;
+                            }
+                            setSelectedProducts((state) => [
+                              ...state,
+                              {
+                                productId: pr.product_id,
+                                variationId: pr?.variationId,
+                                variationValueId: pr?.variationValueId,
+                              },
+                            ]);
+                          }}
+                        >
+                          <span>
+                            {pr.product_name +
+                              (pr?.variationValueName
+                                ? ` - ${pr.variationValueName}`
+                                : "")}
+                          </span>
+                        </div>
                       ))
                     : null}
                 </div>
-                <span>{data?.productSchema?.length}</span>
+                <div className="flex w-full items-center justify-center">
+                  <button
+                    onClick={() => {
+                      setValue(
+                        (state: any) =>
+                          state +
+                          `<p>/ctap/${selectedProducts.map(
+                            (e) => e.productId
+                          )}/*ctap/</p>`
+                      );
+                    }}
+                    className="bg-green1 px-4 py-2 rounded-md text-white"
+                  >
+                    افزودن کالاها
+                  </button>
+                </div>
               </motion.div>
             </motion.div>,
             document.body
