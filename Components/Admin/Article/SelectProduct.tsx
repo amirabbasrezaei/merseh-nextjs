@@ -123,6 +123,7 @@ export default function SelectProduct({ setValue }: Props) {
                             (e) => e.productId
                           )}/*ctap/</p>`
                       );
+                      setSelectedProducts([])
                     }}
                     className="bg-green1 px-4 py-2 rounded-md text-white"
                   >
