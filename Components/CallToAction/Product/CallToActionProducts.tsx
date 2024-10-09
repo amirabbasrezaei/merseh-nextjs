@@ -5,6 +5,11 @@ import CallToActionProduct, {
 } from "./CallToActionProduct";
 import { delay, motion } from "framer-motion";
 import Link from "next/link";
+import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
+import "swiper/css";
+import useWindowSize from "../../useWindowSize";
+import { Autoplay } from "swiper/modules";
+
 interface Props {
   products: CallToActionProductType[];
 }
@@ -35,29 +40,58 @@ const childAnimation = {
 
 export default function CallToActionProducts({ products }: Props) {
   const [showPostOptions, setShowPostOptions] = useState(false);
+  const [swiperRef] = useState();
+  const { width } = useWindowSize();
+
   return (
-    <div className="flex flex-col w-full items-center justify-center h-fit">
-      <div className="w-fit h-fit shadow-[inset_0px_0px_6px_0px_#00000047] bg-[#00C086] my-7  flex justify-evenly p-7  gap-[40px] items-center rounded-[18px]">
-        {products.map((pr) => (
-          <CallToActionProduct
-            setShowPostOptions={setShowPostOptions}
-            key={
-              pr?.variation_value_id && pr?.variationId
-                ? `${pr.variationId}_${pr.variation_value_id}`
-                : pr.product_id
-            }
-            imageurl={pr.imageurl}
-            price={pr.price}
-            product_id={pr.product_id}
-            product_name={pr.product_name}
-          />
-        ))}
+    <div className="flex flex-col relative w-full items-center justify-center h-fit ">
+      <div className="relative w-full">
+        <Swiper
+          onSwiper={swiperRef}
+          spaceBetween={40}
+          slidesPerView={width > 639 ? 3 : 1}
+          direction="horizontal"
+          className=" bg-inherit rounded-[18px]  h-fit w-full shadow-[inset_0px_0px_6px_0px_#00000047]    flex justify-evenly p-7  gap-[40px] items-center "
+          style={{
+            background: "#00C086",
+            height: "fit-content",
+            width: "100%",
+            padding: 20,
+
+          }}
+          
+          autoplay={{ delay: 20000, disableOnInteraction: false }}
+          modules={[Autoplay]}
+        >
+          {/* <SlidePrevButton /> */}
+          {products.map((pr) => (
+            <SwiperSlide
+            style={{display: "flex", justifyContent: "center", justifyItems: "center"}}
+              className="w-full h-full flex items-center justify-center  rounded-[18px]"
+              key={
+                pr?.variation_value_id && pr?.variationId
+                  ? `${pr.variationId}_${pr.variation_value_id}`
+                  : pr.product_id
+              }
+            >
+              <CallToActionProduct
+                setShowPostOptions={setShowPostOptions}
+                imageurl={pr.imageurl}
+                price={pr.price}
+                product_id={pr.product_id}
+                product_name={pr.product_name}
+              />
+            </SwiperSlide>
+          ))}
+
+          {/* <SlideNextButton /> */}
+        </Swiper>
       </div>
       <motion.div
         variants={parentAnimation}
         animate={showPostOptions ? "open" : "close"}
         initial={false}
-        className="flex flex-col w-[60%] gap-5"
+        className="flex flex-col w-full gap-5 mt-5"
       >
         <motion.div
           className="bg-gray-100 h-14 rounded-md flex justify-center items-center"
@@ -68,18 +102,18 @@ export default function CallToActionProducts({ products }: Props) {
         <div className="flex flex-row justify-evenly items-center">
           <Link href={`/`}>
             <motion.div
-              className="bg-[#006CD0] text-white px-3 py-1 rounded-lg"
+              className="bg-[#006CD0] text-white px-4 py-2 rounded-lg"
               variants={childAnimation}
             >
-              <span>ورود به فروشگاه مرسه</span>
+              <span className="font-[400]">ورود به فروشگاه مرسه</span>
             </motion.div>
           </Link>
           <Link href={`/cart/checkout`}>
             <motion.div
-              className="bg-green2 text-white px-3 py-1 rounded-lg"
+              className="bg-green2 text-white px-4 py-2 rounded-lg"
               variants={childAnimation}
             >
-              <span>مشاهده سبد خرید</span>
+              <span className="font-[400]">مشاهده سبد خرید</span>
             </motion.div>
           </Link>
         </div>

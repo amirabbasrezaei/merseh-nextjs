@@ -1,11 +1,11 @@
-"use client"
+
 import React, { createElement } from "react";
 import { contentType } from "./QuillEditor";
 import Image from "next/image";
 import Link from "next/link";
 import { IRANSansXFaNum } from "../../../app/fonts";
 import classNames from "classnames";
-import { trpc } from "@/utils/trpc";
+
 import CallToActionProducts from "@/Components/CallToAction/Product/CallToActionProducts";
 
 interface Props {

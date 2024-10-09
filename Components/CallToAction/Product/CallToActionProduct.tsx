@@ -25,7 +25,7 @@ export default function CallToActionProduct({
   const { addProduct } = useShoppingCart();
 
   return (
-    <div className="w-fit h-full p-5 px-7 bg-white rounded-[18px] flex flex-col items-center shadow-[0px_4px_15.8px_#0000004a] gap-5 shadow-[#00000067] ">
+    <div className="w-fit h-full p-5 px-7 bg-white rounded-[18px] flex flex-col items-center  gap-5 shadow-[0px_4px_15.8px_#0000004a] shadow-[#00000067] ">
       <Link
         onClick={(e) => {
           // Only prevent navigation if the "Add to Cart" button is clicked
@@ -59,7 +59,9 @@ export default function CallToActionProduct({
         }}
         className="border cursor-pointer border-[#E8E8E8] px-4 py-2 rounded-lg flex flex-row gap-3"
       >
-        <span className="text-[#006CD0] text-[15px] font-[500]">افزودن به سبد خرید</span>
+        <span className="text-[#006CD0] text-[15px] font-[500]">
+          افزودن به سبد خرید
+        </span>
         <AddToShoppingCart_SVG classname="w-5 fill-[#006CD0]" />
       </div>
     </div>
