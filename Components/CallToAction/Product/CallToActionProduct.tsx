@@ -57,7 +57,7 @@ export default function CallToActionProduct({
             setShowPostOptions(true)
           );
         }}
-        className="border cursor-pointer border-[#E8E8E8] px-2 py-1 rounded-lg flex flex-row gap-3"
+        className="border cursor-pointer border-[#E8E8E8] px-4 py-2 rounded-lg flex flex-row gap-3"
       >
         <span className="text-[#006CD0] text-[15px] font-[500]">افزودن به سبد خرید</span>
         <AddToShoppingCart_SVG classname="w-5 fill-[#006CD0]" />
