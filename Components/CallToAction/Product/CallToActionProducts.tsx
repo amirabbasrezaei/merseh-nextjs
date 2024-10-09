@@ -15,7 +15,7 @@ const parentAnimation = {
     transition: {
       duration: 0.3,
 
-      staggerChildren: 0.3,
+      staggerChildren: 0.1,
     },
   },
   close: { opacity: 0, translateY: 150 },

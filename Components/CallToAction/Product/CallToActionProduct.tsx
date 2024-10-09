@@ -26,7 +26,7 @@ export default function CallToActionProduct({
   const { addProduct } = useShoppingCart();
 
   return (
-    <Link href={``}>
+    <Link href={`/product/${product_id}/${product_name.replaceAll(" ", "-")}`}>
       <div className="w-fit h-full p-5 px-7 bg-white rounded-[18px] flex flex-col items-center shadow-[0px_4px_15.8px_#0000004a] shadow-[#00000067] gap-4">
         <Image
           src={imageurl}
