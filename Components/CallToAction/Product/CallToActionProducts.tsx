@@ -45,7 +45,7 @@ export default function CallToActionProducts({ products }: Props) {
   const { width } = useWindowSize();
 
   return (
-    <div className="flex flex-col relative w-full items-center justify-center h-fit   p-5 rounded-lg">
+    <div className="flex flex-col relative w-full items-center justify-center h-fit    rounded-lg">
       <div className="relative w-full">
         <Swiper
           onSwiper={swiperRef}
