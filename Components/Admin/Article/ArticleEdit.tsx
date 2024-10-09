@@ -42,12 +42,9 @@ export default function ArticleEdit({ articleId }: Props) {
     useState<editImageType | null>(null);
   const [engName, setEngName] = useState<string>("");
   const [name, setName] = useState<string>("");
-  const [price, setPrice] = useState<string>("");
   const [files, setFiles] = useState();
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [flag, setFlag] = useState(false);
-  const [filter, setFilter] = useState<filterTypeArgs>({});
-  const [variations, setVariations] = useState<variation[]>([]);
   const [content, setContent] = useState<contentType[]>([]);
 
   const { data: articleData } = trpc.article.getArticleAdmin.useQuery({
@@ -251,7 +248,7 @@ export default function ArticleEdit({ articleId }: Props) {
       {/* <Category filter={filter} setFilter={setFilter} /> */}
 
       <QuillEditor setContent={setContent} content={content} />
-      <ContentViewer contentForView={content} />
+      {/* <ContentViewer contentForView={content} /> */}
     </form>
   );
 }
