@@ -1,3 +1,4 @@
+"use client";
 import React, {
   createElement,
   DOMAttributes,
@@ -6,15 +7,14 @@ import React, {
   useRef,
   useState,
 } from "react";
-import ReactQuill from "react-quill";
+
 import "react-quill/dist/quill.snow.css";
 import styles from "./MyComponent.module.css";
 
 import { IRANYekanXFaNum } from "@/app/fonts";
 import { Image_Svg } from "@/Components/SVGS";
 import SelectProduct from "../Article/SelectProduct";
-
-
+import dynamic from "next/dynamic";
 
 export type contentType = {
   type: Node["nodeName"];
@@ -27,6 +27,10 @@ interface Props {
   content: contentType[];
   initialFlag?: boolean;
 }
+
+const ReactQuill = dynamic(() => import("react-quill"), {
+  loading: () => <p>Loading...</p>,
+});
 
 const contentToHTML = (content: contentType[], parent: HTMLElement): any => {
   for (let ct of content) {
@@ -116,11 +120,13 @@ export default function QuillEditor({
 }: Props) {
   const [flag, setFlag] = useState(initialFlag);
   const [value, setValue] = useState(String(content));
-  const QuillRef = useRef<ReactQuill>();
+  const QuillRef = useRef<typeof ReactQuill>();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    !isClient && setIsClient(true);
+    if (!isClient && typeof document !== undefined) {
+      setIsClient(true);
+    }
     if (content && !flag) {
       const parent = document.createElement("div");
       setValue(contentToHTML(content, parent).innerHTML);
@@ -140,17 +146,16 @@ export default function QuillEditor({
       convertToDom.querySelector("body")?.childNodes || []
     );
 
-
-    console.log( value)
+    console.log(value);
     finalContent?.length && setContent(finalContent);
   }, [value]);
 
-  // useEffect(() => {
-  //   if(content && !flag){
-  //     const parent = document.createElement("div");
-  //     setValue(contentToHTML(content, parent).innerHTML);
-  //   }
-  // } , [flag])
+  useEffect(() => {
+    if (content && !flag) {
+      const parent = document.createElement("div");
+      setValue(contentToHTML(content, parent).innerHTML);
+    }
+  }, [flag]);
 
   const imageHandler = () => {
     const reader = new FileReader();
@@ -187,9 +192,10 @@ export default function QuillEditor({
       <div
         className={`[&_.ql-editor]:text-right [&_.ql-editor]:min-h-[360px] [&_.ql-editor]:h-[800px] [&_img]:w-3/4  [&_p]:text-lg [&_.ql-container]:font-normal`}
       >
-        {isClient && document !== undefined ? (
+        {isClient ? (
           <ReactQuill
-            ref={(element) => {
+          // @ts-ignore
+            ref={(element: any) => {
               if (element != null) {
                 QuillRef.current = element;
               }
