@@ -45,10 +45,7 @@ export default function CallToActionProducts({ products }: Props) {
   const { width } = useWindowSize();
 
   return (
-    <div className="flex flex-col relative w-full items-center justify-center h-fit gap-5  p-5 rounded-lg">
-      <div className="  flex items-center justify-center w-full ">
-        <Merseh_nastaliq classname="w-[50px] fill-[#414141]" />
-      </div>
+    <div className="flex flex-col relative w-full items-center justify-center h-fit   p-5 rounded-lg">
       <div className="relative w-full">
         <Swiper
           onSwiper={swiperRef}
@@ -94,11 +91,14 @@ export default function CallToActionProducts({ products }: Props) {
           {/* <SlideNextButton /> */}
         </Swiper>
       </div>
+      <div className="  flex items-center justify-start w-full mr-10 mt-5">
+        <Merseh_nastaliq classname="w-[40px] fill-[#414141]" />
+      </div>
       <motion.div
         variants={parentAnimation}
         animate={showPostOptions ? "open" : "close"}
         initial={false}
-        className="flex flex-col w-full gap-5 "
+        className="flex flex-col w-full gap-5 mt-5"
       >
         <motion.div
           className="bg-gray-100 h-14 rounded-md flex justify-center items-center"
