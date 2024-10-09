@@ -237,8 +237,7 @@ export async function getArticleController({
             },
             type: "img",
           });
-        }
-        if (
+        } else if (
           node.type === "p" &&
           node.childs?.length &&
           typeof node.childs[0]?.content === "string" &&
@@ -275,13 +274,12 @@ export async function getArticleController({
                 },
               ],
             });
-            ;
           } catch (error) {
             console.log(error);
           }
-          break
+        } else {
+          resultContent.push(node);
         }
-        resultContent.push(node);
       }
       return resultContent;
     };

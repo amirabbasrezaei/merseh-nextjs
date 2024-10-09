@@ -1,4 +1,4 @@
-"use client";
+
 import React, { createElement } from "react";
 import { contentType } from "./QuillEditor";
 import Image from "next/image";
@@ -60,20 +60,14 @@ export function ContentViewer({ contentForView }: Props) {
               typeof node.childs[0]?.content == "string" &&
               node.childs[0]?.content?.includes("/ctap/")
             ) {
-               console.log(
-             
-                  node.childs[0]?.content
-                    .replace("/ctap/", "")
-                    .replace("/*ctap/", "")
-                
+
+              const products = JSON.parse(
+                node.childs[0]?.content
+                  .replace("/ctap/", "")
+                  .replace("/*ctap/", "") 
               );
-              // const products = JSON.parse(
-              //   node.childs[0]?.content
-              //     .replace("/ctap/", "")
-              //     .replace("/*ctap/", "") || "{}"
-              // );
-              // console.log(products);
-              // return <CallToActionProducts key={i} products={products} />;
+              console.log(products);
+              return <CallToActionProducts key={i} products={products} />;
             }
 
             if (node?.childs?.length) {

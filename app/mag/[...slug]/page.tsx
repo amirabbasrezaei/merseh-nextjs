@@ -16,7 +16,7 @@ export type NextPagePropsType = {
 const getArticle = cache(async (articleId: string) => {
   const { data } = await axios.get(
     `${
-      process.env.NODE_ENV === "production" || true
+      process.env.NODE_ENV === "production" 
         ? process.env.BASE_URL
         : "http://localhost:3000"
     }/api/trpc/article.getArticle?input={"articleId":${articleId}}`
