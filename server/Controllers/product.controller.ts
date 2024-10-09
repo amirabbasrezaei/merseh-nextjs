@@ -34,13 +34,35 @@ const productVariation = z.object({
   ),
 });
 
-export const content = z.object({
-  content: z
-    .string()
-    .or(z.object({ src: z.string(), name: z.string(), format: z.string() })),
+export const isImageContent = (
+  content: any
+): content is z.infer<typeof imageContentType> => {
+  return content && content.type === "img";
+};
+
+export const CallToActionProductType = z.object({
+  product_name: z.string(),
+  product_id: z.number(),
+  variationId: z.number().optional(),
+  variation_value_id: z.number().optional(),
+  variation_value_name: z.string().optional(),
+  price: z.number(),
+  imageurl: z.string()
+});
+
+export const imageContentType = z.object({
+  src: z.string(),
+  name: z.string(),
+  format: z.string(),
+});
+
+export const ContentType = z.object({
+  content: z.string().or(imageContentType).or(z.array(CallToActionProductType)),
   type: z.string(),
   childs: z.any(),
 });
+
+
 
 const productVariationForPayload = z.object({
   id: z.number(),
@@ -62,7 +84,7 @@ export const getProductPayloadSchema = z.object({
       imageUrls: z.array(z.string()),
       price: z.number(),
       variations: z.array(productVariationForPayload),
-      content: z.array(content),
+      content: z.array(ContentType),
     })
     .optional(),
 
@@ -171,7 +193,7 @@ export const AddProductControllerArgSchema = z.object({
   categoryId: z.string(),
   parentCategories: z.array(z.number()).optional(),
   productVariations: z.array(productVariation).optional(),
-  productContent: z.array(content),
+  productContent: z.array(ContentType),
   details: z.array(z.string()),
   metaDescription: z.string(),
 });
@@ -545,7 +567,7 @@ export const editProductInputSchema = z.object({
   price: z.string(),
   categoryId: z.string(),
   productVariations: z.array(productVariation).optional(),
-  productContent: z.array(content),
+  productContent: z.array(ContentType),
   productId: z.string(),
   metaDescription: z.string(),
   details: z.array(z.string()),
@@ -568,8 +590,7 @@ export async function editProductController({
 
   try {
     const filterContentImages = input.productContent.map((e) =>
-      typeof e.content !== "string" &&
-      e.type === "img" &&
+      isImageContent(e.content) && 
       !e.content.src.includes("https://")
         ? { base64: e.content.src, name: e.content.name }
         : { base64: "", name: "" }
@@ -583,7 +604,7 @@ export async function editProductController({
   }
 
   const productImageStructure = input.productContent.map((e) => {
-    if (typeof e.content !== "string" && e.type === "img") {
+    if (isImageContent(e.content)) {
       return {
         content: {
           name: e.content?.name

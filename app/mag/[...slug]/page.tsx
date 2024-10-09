@@ -63,7 +63,7 @@ export default async function page({ params }: NextPagePropsType) {
   const wordCount = () => {
     let counter = 0;
     article.article.content
-      .filter((e: any) => e.type === "p" && e.childs[0].type === "#text")
+      .filter((e: any) => e.type === "p" && e.childs.length && e.childs[0].type === "#text")
       .map((p: any) => {
         counter += ((p?.childs[0]?.content as string) || "").split(" ").length;
       });

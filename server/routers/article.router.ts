@@ -6,6 +6,7 @@ import {
   editArticleController,
   editArticleInput,
   getArticleController,
+  getArticleController_admin,
   getArticleInput,
   recentArticlesController,
 } from "../Controllers/article.controller";
@@ -41,4 +42,7 @@ export const articleRouter = router({
     .input(add_article_comment_schema)
     .mutation(add_article_comment_controller),
   sitemapArticle: publicProcedure.query(article_for_sitemap),
+  getArticleAdmin: adminProtectedProcedure
+    .input(getArticleInput)
+    .query(getArticleController_admin),
 });

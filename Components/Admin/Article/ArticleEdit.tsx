@@ -50,7 +50,7 @@ export default function ArticleEdit({ articleId }: Props) {
   const [variations, setVariations] = useState<variation[]>([]);
   const [content, setContent] = useState<contentType[]>([]);
 
-  const { data: articleData } = trpc.article.getArticle.useQuery({
+  const { data: articleData } = trpc.article.getArticleAdmin.useQuery({
     articleId: Number(articleId),
   });
   const { mutateAsync: mutateEditArticle } =

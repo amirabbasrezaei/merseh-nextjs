@@ -20,7 +20,7 @@ export default function Comments({ commentsRef, articleId }: Props) {
   const [userInfo] = useRecoilState(userInfoStoreAtom);
   const [showNotRegisteredPopUp, setShowNotRegisteredPopUp] = useState(false);
   const [themeStore, setThemeStore] = useRecoilState(themeRecoilStateAtom);
-  console.log(userInfo);
+
 
   const {
     data: product_comments_data,

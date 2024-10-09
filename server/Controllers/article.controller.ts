@@ -1,8 +1,14 @@
 import { ArgsStructure } from "./category.controller";
 import z from "zod";
-import { content } from "./product.controller";
+import {
+  CallToActionProductType,
+  ContentType,
+  imageContentType,
+  isImageContent,
+} from "./product.controller";
 import uploadFile from "../utils/uploadFile";
 import { TRPCError } from "@trpc/server";
+import { contentType } from "@/Components/Admin/AddProduct/QuillEditor";
 const imageType = z.object({
   base64: z.string(),
   name: z.string(),
@@ -11,7 +17,7 @@ const imageType = z.object({
 export const createArticleInput = z.object({
   title: z.string(),
   images: z.array(imageType),
-  content: z.array(content),
+  content: z.array(ContentType),
   metaDescription: z.string(),
   englishTitle: z.string(),
 });
@@ -50,9 +56,7 @@ export async function createArticleController({
     /// handle content image upload
     try {
       const filterContentImages = input.content.map((e) =>
-        typeof e.content !== "string" &&
-        e.type === "img" &&
-        !e.content.src.includes("https://")
+        isImageContent(e.content) && !e.content.src.includes("https://")
           ? { base64: e.content.src, name: e.content.name }
           : { base64: "", name: "" }
       );
@@ -61,7 +65,7 @@ export async function createArticleController({
         uploadDirectory: "articleContentImages",
       }).then(() => {
         const changedContent = input.content.map((e) => {
-          if (typeof e.content !== "string" && e.type === "img") {
+          if (isImageContent(e.content)) {
             return {
               content: {
                 name: e.content?.name
@@ -102,7 +106,7 @@ export const editArticleInput = z.object({
   images: z.array(imageType),
   // categoryId: z.string(),
   // parentCategories: z.array(z.number()).optional(),
-  content: z.array(content),
+  content: z.array(ContentType),
   metaDescription: z.string(),
   englishTitle: z.string(),
 });
@@ -156,19 +160,23 @@ export async function editArticleController({
   }
 
   try {
-    const filterContentImages = input.content.map((e) =>
-      typeof e.content !== "string" &&
-      e.type === "img" &&
-      !e.content.src.includes("https://")
-        ? { base64: e.content.src, name: e.content.name }
-        : { base64: "", name: "" }
-    );
+    type stype = {
+      type: string;
+      childs: any;
+      content: { src: string; name: string; format: string };
+    };
+    const filterContentImages = input.content.map((e) => {
+      if (isImageContent(e.content) && !e.content.src.includes("https://")) {
+        return { base64: e.content.src, name: e.content.name };
+      }
+      return { base64: "", name: "" };
+    });
     uploadFile({
       images: filterContentImages,
       uploadDirectory: "articleContentImages",
     }).then(() => {
       const changedContent = input.content.map((e) => {
-        if (typeof e.content !== "string" && e.type === "img") {
+        if (isImageContent(e.content)) {
           return {
             content: {
               name: e.content?.name
@@ -204,6 +212,100 @@ export const getArticleInput = z.object({
 });
 type GetArticle = z.infer<typeof getArticleInput>;
 export async function getArticleController({
+  ctx: { prisma },
+  input,
+}: ArgsStructure<GetArticle>) {
+  try {
+    const article = await prisma.article.findUnique({
+      where: { id: input.articleId },
+      include: { comments: true },
+    });
+
+    if (!article) {
+      return { article: null, message: "article doesn't found", error: "" };
+    }
+
+    const prepareContent = async (content: any) => {
+      const resultContent: any[] = [];
+
+      for (let node of content) {
+        if (node.type === "img") {
+          resultContent.push({
+            content: {
+              src: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/articleContentImages/${node.content.name}`,
+              name: node.content.name,
+            },
+            type: "img",
+          });
+          break;
+        }
+        if (
+          node.type === "p" &&
+          node.childs?.length &&
+          typeof node.childs[0]?.content === "string" &&
+          node.childs[0].content.includes("/ctap/")
+        ) {
+          const get_ids: number[] = node.childs[0].content
+            .replace("/ctap/", "")
+            .replace("/*ctap/", "")
+            .split(",")
+            .map((e: any) => Number(e));
+          // return { type: "p", content: "", childs: [{ type: "p", content: "ssfsdf", childs: [] }] }
+
+          try {
+            const get_products = await prisma.product.findMany({
+              where: {
+                id: { in: get_ids },
+              },
+            });
+            resultContent.push({
+              type: "p",
+              content: "",
+              childs: [
+                {
+                  type: "#text",
+                  content: `/ctap/${JSON.stringify(
+                    get_products.map((pr) => ({
+                      price: pr.price,
+                      product_id: pr.id,
+                      product_name: pr.name,
+                      imageurl: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${pr.imageNames[0]}`,
+                    })) as z.infer<typeof CallToActionProductType>[]
+                  )}/*ctap/`,
+                  childs: [],
+                },
+              ],
+            });
+          } catch (error) {
+            console.log(error);
+          }
+          break;
+        }
+        resultContent.push(node);
+      }
+      return resultContent;
+    };
+    const result = {
+      id: article.id,
+      imageUrls: article.images.map(
+        (imgName) =>
+          `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/articleMainImages/${imgName}`
+      ),
+      title: article.title,
+      metaDescription: article.metaDescription,
+      created_at: article.created_at,
+      updated_at: article.updated_at,
+      englishTitle: article.englishTitle,
+      content: await prepareContent(JSON.parse(article.content)),
+    };
+
+    return { article: result, message: null };
+  } catch (error) {
+    return { article: null, message: JSON.stringify(error || "{}") };
+  }
+}
+
+export async function getArticleController_admin({
   ctx: { prisma },
   input,
 }: ArgsStructure<GetArticle>) {

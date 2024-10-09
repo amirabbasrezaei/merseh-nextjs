@@ -1,14 +1,17 @@
-
+"use client";
 import React, { createElement } from "react";
 import { contentType } from "./QuillEditor";
 import Image from "next/image";
 import Link from "next/link";
 import { IRANSansXFaNum } from "../../../app/fonts";
 import classNames from "classnames";
+import { trpc } from "@/utils/trpc";
+import CallToActionProducts from "@/Components/CallToAction/Product/CallToActionProducts";
+
 interface Props {
   contentForView: contentType[];
 }
-export  function ContentViewer({ contentForView }: Props) {
+export function ContentViewer({ contentForView }: Props) {
   return (
     <>
       {contentForView
@@ -51,6 +54,20 @@ export  function ContentViewer({ contentForView }: Props) {
                 </Link>
               );
             }
+            if (
+              node.type === "p" &&
+              node.childs.length &&
+              typeof node.childs[0]?.content == "string" &&
+              node.childs[0]?.content?.includes("/ctap/")
+            ) {
+              const products = JSON.parse(
+                node.childs[0]?.content
+                  .replace("/ctap/", "")
+                  .replace("/*ctap/", "")
+              );
+
+              return <CallToActionProducts products={products} />;
+            }
 
             if (node?.childs?.length) {
               return createElement(
@@ -71,7 +88,7 @@ export  function ContentViewer({ contentForView }: Props) {
   );
 }
 
-export default  function Content({ contentForView }: Props) {
+export default function Content({ contentForView }: Props) {
   return (
     <article
       className={classNames(
