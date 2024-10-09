@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { createPortal } from "react-dom";
+// import { createPortal } from "react-dom";
 import { trpc } from "@/utils/trpc";
 import classNames from "classnames";
+import { createPortal } from "react-dom";
 
 type ProductCallToAction = {
   productId: string;
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export default function SelectProduct({ setValue }: Props) {
+  const [isClient, setIsClient] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState<
     ProductCallToAction[]
@@ -23,13 +25,13 @@ export default function SelectProduct({ setValue }: Props) {
     cacheTime: 0,
   });
 
-  //   useEffect(() => {
-  //     console.log(selectedProducts);
-  //   }, [selectedProducts]);
+  useEffect(() => {
+    setIsClient(true);
+  }, [selectedProducts]);
 
   return (
     <div>
-      {isOpen && process.browser
+      {isClient && isOpen && document !== undefined
         ? createPortal(
             <motion.div
               key="portal"
@@ -123,7 +125,7 @@ export default function SelectProduct({ setValue }: Props) {
                             (e) => e.productId
                           )}/*ctap/</p>`
                       );
-                      setSelectedProducts([])
+                      setSelectedProducts([]);
                       setIsOpen(false);
                     }}
                     className="bg-green1 px-4 py-2 rounded-md text-white"
