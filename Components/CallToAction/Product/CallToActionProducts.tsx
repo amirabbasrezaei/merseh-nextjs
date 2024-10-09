@@ -60,7 +60,7 @@ export default function CallToActionProducts({ products }: Props) {
             padding: 20,
             // paddingTop: 60,
           }}
-          autoplay={{ delay: 20000, disableOnInteraction: false }}
+          autoplay={{ delay: 5000, disableOnInteraction: false }}
           modules={[Autoplay]}
         >
           {/* <SlidePrevButton /> */}
