@@ -12,7 +12,6 @@ interface Props {
   contentForView: contentType[];
 }
 export function ContentViewer({ contentForView }: Props) {
-  console.log(contentForView)
   return (
     <>
       {contentForView
@@ -55,20 +54,27 @@ export function ContentViewer({ contentForView }: Props) {
                 </Link>
               );
             }
-            // if (
-            //   node.type === "p" &&
-            //   node.childs.length &&
-            //   typeof node.childs[0]?.content == "string" &&
-            //   node.childs[0]?.content?.includes("/ctap/")
-            // ) {
-            //   const products = JSON.parse(
-            //     node.childs[0]?.content
-            //       .replace("/ctap/", "")
-            //       .replace("/*ctap/", "")
-            //   );
-
-            //   return <CallToActionProducts key={i} products={products} />;
-            // }
+            if (
+              node.type === "p" &&
+              node.childs.length &&
+              typeof node.childs[0]?.content == "string" &&
+              node.childs[0]?.content?.includes("/ctap/")
+            ) {
+               console.log(
+             
+                  node.childs[0]?.content
+                    .replace("/ctap/", "")
+                    .replace("/*ctap/", "")
+                
+              );
+              // const products = JSON.parse(
+              //   node.childs[0]?.content
+              //     .replace("/ctap/", "")
+              //     .replace("/*ctap/", "") || "{}"
+              // );
+              // console.log(products);
+              // return <CallToActionProducts key={i} products={products} />;
+            }
 
             if (node?.childs?.length) {
               return createElement(

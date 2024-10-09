@@ -279,7 +279,7 @@ export async function getArticleController({
           } catch (error) {
             console.log(error);
           }
-          
+          break
         }
         resultContent.push(node);
       }

@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import CallToActionProduct, {
   CallToActionProductType,
@@ -22,8 +23,13 @@ const parentAnimation = {
 };
 
 const childAnimation = {
-  open: { scale: 1, opacity: 1,translateY: 0, transition: {duration: 0.3} },
-  close: { scale: 0, opacity: 0.4,translateY: 150, transition: {duration: 0.3}  },
+  open: { scale: 1, opacity: 1, translateY: 0, transition: { duration: 0.3 } },
+  close: {
+    scale: 0,
+    opacity: 0.4,
+    translateY: 150,
+    transition: { duration: 0.3 },
+  },
 };
 
 export default function CallToActionProducts({ products }: Props) {
