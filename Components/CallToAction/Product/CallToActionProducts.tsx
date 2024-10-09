@@ -13,13 +13,14 @@ const parentAnimation = {
   open: {
     opacity: 1,
     translateY: 0,
+    height: "fit-content",
     transition: {
       duration: 0.3,
 
       staggerChildren: 0.1,
     },
   },
-  close: { opacity: 0, translateY: 150 },
+  close: { opacity: 0, translateY: 150, height: 0 },
 };
 
 const childAnimation = {
@@ -35,7 +36,7 @@ const childAnimation = {
 export default function CallToActionProducts({ products }: Props) {
   const [showPostOptions, setShowPostOptions] = useState(false);
   return (
-    <div className="flex flex-col w-full items-center justify-center">
+    <div className="flex flex-col w-full items-center justify-center h-fit">
       <div className="w-fit h-fit shadow-[inset_0px_0px_6px_0px_#00000047] bg-[#00C086] my-7  flex justify-evenly p-7  gap-[40px] items-center rounded-[18px]">
         {products.map((pr) => (
           <CallToActionProduct

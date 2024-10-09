@@ -1,4 +1,4 @@
-
+"use client"
 import React, { createElement } from "react";
 import { contentType } from "./QuillEditor";
 import Image from "next/image";
