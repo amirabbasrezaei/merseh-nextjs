@@ -16,7 +16,7 @@ export type NextPagePropsType = {
 const getArticle = cache(async (articleId: string) => {
   const { data } = await axios.get(
     `${
-      process.env.NODE_ENV === "production" || true
+      process.env.NODE_ENV === "production" 
         ? process.env.BASE_URL
         : "http://localhost:3000"
     }/api/trpc/article.getArticle?input={"articleId":${articleId}}`
@@ -62,8 +62,8 @@ export default async function page({ params }: NextPagePropsType) {
 
   const wordCount = () => {
     let counter = 0;
-    article.article.content
-      .filter((e: any) => e.type === "p" && e.childs.length && e.childs[0].type === "#text")
+    article.article?.content
+      ?.filter((e: any) => e.type === "p" && e.childs.length && e.childs[0].type === "#text")
       .map((p: any) => {
         counter += ((p?.childs[0]?.content as string) || "").split(" ").length;
       });

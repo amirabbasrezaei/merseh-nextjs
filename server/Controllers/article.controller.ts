@@ -237,7 +237,6 @@ export async function getArticleController({
             },
             type: "img",
           });
-          break;
         }
         if (
           node.type === "p" &&
@@ -276,10 +275,11 @@ export async function getArticleController({
                 },
               ],
             });
+            ;
           } catch (error) {
             console.log(error);
           }
-          break;
+          
         }
         resultContent.push(node);
       }
