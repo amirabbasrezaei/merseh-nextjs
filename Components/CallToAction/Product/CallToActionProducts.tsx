@@ -9,6 +9,7 @@ import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
 import "swiper/css";
 import useWindowSize from "../../useWindowSize";
 import { Autoplay } from "swiper/modules";
+import { Merseh_nastaliq } from "@/Components/SVGS";
 
 interface Props {
   products: CallToActionProductType[];
@@ -57,16 +58,22 @@ export default function CallToActionProducts({ products }: Props) {
             height: "fit-content",
             width: "100%",
             padding: 20,
-
+            paddingTop: 60,
           }}
-          
           autoplay={{ delay: 20000, disableOnInteraction: false }}
           modules={[Autoplay]}
         >
+          <div className="absolute top-4 flex items-center justify-center w-full ">
+            <Merseh_nastaliq classname="w-[50px] fill-[#f3f3f3]" />
+          </div>
           {/* <SlidePrevButton /> */}
           {products.map((pr) => (
             <SwiperSlide
-            style={{display: "flex", justifyContent: "center", justifyItems: "center"}}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                justifyItems: "center",
+              }}
               className="w-full h-full flex items-center justify-center  rounded-[18px]"
               key={
                 pr?.variation_value_id && pr?.variationId
