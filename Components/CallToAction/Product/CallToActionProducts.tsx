@@ -23,25 +23,33 @@ interface Props {
 
 const parentAnimation = {
   open: {
-    opacity: 1,
+    // opacity: 1,
 
     height: "fit-content",
     transition: {
-      duration: 0.2,
+      // duration: 0.2,
 
-      staggerChildren: 0.1,
+      staggerChildren: 0.2,
     },
   },
-  close: { opacity: 0,  height: 0 },
+  close: {
+    // opacity: 0,
+    height: 0,
+  },
 };
 
 const childAnimation = {
-  open: { scale: 1, opacity: 1, translateY: 0, transition: { duration: 0.3 } },
+  open: {
+    scale: 1,
+    opacity: 1,
+    translateY: 0,
+    transition: { duration: 0.3 },
+  },
   close: {
-    scale: 0.4,
+    scale: 0,
     opacity: 0,
-    translateY: 50,
-    transition: { duration: 0.2 },
+    translateY: -250,
+    transition: { duration: 0.3 },
   },
 };
 
@@ -113,25 +121,32 @@ export default function CallToActionProducts({ products }: Props) {
           <span className="font-[500]">کالا به سبد خرید شما اضافه شد</span>
         </motion.div>
         <div className="flex flex-col md:flex-row justify-evenly items-center w-full gap-4">
-        <Link className="w-full" href={`/cart/checkout`}>
+          <Link
+            style={{ background: "transparent" }}
+            className="w-full flex justify-center "
+            href={`/cart/checkout`}
+          >
             <motion.div
-              className="bg-green2 text-white px-4 py-2 rounded-lg w-full flex flex-row gap-3 justify-center items-center"
+              className="bg-green2 text-white px-4 py-2 rounded-lg w-full md:w-fit flex flex-row gap-3 justify-center items-center"
               variants={childAnimation}
             >
               <span className="font-[400]">مشاهده سبد خرید</span>
               <Shop_Cart classname="w-7 fill-white" />
             </motion.div>
           </Link>
-          <Link className="w-full" href={`/`}>
+          <Link
+            style={{ background: "transparent" }}
+            className="w-full flex justify-center "
+            href={`/`}
+          >
             <motion.div
-              className="bg-[#006CD0] text-white px-4 py-2 rounded-lg w-full flex flex-row gap-3  justify-center items-center"
+              className="bg-[#006CD0] text-white px-4 py-2 rounded-lg w-full md:w-fit flex flex-row gap-3  justify-center items-center"
               variants={childAnimation}
             >
               <span className="font-[400]">ورود به فروشگاه مرسه</span>
               <MersehSvg_no_color classname="w-6 fill-white" />
             </motion.div>
           </Link>
-      
         </div>
       </motion.div>
     </div>
