@@ -21,6 +21,7 @@ interface Props {
   products: CallToActionProductType[];
 }
 
+
 const parentAnimation = {
   open: {
     // opacity: 1,
