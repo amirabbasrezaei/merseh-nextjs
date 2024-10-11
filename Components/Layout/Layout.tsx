@@ -23,6 +23,7 @@ export default function Layout({
   footer = true,
   fullWidth = false,
 }: props) {
+
   return (
     <>
       <Suspense fallback={<Loading />}>

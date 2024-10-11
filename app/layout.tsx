@@ -42,6 +42,7 @@ export default function RootLayout({
 }>) {
   const AuthorizeStatus = cookies().get("AuthorizeStatus")?.value;
   console.log(AuthorizeStatus);
+
   return (
     <html lang="en" dir="rtl">
       <head>
@@ -75,15 +76,17 @@ export default function RootLayout({
         </RecoilRootProvider>
       </body>
 
+     
+
       {process.env.NODE_ENV === "production" ? (
         <>
-          <Script
-            id="goftino-widget"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `!function(){var i="tZh0Ld",a=window,d=document;function g(){var g=d.createElement("script"),s="https://www.goftino.com/widget/"+i,l=localStorage.getItem("goftino_"+i);g.async=!0,g.src=l?s+"?o="+l:s;d.getElementsByTagName("head")[0].appendChild(g);}"complete"===d.readyState?g():a.attachEvent?a.attachEvent("onload",g):a.addEventListener("load",g,!1);}();`,
-            }}
-          />
+         <Script
+        id="goftino-widget"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `!function(){var i="tZh0Ld",a=window,d=document;function g(){var g=d.createElement("script"),s="https://www.goftino.com/widget/"+i,l=localStorage.getItem("goftino_"+i);g.async=!0,g.src=l?s+"?o="+l:s;d.getElementsByTagName("head")[0].appendChild(g);}"complete"===d.readyState?g():a.attachEvent?a.attachEvent("onload",g):a.addEventListener("load",g,!1);}();`,
+        }}
+      />
           <GoogleAnalytics gaId="G-DD1SELQY4Y" />
         </>
       ) : null}

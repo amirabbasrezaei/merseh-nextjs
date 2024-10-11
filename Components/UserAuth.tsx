@@ -167,6 +167,7 @@ export default function UserAuth() {
                   {themeStore.openAuthModal && (
                     <motion.div
                       key="portal"
+                      initial={false}
                       animate={{
                         opacity: 1,
                         backdropFilter: "blur(2px) brightness(85%)",

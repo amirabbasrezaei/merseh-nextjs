@@ -29,5 +29,6 @@ export const metadata: Metadata = {
 export default function MagLayout({ children }: { children: React.ReactNode }) {
   return <>
   
-  {children}</>;
+  {children}
+  </>;
 }
