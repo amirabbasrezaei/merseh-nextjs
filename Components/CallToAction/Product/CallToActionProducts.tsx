@@ -11,10 +11,8 @@ import useWindowSize from "../../useWindowSize";
 import { Autoplay } from "swiper/modules";
 import {
   Merseh_nastaliq,
-  MersehSvg,
   MersehSvg_no_color,
   Shop_Cart,
-  Shopping_Cart_Empty,
 } from "@/Components/SVGS";
 
 interface Props {

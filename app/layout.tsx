@@ -10,19 +10,15 @@ import { Toaster } from "react-hot-toast";
 import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google";
 import Script from "next/script";
 
-
-
 export const metadata: Metadata = {
   title: {
     default: "فروشگاه مرسه",
     template: "%s  - مرسه",
-
   },
   description:
     "مرسه تولید کننده انواع محصولات طبیعی شامل روغنهای گیاهی مانند روغن زیتون، روغن کنجد، روغن آفتابگردان، روغن سیاه دانه، کره گیاهی، ارده و ... می‌باشد.",
   alternates: {
     canonical: `${process.env.BASE_URL}`,
-
   },
   metadataBase: new URL("https://merseh.com"),
   robots: { follow: true, index: true },
@@ -30,15 +26,13 @@ export const metadata: Metadata = {
     locale: "fa_IR",
     siteName: "مرسه",
     type: "website",
-    countryName:"IRAN",
-    
+    countryName: "IRAN",
   },
   other: {
     currency: "IRT",
     lang: "fa",
     "theme-color": "#00A573",
   },
-  
 };
 
 export default function RootLayout({
@@ -53,10 +47,11 @@ export default function RootLayout({
       <head>
         <meta charSet="utf-8" />
       </head>
+
       {process.env.NODE_ENV === "production" ? (
         <>
           <Script
-          id="gtag"
+            id="gtag"
             strategy="afterInteractive"
             src="https://www.googletagmanager.com/gtag/js?id=GTM-T83BTZM4"
           />
@@ -69,9 +64,7 @@ export default function RootLayout({
           </Script>
         </>
       ) : null}
-      <body
-        className={`overflow-x-hidden  ${IRANYekanXFaNum.className}`}
-      >
+      <body className={`overflow-x-hidden  ${IRANYekanXFaNum.className}`}>
         <Toaster />
         <RecoilRootProvider>
           <TRPC_Provider>
@@ -80,10 +73,19 @@ export default function RootLayout({
             </ThemeController>
           </TRPC_Provider>
         </RecoilRootProvider>
-        
       </body>
+
       {process.env.NODE_ENV === "production" ? (
-        <GoogleAnalytics gaId="G-DD1SELQY4Y" />
+        <>
+          <Script
+            id="goftino-widget"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `!function(){var i="tZh0Ld",a=window,d=document;function g(){var g=d.createElement("script"),s="https://www.goftino.com/widget/"+i,l=localStorage.getItem("goftino_"+i);g.async=!0,g.src=l?s+"?o="+l:s;d.getElementsByTagName("head")[0].appendChild(g);}"complete"===d.readyState?g():a.attachEvent?a.attachEvent("onload",g):a.addEventListener("load",g,!1);}();`,
+            }}
+          />
+          <GoogleAnalytics gaId="G-DD1SELQY4Y" />
+        </>
       ) : null}
     </html>
   );
