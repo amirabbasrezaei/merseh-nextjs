@@ -72,6 +72,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "style-loader": "^4.0.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "yarn-upgrade-all": "^0.7.4"
   }
 }

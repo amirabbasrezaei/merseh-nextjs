@@ -35,7 +35,10 @@ const nextConfig = {
                 ]
             }
         ]
-    }
+    },
+    httpAgentOptions: {
+      keepAlive: false,
+    },
 };
 
 export default nextConfig;
