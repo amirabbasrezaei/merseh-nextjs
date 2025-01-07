@@ -61,7 +61,6 @@ export async function updateActiveOrderController({
         },
       },
     });
-    
 
     if (!input.shippingInfo) {
       let activeOrder = await prisma.order.upsert({
@@ -416,9 +415,6 @@ export async function ordersController({ ctx }: ArgsStructure) {
   const { prisma, user } = ctx;
   try {
     const orders = await prisma.order.findMany({
-      where: {
-        userId: user.userId,
-      },
       include: {
         ProductForOrder: {
           select: {
@@ -427,6 +423,7 @@ export async function ordersController({ ctx }: ArgsStructure) {
             ProductVariationValue: true,
           },
         },
+        user: { select: { name: true, phoneNumber: true } },
         Address: {
           select: {
             addressDetails: true,
@@ -437,6 +434,8 @@ export async function ordersController({ ctx }: ArgsStructure) {
             reciverFamilyName: true,
             reciverPhoneNumber: true,
             postalCode: true,
+            latitude: true,
+            longitude: true
           },
         },
       },

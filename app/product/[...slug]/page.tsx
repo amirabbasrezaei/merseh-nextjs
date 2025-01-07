@@ -16,7 +16,7 @@ const getProduct = cache(async (productId: string) => {
   
   const { data } = await axios.get(
     `${
-      process.env.NODE_ENV === "production" || true
+      process.env.NODE_ENV === "production" 
         ? process.env.BASE_URL
         : "http://localhost:3000"
     }/api/trpc/product.getproduct?input={"productId":${productId}}`

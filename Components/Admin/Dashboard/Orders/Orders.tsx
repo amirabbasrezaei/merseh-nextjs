@@ -9,10 +9,16 @@ export default function Orders() {
       {data?.orders?.length
         ? data?.orders?.map((order) => (
             <Order_item
+              customer_name={order.user.name}
+              province={order?.Address?.Province?.name || ""}
               key={order.id}
               id={String(order.id)}
               section="users"
-              // title={`${order.name} ${user.familyName}`}
+              phoneNumber={
+                order.Address.reciverPhoneNumber || order.user.phoneNumber
+              }
+              city={order?.Address?.city?.name || ""}
+
             />
           ))
         : null}
