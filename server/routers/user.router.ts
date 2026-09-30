@@ -1,12 +1,18 @@
 import {
   LogoutPayloadSchema,
+  LoginWithPasswordSchema,
   SendVerifyCodeSchema,
+  UpdateAdminPasswordSchema,
+  UpdateAdminPhoneSchema,
   UserInfoResponsePayload,
   VerifyLoginCodeSchema,
   createUserController,
   createUserSchema,
+  loginWithPasswordController,
   logoutController,
   sendVerifyCodeController,
+  updateAdminPasswordController,
+  updateAdminPhoneController,
   userInfoController,
   users,
   verifyLoginCodeController,
@@ -23,7 +29,16 @@ export const userRouter = router({
   verifyLoginCode: publicProcedure
     .input(VerifyLoginCodeSchema)
     .mutation(verifyLoginCodeController),
-  users: publicProcedure.query(users),
+  loginWithPassword: publicProcedure
+    .input(LoginWithPasswordSchema)
+    .mutation(loginWithPasswordController),
+  users: adminProtectedProcedure.query(users),
+  updateAdminPhone: adminProtectedProcedure
+    .input(UpdateAdminPhoneSchema)
+    .mutation(updateAdminPhoneController),
+  updateAdminPassword: adminProtectedProcedure
+    .input(UpdateAdminPasswordSchema)
+    .mutation(updateAdminPasswordController),
   logout: userProtectedProcedure
     .output(LogoutPayloadSchema)
     .mutation(logoutController),

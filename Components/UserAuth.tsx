@@ -1,6 +1,7 @@
+"use client";
 import React, { useEffect, useState } from "react";
-import { atom, useRecoilState } from "recoil";
-import { themeRecoilStateAtom } from "./ThemeController";
+import { useThemeStore } from "./ThemeController";
+import { useUserInfoStore } from "./stores/userInfoStore";
 import { trpc } from "@/utils/trpc";
 import Skeleton from "react-loading-skeleton";
 import { Login_icon, Profile_Svg } from "./SVGS";
@@ -10,16 +11,7 @@ import Auth from "./Auth/Auth";
 import { useRouter } from "next/navigation";
 import classNames from "classnames";
 
-type UserInfo = {
-  name: string;
-  familyName: string;
-  phoneNumber: string;
-} | null;
-
-export const userInfoStoreAtom = atom<UserInfo>({
-  key: "userInfo",
-  default: null,
-});
+export { useUserInfoStore, type UserInfo } from "./stores/userInfoStore";
 
 const animation = {
   open: {
@@ -55,19 +47,21 @@ const ItemsAnimation = {
 };
 
 export default function UserAuth() {
-  const [userInfo, setUserInfo] = useRecoilState(userInfoStoreAtom);
+  const userInfo = useUserInfoStore((s) => s.userInfo);
+  const setUserInfo = useUserInfoStore((s) => s.setUserInfo);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const router = useRouter();
   const { data, isLoading, error } = trpc.user.userInfo.useQuery(undefined, {
     retry: false,
     networkMode: "online",
-    cacheTime: 0,
+    gcTime: 0,
   });
 
   const { user } = trpc.useUtils();
   const { mutate: mutateLogout, data: logoutData } =
     trpc.user.logout.useMutation();
-  const [themeStore, setThemeStore] = useRecoilState(themeRecoilStateAtom);
+  const themeStore = useThemeStore();
+  const setThemeStore = useThemeStore.setState;
 
   useEffect(() => {
     if (data) {
@@ -77,7 +71,7 @@ export default function UserAuth() {
         phoneNumber: data.phoneNumber,
       });
     }
-  }, [data]);
+  }, [data, setUserInfo]);
 
   useEffect(() => {
     if (logoutData?.isUserLoggedout) {
@@ -150,9 +144,7 @@ export default function UserAuth() {
       ) : (
         <>
           <div
-            onClick={() =>
-              setThemeStore((state) => ({ ...state, openAuthModal: true }))
-            }
+            onClick={() => setThemeStore({ openAuthModal: true })}
             className="flex flex-row justify-center items-center gap-2 hover:bg-hover1  px-4 py-2 rounded-[10px] cursor-pointer w-[160px]"
           >
             <span className="text-[16px] text-black1 font-[500]">
@@ -161,7 +153,7 @@ export default function UserAuth() {
             <Login_icon classname="w-[15px] h-auto mt-[2px] fill-[#303030]" />
           </div>
 
-          {process.browser
+          {typeof window !== "undefined"
             ? createPortal(
                 <AnimatePresence mode="sync">
                   {themeStore.openAuthModal && (
@@ -177,14 +169,10 @@ export default function UserAuth() {
                         backdropFilter: "blur(0px) brightness(100%)",
                       }}
                       transition={{ duration: 0.3 }}
-                      onClick={(e) => {
-                        setThemeStore((state) => ({
-                          ...state,
-                          openAuthModal: true,
-                        }));
-                        e.stopPropagation();
+                      onClick={() => {
+                        setThemeStore({ openAuthModal: false });
                       }}
-                      className="w-full h-full z-20  flex items-center justify-center fixed left-0 right-0  top-0 bottom-0 "
+                      className="w-full h-full z-20 flex items-center justify-center fixed left-0 right-0 top-0 bottom-0 cursor-pointer"
                     >
                       <motion.div
                         initial={{
@@ -201,6 +189,8 @@ export default function UserAuth() {
                           type: "spring",
                           bounce: 0.3,
                         }}
+                        onClick={(e) => e.stopPropagation()}
+                        className="cursor-default"
                       >
                         <Auth setShowAuthModal={setThemeStore} isModal={true} />
                       </motion.div>

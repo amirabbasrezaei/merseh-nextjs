@@ -20,6 +20,12 @@ export default function Header() {
           <MagHeaderSearch />
           </div>
           <HeaderCategory />
+          <Link
+            href="/brands"
+            className="flex-none rounded-[10px] px-2 py-2 text-[14px] font-medium text-black1 hover:bg-hover1 sm:px-4 sm:text-[16px]"
+          >
+            برندها
+          </Link>
           <Link aria-label="مرسه" href={"/"} className="h-full flex items-center ">
             <span className="text-[15px] font-[500] text-[#4d4d4d]">
               فروشگاه مرسه

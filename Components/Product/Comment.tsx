@@ -32,7 +32,7 @@ export default function Comment({
   const {
     mutate: mutateEditComment,
     data: editCommentData,
-    isLoading,
+    isPending: isLoading,
   } = trpc.product.likeComment.useMutation();
   const { refetch: refetchComments } = trpc.product.productComments.useQuery({
     productId: Number(productId),

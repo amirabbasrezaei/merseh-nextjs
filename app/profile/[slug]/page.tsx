@@ -3,11 +3,16 @@ import Profile from "@/Components/Profile/Profile";
 import { Metadata } from "next";
 import React from "react";
 
-export async function generateMetadata({ params }: any): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
   return {
-    title: params.slug === "orders" ? "سفارش ها" : "",
+    title: slug === "orders" ? "سفارش ها" : "",
     alternates: {
-      canonical: `${process.env.BASE_URL}/${params.slug}`,
+      canonical: `${process.env.BASE_URL}/${slug}`,
     },
   };
 }

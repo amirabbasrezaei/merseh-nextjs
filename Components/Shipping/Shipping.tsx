@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import Addresses from "./Address/Addresses";
 import { trpc } from "@/utils/trpc";
 import RadioInput from "../RadioInput";
-import { useRecoilState } from "recoil";
 
 import Image from "next/image";
 import splitNumber from "../utils/splitNumber";
@@ -20,18 +19,18 @@ export default function Shipping() {
   const {
     mutate: mutateOrder,
     data: activeOrderData,
-    isLoading: isLoadingActiveOrderData,
+    isPending: isLoadingActiveOrderData,
   } = trpc.order.updateActiveOrder.useMutation({});
   const {
     data: shippingPricesData,
     mutate: mutateShippingPrices,
-    isLoading: isLoadingShippingPrices,
+    isPending: isLoadingShippingPrices,
   } = trpc.shipping.shippingPrices.useMutation();
 
   const {
     mutate: mutateCreatePayment,
     data: createPaymentData,
-    isLoading: isCreatePaymentPending,
+    isPending: isCreatePaymentPending,
   } = trpc.payment.createPayment.useMutation();
 
   useEffect(() => {

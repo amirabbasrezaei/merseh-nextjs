@@ -5,20 +5,18 @@ import { trpc } from "@/utils/trpc";
 import Comment from "./Comment";
 import { AnimatePresence } from "framer-motion";
 import PopUp from "../PopUp";
-import { themeRecoilStateAtom } from "../ThemeController";
-import { useRecoilState } from "recoil";
-import { userInfoStoreAtom } from "../UserAuth";
+import { useThemeStore } from "../ThemeController";
+import { useUserInfoStore } from "../stores/userInfoStore";
 type Props = {
   productId: string;
-
-  commentsRef: React.MutableRefObject<null>;
+  commentsRef: React.RefObject<HTMLDivElement | null>;
 };
 
 export default function Comments({ productId, commentsRef }: Props) {
   const [commentInput, setCommentInput] = useState("");
   const [showNotRegisteredPopUp, setShowNotRegisteredPopUp] = useState(false);
-  const [userInfo] = useRecoilState(userInfoStoreAtom);
-  const [themeStore, setThemeStore] = useRecoilState(themeRecoilStateAtom);
+  const userInfo = useUserInfoStore((s) => s.userInfo);
+  const setThemeStore = useThemeStore.setState;
   const {
     data: product_comments_data,
     isLoading: isCommentsLoading,
@@ -36,7 +34,7 @@ export default function Comments({ productId, commentsRef }: Props) {
     }
   }, [addCommentData]);
   return (
-    <div ref={commentsRef} className="flex flex-col gap-5">
+    <div ref={commentsRef} className="flex w-full scroll-mt-6 flex-col gap-6">
       <h3 className="text-[22px] font-[500] text-black1">دیدگاه ها</h3>
       {isCommentsLoading ? (
         <div></div>

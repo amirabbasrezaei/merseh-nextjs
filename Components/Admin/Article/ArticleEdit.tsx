@@ -1,15 +1,17 @@
 "use client";
 
 import { trpc } from "@/utils/trpc";
-import React, { createElement, useEffect, useState } from "react";
-import "react-quill/dist/quill.snow.css";
+import React, { useEffect, useState } from "react";
 import QuillEditor, { contentType } from "../AddProduct/QuillEditor";
-import { Plus_Svg } from "@/Components/SVGS";
-import Category from "../Category/Category.admin";
-import ContentViewer from "../AddProduct/ContentViewer";
 import Image from "next/image";
-import { EditProductInput } from "@/server/Controllers/product.controller";
 import { EditArticleInput } from "@/server/Controllers/article.controller";
+import AdminPageHeader from "../ui/AdminPageHeader";
+import AdminPanel from "../ui/AdminPanel";
+import AdminInput from "../ui/AdminInput";
+import AdminTextarea from "../ui/AdminTextarea";
+import AdminSelect from "../ui/AdminSelect";
+import AdminButton from "../ui/AdminButton";
+import AdminLinkButton from "../ui/AdminLinkButton";
 
 type Props = {
   articleId?: string;
@@ -20,11 +22,6 @@ type imageType = { base64: string; name: string };
 type editImageType = {
   existingImages: { url: string; name: string }[];
   newImages?: { base64: string; name: string }[];
-};
-
-type variation = {
-  variationName: string;
-  variations: { name: string; price: number }[];
 };
 
 export interface filterTypeArgs {
@@ -46,18 +43,25 @@ export default function ArticleEdit({ articleId }: Props) {
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [flag, setFlag] = useState(false);
   const [content, setContent] = useState<contentType[]>([]);
+  const [status, setStatus] = useState<"DRAFT" | "PUBLISHED" | "ARCHIVED">(
+    "DRAFT"
+  );
 
-  const { data: articleData } = trpc.article.getArticleAdmin.useQuery({
-    articleId: Number(articleId),
-  });
+  const { data: articleData } = trpc.article.getArticleAdmin.useQuery(
+    { articleId: Number(articleId) },
+    { enabled: !!articleId && !Number.isNaN(Number(articleId)) }
+  );
   const { mutateAsync: mutateEditArticle } =
     trpc.article.editArticle.useMutation();
+  const { mutateAsync: setArticleStatus } =
+    trpc.article.setArticleStatus.useMutation();
 
   useEffect(() => {
     if (articleData?.article) {
       setName(articleData.article.title);
       setContent(articleData.article.content);
       setEngName(articleData.article.englishTitle);
+      setStatus(articleData.article.status || "DRAFT");
       seteditProductImages({
         existingImages: articleData.article.imageUrls.map((img: any) => ({
           url: img,
@@ -65,7 +69,6 @@ export default function ArticleEdit({ articleId }: Props) {
         })),
       });
       setMetaDescription(articleData.article.metaDescription || "");
-      // setFilter({ categoryId: data.product.mainCategoryId });
     }
   }, [articleData]);
 
@@ -88,7 +91,6 @@ export default function ArticleEdit({ articleId }: Props) {
           const chooseImage = (files as any)[currentImageIndex];
           reader.onloadend = (res) => {
             const promise = new Promise((resolved) => {
-              console.log("hi");
               if (articleId) {
                 seteditProductImages((state) => ({
                   ...state,
@@ -138,9 +140,11 @@ export default function ArticleEdit({ articleId }: Props) {
     }
   }, [currentImageIndex, files]);
 
+  const submitLabel = articleId ? "ذخیره تغییرات" : "افزودن مقاله";
+
   return (
     <form
-      className="w-full max-w-[1400px] flex flex-col gap-10 px-20 overflow-y-scroll py-10 h-full"
+      className="relative flex w-full flex-col gap-5 pb-24"
       onSubmit={(e) => {
         e.preventDefault();
 
@@ -157,7 +161,6 @@ export default function ArticleEdit({ articleId }: Props) {
             englishTitle: engName,
             title: name,
             content,
-
             metaDescription: metaDescription,
           };
           mutateEditArticle(editProductBody);
@@ -172,83 +175,121 @@ export default function ArticleEdit({ articleId }: Props) {
         }
       }}
     >
-      <div className="w-full flex justify-end">
-        <button className="bg-green2 h-10 text-white w-[300px] rounded-[13px]">
-          {articleId ? "ویرایش" : "افزودن"}
-        </button>
-      </div>
-      <div className="bg-blue-100 flex flex-col gap-5 rounded-md p-5">
-        <div>
-          <h2 className="text-[20px]">تصویر شاخص</h2>
-          {editProductImages?.existingImages.map((image, i) => (
-            <Image
-              key={i}
-              src={image.url}
-              alt={image.name}
-              width={200}
-              height={200}
-            />
-          ))}
-        </div>
-        <div>
-          <input
-            onChange={(e) => {
-              setCurrentImageIndex(0);
-              setImages([]);
-              setFlag(false);
-              setFiles((e.target as any).files);
-            }}
-            multiple
-            type="file"
-            accept="image/*"
-          />
-        </div>
-      </div>
-      <div className="flex flex-wrap -mx-3 mb-6">
-        <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-          <label
-            className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-            htmlFor="grid-first-name"
-          >
-            نام مقاله
-          </label>
-          <input
-            value={name}
-            onChange={(e) => setName(e.currentTarget.value)}
-            className="appearance-none block w-full bg-gray-200 text-gray-700 border  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-            id="grid-first-name"
-            type="text"
-          />
-        </div>
-        <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-          <label
-            className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-            htmlFor="grid-first-name"
-          >
-            نام انگلیسی مقاله
-          </label>
-          <input
-            value={engName}
-            onChange={(e) => setEngName(e.currentTarget.value)}
-            className="appearance-none block w-full bg-gray-200 text-gray-700 border  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-            id="grid-first-name"
-            type="text"
-          />
-        </div>
-      </div>
-      <label>توضیحات متا</label>
-      <textarea
-        value={metaDescription}
-        onChange={(e) => {
-          setMetaDescription(e.target.value);
-        }}
-        className="bg-gray-50 appearance-none outline-none p-4"
+      <AdminPageHeader
+        title={articleId ? "ویرایش مقاله" : "افزودن مقاله"}
+        actions={
+          <AdminLinkButton href="/admin/articles" variant="secondary" size="sm">
+            بازگشت به لیست
+          </AdminLinkButton>
+        }
       />
 
-      {/* <Category filter={filter} setFilter={setFilter} /> */}
+      <AdminPanel title="اطلاعات پایه">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <AdminInput
+            label="نام مقاله"
+            value={name}
+            onChange={(e) => setName(e.currentTarget.value)}
+          />
+          <AdminInput
+            label="نام انگلیسی مقاله"
+            value={engName}
+            onChange={(e) => setEngName(e.currentTarget.value)}
+            dir="ltr"
+          />
+        </div>
+      </AdminPanel>
 
-      <QuillEditor setContent={setContent} content={content} />
-      {/* <ContentViewer contentForView={content} /> */}
+      <AdminPanel title="تصویر شاخص">
+        {editProductImages?.existingImages?.length ? (
+          <div className="mb-4 flex flex-wrap gap-3">
+            {editProductImages.existingImages.map((image, i) => (
+              <div
+                key={i}
+                className="relative h-36 w-36 overflow-hidden rounded-lg border border-gray-200"
+              >
+                <Image
+                  src={image.url}
+                  alt={image.name}
+                  fill
+                  className="object-cover"
+                  sizes="144px"
+                />
+              </div>
+            ))}
+          </div>
+        ) : null}
+        <input
+          onChange={(e) => {
+            setCurrentImageIndex(0);
+            setImages([]);
+            setFlag(false);
+            setFiles((e.target as any).files);
+          }}
+          multiple
+          type="file"
+          accept="image/*"
+          className="text-sm text-gray-600 file:ml-3 file:rounded-lg file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-gray-700"
+        />
+      </AdminPanel>
+
+      <AdminPanel title="سئو">
+        <AdminTextarea
+          label="توضیحات متا"
+          value={metaDescription}
+          onChange={(e) => setMetaDescription(e.target.value)}
+          rows={3}
+        />
+      </AdminPanel>
+
+      <AdminPanel title="محتوا">
+        <QuillEditor
+          setContent={setContent}
+          content={content}
+          folder="article/content"
+        />
+      </AdminPanel>
+
+      <AdminPanel title="وضعیت انتشار">
+        {articleId ? (
+          <div className="flex flex-wrap items-end gap-3">
+            <AdminSelect
+              label="وضعیت"
+              className="!w-auto min-w-[160px]"
+              value={status}
+              onChange={(e) =>
+                setStatus(
+                  e.target.value as "DRAFT" | "PUBLISHED" | "ARCHIVED"
+                )
+              }
+            >
+              <option value="DRAFT">پیش‌نویس</option>
+              <option value="PUBLISHED">منتشر شده</option>
+              <option value="ARCHIVED">آرشیو</option>
+            </AdminSelect>
+            <AdminButton
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                void setArticleStatus({
+                  articleId: Number(articleId),
+                  status,
+                });
+              }}
+            >
+              ذخیره وضعیت
+            </AdminButton>
+          </div>
+        ) : (
+          <p className="text-sm text-lightBlack">
+            مقاله جدید به‌صورت پیش‌نویس ذخیره می‌شود.
+          </p>
+        )}
+      </AdminPanel>
+
+      <div className="fixed bottom-0 left-0 right-0 z-20 flex items-center justify-end gap-3 border-t border-gray-200 bg-white/95 px-4 py-3 backdrop-blur lg:right-64">
+        <AdminButton type="submit">{submitLabel}</AdminButton>
+      </div>
     </form>
   );
 }

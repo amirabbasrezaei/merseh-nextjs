@@ -1,10 +1,57 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+}
+
+enum FileKind {
+  IMAGE
+  DOCUMENT
+  VIDEO
+  AUDIO
+  OTHER
+}
+
+model File {
+  id           String   @id @default(uuid())
+  key          String   @unique
+  originalName String
+  mimeType     String
+  sizeBytes    Int
+  kind         FileKind
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  productGallery  ProductGalleryFile[]
+  articleGallery  ArticleGalleryFile[]
+  category        Category?
+  shippingPartner ShippingPartner?
+  banner          Banner?
+  brand           Brand?           @relation("BrandLogo")
+  homeCarousel    HomeCarousel?    @relation("CarouselLogo")
+}
+
+model ProductGalleryFile {
+  productId Int
+  fileId    String
+  sortOrder Int     @default(0)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  file      File    @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@id([productId, fileId])
+}
+
+model ArticleGalleryFile {
+  articleId Int
+  fileId    String
+  sortOrder Int     @default(0)
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  file      File    @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, fileId])
 }
 
 model Address {
@@ -45,17 +92,18 @@ model City {
 }
 
 model Article {
-  id              Int       @id @default(autoincrement())
-  images          String[]
+  id              Int                  @id @default(autoincrement())
   title           String
-  englishTitle    String    @default("")
-  created_at      DateTime  @default(now())
+  englishTitle    String               @default("")
+  created_at      DateTime             @default(now())
   updated_at      DateTime?
   comments        Comment[]
   content         String
   metaDescription String?
   isSuggested     Boolean?
   keywords        String[]
+  status          ContentStatus        @default(DRAFT)
+  galleryFiles    ArticleGalleryFile[]
 }
 
 model OrderShipping {
@@ -72,30 +120,37 @@ model OrderShipping {
 model ShippingPartner {
   id            String          @id @default(uuid())
   name          String
-  imageName     String
+  imageFileId   String?         @unique
+  imageFile     File?           @relation(fields: [imageFileId], references: [id])
   Order         Order[]
   OrderShipping OrderShipping[]
 }
 
 model Product {
-  id               Int                @id @default(autoincrement())
+  id               Int                  @id @default(autoincrement())
   name             String
   price            Int
-  imageNames       String[]
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @default(now())
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @default(now())
   content          String
-  engName          String             @default("")
-  discount         Int                @default(0)
-  quantity         Int                @default(10)
-  mainCategoryId   Int                @default(1)
-  metaDescription  String             @default("")
+  engName          String               @default("")
+  discount         Int                  @default(0)
+  quantity         Int                  @default(10)
+  mainCategoryId   Int                  @default(1)
+  metaDescription  String               @default("")
+  status           ContentStatus        @default(DRAFT)
   ProductForOrder  ProductForOrder[]
   ProductVariation ProductVariation[]
-  category         Category[]         @relation("CategoryToProduct")
+  category         Category[]           @relation("CategoryToProduct")
   details          String[]
   Comments         Comment[]
   content_keywords String[]
+  galleryFiles     ProductGalleryFile[]
+  brandId          Int?
+  brand            Brand?                 @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  carouselItems    HomeCarouselProduct[]
+
+  @@index([brandId])
 }
 
 model ProductVariationValue {
@@ -153,7 +208,8 @@ model Category {
   id               Int            @id @default(autoincrement())
   title            String
   parentCategoryId Int?
-  imageName        String         @default("")
+  imageFileId      String?        @unique
+  imageFile        File?          @relation(fields: [imageFileId], references: [id])
   content          String         @default("")
   englishTitle     String         @default("")
   parentCategory   Category?      @relation("SubCategories", fields: [parentCategoryId], references: [id])
@@ -162,11 +218,91 @@ model Category {
   updated_at       DateTime?      @default(now())
   metaDescription  String         @default("")
   status           CategoryStatus @default(ENABLED)
+  carousels        HomeCarousel[]
 }
 
 enum CategoryStatus {
   ENABLED
   DISABLED
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum BannerPlacement {
+  HERO
+  SIDE
+}
+
+model Brand {
+  id              Int       @id @default(autoincrement())
+  name            String
+  englishName     String    @default("")
+  content         String    @default("")
+  metaDescription String    @default("")
+  isActive        Boolean   @default(true)
+  logoFileId      String?   @unique
+  logoFile        File?     @relation("BrandLogo", fields: [logoFileId], references: [id], onDelete: SetNull)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  products        Product[]
+  carousels       HomeCarousel[]
+
+  @@index([isActive])
+}
+
+enum HomeCarouselSource {
+  CATEGORY
+  BRAND
+  MANUAL
+}
+
+model HomeCarousel {
+  id         Int                   @id @default(autoincrement())
+  title      String
+  logoFileId String?               @unique
+  logoFile   File?                 @relation("CarouselLogo", fields: [logoFileId], references: [id], onDelete: SetNull)
+  source     HomeCarouselSource
+  categoryId Int?
+  category   Category?             @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  brandId    Int?
+  brand      Brand?                @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  sortOrder  Int                   @default(0)
+  isActive   Boolean               @default(true)
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
+  products   HomeCarouselProduct[]
+
+  @@index([isActive, sortOrder])
+  @@index([categoryId])
+  @@index([brandId])
+}
+
+model HomeCarouselProduct {
+  carouselId Int
+  productId  Int
+  sortOrder  Int          @default(0)
+  carousel   HomeCarousel @relation(fields: [carouselId], references: [id], onDelete: Cascade)
+  product    Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([carouselId, productId])
+  @@index([productId])
+}
+
+model Banner {
+  id          String          @id @default(uuid())
+  placement   BannerPlacement
+  title       String?
+  href        String?
+  sortOrder   Int             @default(0)
+  isActive    Boolean         @default(true)
+  imageFileId String          @unique
+  imageFile   File            @relation(fields: [imageFileId], references: [id])
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 }
 
 model User {

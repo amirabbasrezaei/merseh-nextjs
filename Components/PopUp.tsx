@@ -1,14 +1,7 @@
-import React, { Component, ReactNode } from "react";
-import {
-  motion,
-  AnimationProps,
-  AnimationControls,
-  MotionValue,
-} from "framer-motion";
+import React, { ReactNode } from "react";
+import { motion } from "framer-motion";
 import { createPortal } from "react-dom";
 import { XMark_Svg } from "./SVGS";
-import { useRecoilState } from "recoil";
-import { themeRecoilStateAtom } from "./ThemeController";
 
 interface Props {
   children: ReactNode ;

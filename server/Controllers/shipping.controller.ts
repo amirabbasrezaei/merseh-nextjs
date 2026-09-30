@@ -3,6 +3,7 @@ import { estimate_miare_price } from "./shipping/miare.controller";
 import { ArgsStructure } from "./category.controller";
 import CitiesJson from "../../public/gistfile1.json";
 import { podroShippingPrices } from "./shipping/podro.controller";
+import { publicUrl } from "../utils/storage";
 
 export const ShippingPricesInputSchema = z.object({
   addressId: z.string(),
@@ -59,16 +60,21 @@ export async function getShippingPricesController({
     if (order.Address?.city.podroCode === "2301") {
       const miare = await estimate_miare_price(coordinateBody);
       if (miare) {
+        const miarePartner = await prisma.shippingPartner.findFirst({
+          where: { name: "miare" },
+          include: { imageFile: true },
+        });
         shippings.push({
           shippingTypeName: "پیک موتوری",
           shippingPartners: [
             {
               title: "میاره",
               name: "miare",
-              image:
-                "https://merseh.storage.iran.liara.space/main_images/miare-logo.svg",
+              image: miarePartner?.imageFile
+                ? publicUrl(miarePartner.imageFile.key)
+                : "",
               price: miare.price,
-              shippingPartnerId: 1,
+              shippingPartnerId: miarePartner?.id || 1,
             },
           ],
         });

@@ -1,7 +1,11 @@
 import { publicProcedure, router } from "../trpc";
 import { articleRouter } from "./article.router";
+import { bannerRouter } from "./banner.router";
+import { brandRouter } from "./brand.router";
+import { carouselRouter } from "./carousel.router";
 import { commentRouter } from "./comment.router";
 import { filterRouter } from "./filter.router";
+import { mediaRouter } from "./media.router";
 import { orderRouter } from "./order.router";
 import { paymentRouter } from "./payment.router";
 import { productRouter } from "./product.router";
@@ -16,7 +20,11 @@ export const appRouter = router({
   shipping: shippingRouter,
   filter: filterRouter,
   article: articleRouter,
-  comment:commentRouter
+  comment: commentRouter,
+  media: mediaRouter,
+  banner: bannerRouter,
+  brand: brandRouter,
+  carousel: carouselRouter,
 });
 // export type definition of API
 export type AppRouter = typeof appRouter;

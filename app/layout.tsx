@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import "contenido/dist/styles.css";
 import TRPC_Provider from "@/Components/TRPC_Provider";
 import { IRANYekanXFaNum } from "./fonts";
-import RecoilRootProvider from "@/Components/StateManager/RecoilRootProvider";
 import { cookies } from "next/headers";
 import ThemeController from "@/Components/ThemeController";
 import { Toaster } from "react-hot-toast";
@@ -35,12 +33,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const AuthorizeStatus = cookies().get("AuthorizeStatus")?.value;
+  const cookieStore = await cookies();
+  const AuthorizeStatus = cookieStore.get("AuthorizeStatus")?.value;
   console.log(AuthorizeStatus);
 
   return (
@@ -67,13 +66,11 @@ export default function RootLayout({
       ) : null}
       <body className={`overflow-x-hidden  ${IRANYekanXFaNum.className}`}>
         <Toaster />
-        <RecoilRootProvider>
-          <TRPC_Provider>
-            <ThemeController AuthorizeStatus={AuthorizeStatus}>
-              {children}
-            </ThemeController>
-          </TRPC_Provider>
-        </RecoilRootProvider>
+        <TRPC_Provider>
+          <ThemeController AuthorizeStatus={AuthorizeStatus}>
+            {children}
+          </ThemeController>
+        </TRPC_Provider>
       </body>
 
      

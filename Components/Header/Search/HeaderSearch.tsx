@@ -25,7 +25,7 @@ export default function HeaderSearch() {
   const [isClient, setisClient] = useState(false);
   const { height } = useWindowSize();
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const { data, isLoading, mutate } = trpc.filter.search.useMutation();
+  const { data, isPending: isLoading, mutate } = trpc.filter.search.useMutation();
   // for mobile purpose
   const [showSearch, setShowSearch] = useState(false);
 

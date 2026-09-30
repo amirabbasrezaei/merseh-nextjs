@@ -1,4 +1,4 @@
-import { Droplet } from "@/Components/SVGS";
+import { Chevron_Down } from "@/Components/SVGS";
 import classNames from "classnames";
 import Link from "next/link";
 import React from "react";
@@ -30,15 +30,18 @@ export default function CategoryItem({
       <div
         onMouseOver={() => setSelectedCategoryIndex(categoryIndex)}
         className={classNames(
-          "cursor-pointer   gap-1   grow flex flex-row items-center justify-start px-8  rounded-[8px]  h-[55px] w-full",
+          "flex h-12 cursor-pointer flex-row items-center justify-between gap-2 rounded-xl px-3.5 transition-colors",
           isSelected
-            ? "bg-gray-50 fill-green1 text-green1"
-            : "bg-transparent text-[#4E4E4E]"
+            ? "bg-white text-green2 shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+            : "bg-transparent text-[#4E4E4E] hover:bg-white/80"
         )}
       >
-        <span className=" text-inherit text-[16px] text-nowrap">
+        <span className="text-inherit text-[15px] font-[500] text-nowrap">
           {categoryName}
         </span>
+        {isSelected ? (
+          <Chevron_Down classname="h-auto w-2.5 shrink-0 rotate-90 fill-green2" />
+        ) : null}
       </div>
     </Link>
   );

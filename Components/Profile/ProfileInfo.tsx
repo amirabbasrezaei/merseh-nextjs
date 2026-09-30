@@ -1,11 +1,10 @@
 import { trpc } from "@/utils/trpc";
 import React, { useEffect } from "react";
 import { Edit_Svg } from "../SVGS";
-import { useRecoilState } from "recoil";
-import { themeRecoilStateAtom } from "../ThemeController";
+import { useThemeStore } from "../ThemeController";
 
 export default function ProfileInfo() {
-  const [themeStore, setThemeStore] = useRecoilState(themeRecoilStateAtom);
+  const setThemeStore = useThemeStore.setState;
   const {
     data: userInfoData,
     isLoading,

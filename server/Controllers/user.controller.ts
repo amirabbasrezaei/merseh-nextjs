@@ -2,10 +2,10 @@ import { Context } from "../context";
 import { z } from "zod";
 import { signJWT } from "../utils/signJWT";
 import { TRPCError } from "@trpc/server";
-import Prisma from "@prisma/client";
+import { User } from "@/generated/prisma/client";
 import { sendSMSCodeController } from "./sms.controller";
 import { cookies } from "next/headers";
-import { User } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 type UserRouterArgsController<T = null> = T extends null
   ? {
@@ -229,6 +229,53 @@ export async function verifyLoginCodeController({
 
 ////
 
+//// login with password (admin / seeded accounts)
+export const LoginWithPasswordSchema = z.object({
+  phoneNumber: z.string().max(13),
+  password: z.string().min(1),
+});
+export type LoginWithPassword = z.infer<typeof LoginWithPasswordSchema>;
+
+export async function loginWithPasswordController({
+  ctx,
+  input,
+}: UserRouterArgsController<LoginWithPassword>) {
+  const { phoneNumber, password } = input;
+  const findUser = await ctx.prisma.user.findUnique({
+    where: { phoneNumber },
+  });
+
+  if (!findUser?.password) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "شماره یا رمز عبور نامعتبر است",
+    });
+  }
+
+  const isValid = await bcrypt.compare(password, findUser.password);
+  if (!isValid) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "شماره یا رمز عبور نامعتبر است",
+    });
+  }
+
+  if (!findUser.isVerified) {
+    await ctx.prisma.user.update({
+      where: { phoneNumber },
+      data: { isVerified: true },
+    });
+  }
+
+  return signJWT({ res: ctx.res, user: findUser }).then(
+    ({ accessToken, refreshToken }) => {
+      return { accessToken, refreshToken };
+    }
+  );
+}
+
+////
+
 //// Logout
 
 export const LogoutPayloadSchema = z.object({
@@ -245,7 +292,8 @@ export async function logoutController({
   ctx,
 }: UserRouterArgsController): Promise<LogoutPayload> {
   const { prisma } = ctx;
-  const refreshToken = cookies().get("refreshToken")?.value;
+  const cookieStore = await cookies();
+  const refreshToken = cookieStore.get("refreshToken")?.value;
   try {
     await prisma.session.delete({
       where: {
@@ -255,8 +303,8 @@ export async function logoutController({
   } catch (error) {
     console.log(error);
   }
-  cookies().delete("accessToken");
-  cookies().delete("refreshToken");
+  cookieStore.delete("accessToken");
+  cookieStore.delete("refreshToken");
 
   return { isUserLoggedout: true };
 }
@@ -267,7 +315,7 @@ export async function logoutController({
 
 export async function users({
   ctx,
-}: UserRouterArgsController): Promise<Prisma.User[]> {
+}: UserRouterArgsController): Promise<User[]> {
   const { prisma } = ctx;
   const users = await prisma.user.findMany();
   return users;
@@ -327,5 +375,114 @@ export async function userInfoController({
   }
 }
 
+//// update admin account (phone / password)
+
+export const UpdateAdminPhoneSchema = z.object({
+  currentPassword: z.string().min(1),
+  phoneNumber: z.string().min(10).max(13),
+});
+export type UpdateAdminPhone = z.infer<typeof UpdateAdminPhoneSchema>;
+
+export const UpdateAdminPasswordSchema = z.object({
+  currentPassword: z.string().min(1),
+  newPassword: z.string().min(6),
+  confirmPassword: z.string().min(6),
+});
+export type UpdateAdminPassword = z.infer<typeof UpdateAdminPasswordSchema>;
+
+async function getAdminUserOrThrow(ctx: Context, userId: string) {
+  const findUser = await ctx.prisma.user.findUnique({ where: { id: userId } });
+  if (!findUser || findUser.role !== "ADMIN") {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "دسترسی مجاز نیست",
+    });
+  }
+  return findUser;
+}
+
+async function assertCurrentPassword(user: User, currentPassword: string) {
+  if (!user.password) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "برای این حساب رمزی تنظیم نشده است",
+    });
+  }
+  const isValid = await bcrypt.compare(currentPassword, user.password);
+  if (!isValid) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "رمز عبور فعلی نادرست است",
+    });
+  }
+}
+
+export async function updateAdminPhoneController({
+  ctx,
+  input,
+}: UserRouterArgsController<UpdateAdminPhone>) {
+  const userId = ctx.user?.userId as string | undefined;
+  if (!userId) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  const admin = await getAdminUserOrThrow(ctx, userId);
+  await assertCurrentPassword(admin, input.currentPassword);
+
+  const phoneNumber = input.phoneNumber.trim();
+  if (phoneNumber === admin.phoneNumber) {
+    return { phoneNumber, accessToken: null, refreshToken: null };
+  }
+
+  const existing = await ctx.prisma.user.findUnique({
+    where: { phoneNumber },
+  });
+  if (existing && existing.id !== admin.id) {
+    throw new TRPCError({
+      code: "CONFLICT",
+      message: "این شماره قبلاً ثبت شده است",
+    });
+  }
+
+  const updated = await ctx.prisma.user.update({
+    where: { id: admin.id },
+    data: { phoneNumber },
+  });
+
+  const tokens = await signJWT({ res: ctx.res, user: updated });
+  return {
+    phoneNumber: updated.phoneNumber,
+    accessToken: tokens.accessToken,
+    refreshToken: tokens.refreshToken,
+  };
+}
+
+export async function updateAdminPasswordController({
+  ctx,
+  input,
+}: UserRouterArgsController<UpdateAdminPassword>) {
+  const userId = ctx.user?.userId as string | undefined;
+  if (!userId) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  if (input.newPassword !== input.confirmPassword) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "تکرار رمز عبور مطابقت ندارد",
+    });
+  }
+
+  const admin = await getAdminUserOrThrow(ctx, userId);
+  await assertCurrentPassword(admin, input.currentPassword);
+
+  const hashedPassword = await bcrypt.hash(input.newPassword, 12);
+  await ctx.prisma.user.update({
+    where: { id: admin.id },
+    data: { password: hashedPassword },
+  });
+
+  return { updated: true };
+}
 
 

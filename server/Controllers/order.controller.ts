@@ -2,6 +2,11 @@ import { z } from "zod";
 import { Context } from "../context";
 import { estimate_miare_price } from "./shipping/miare.controller";
 import { getShippingPricesController } from "./shipping.controller";
+import {
+  firstGalleryImageUrl,
+  galleryImageUrls,
+  galleryInclude,
+} from "../utils/storage";
 
 type ArgsStructure<T = null> = T extends null
   ? {
@@ -32,6 +37,24 @@ export const activeOrderInputSchema = z.object({
 });
 
 type ActiveOrderInput = z.infer<typeof activeOrderInputSchema>;
+
+function withProductImageUrls<
+  T extends {
+    ProductForOrder: Array<{ Product: { galleryFiles?: any[] } & Record<string, any> } & Record<string, any>>;
+  },
+>(order: T) {
+  return {
+    ...order,
+    ProductForOrder: order.ProductForOrder.map((e) => ({
+      ...e,
+      Product: {
+        ...e.Product,
+        imageUrls: galleryImageUrls(e.Product.galleryFiles),
+        imageNames: galleryImageUrls(e.Product.galleryFiles),
+      },
+    })),
+  };
+}
 
 export async function updateActiveOrderController({
   ctx,
@@ -118,11 +141,11 @@ export async function updateActiveOrderController({
             include: {
               Product: {
                 select: {
-                  imageNames: true,
                   name: true,
                   price: true,
                   id: true,
                   discount: true,
+                  ...galleryInclude(),
                 },
               },
               ProductVariationValue: {
@@ -137,19 +160,7 @@ export async function updateActiveOrderController({
         },
       });
 
-      const addProductImages = {
-        ...activeOrder,
-        ProductForOrder: activeOrder.ProductForOrder.map((e) => ({
-          ...e,
-          Product: {
-            ...e.Product,
-            imageUrls: e.Product.imageNames.map(
-              (imgName) =>
-                `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${imgName}`
-            ),
-          },
-        })),
-      };
+      const addProductImages = withProductImageUrls(activeOrder);
 
       // calculate final price
       let totalPrice: number = 0;
@@ -254,10 +265,10 @@ export async function updateActiveOrderController({
                     include: {
                       Product: {
                         select: {
-                          imageNames: true,
                           name: true,
                           price: true,
                           id: true,
+                          ...galleryInclude(),
                         },
                       },
                       ProductVariationValue: {
@@ -276,21 +287,7 @@ export async function updateActiveOrderController({
                 },
               });
 
-              const addProductImages = {
-                ...updateOrderShipping,
-                ProductForOrder: updateOrderShipping.ProductForOrder.map(
-                  (e) => ({
-                    ...e,
-                    Product: {
-                      ...e.Product,
-                      imageUrls: e.Product.imageNames.map(
-                        (imgName) =>
-                          `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${imgName}`
-                      ),
-                    },
-                  })
-                ),
-              };
+              const addProductImages = withProductImageUrls(updateOrderShipping);
 
               return {
                 result: "ok",
@@ -341,7 +338,7 @@ export async function getActiveOrderController({ ctx }: ArgsStructure) {
       include: {
         ProductForOrder: {
           include: {
-            Product: true,
+            Product: { include: galleryInclude() },
             ProductVariationValue: true,
           },
         },
@@ -354,19 +351,7 @@ export async function getActiveOrderController({ ctx }: ArgsStructure) {
     });
 
     if (activeOrder) {
-      const addProductImages = {
-        ...activeOrder,
-        ProductForOrder: activeOrder.ProductForOrder.map((e) => ({
-          ...e,
-          Product: {
-            ...e.Product,
-            imageUrls: e.Product.imageNames.map(
-              (imgName) =>
-                `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${imgName}`
-            ),
-          },
-        })),
-      };
+      const addProductImages = withProductImageUrls(activeOrder);
 
       // calculate final price
       let totalPrice: number = 0;
@@ -414,11 +399,13 @@ export async function getActiveOrderController({ ctx }: ArgsStructure) {
 export async function ordersController({ ctx }: ArgsStructure) {
   const { prisma, user } = ctx;
   try {
+    const isAdmin = user?.role === "ADMIN";
     const orders = await prisma.order.findMany({
+      where: isAdmin ? undefined : { userId: user.userId },
       include: {
         ProductForOrder: {
           select: {
-            Product: true,
+            Product: { include: galleryInclude() },
             numberOfproduct: true,
             ProductVariationValue: true,
           },
@@ -435,7 +422,7 @@ export async function ordersController({ ctx }: ArgsStructure) {
             reciverPhoneNumber: true,
             postalCode: true,
             latitude: true,
-            longitude: true
+            longitude: true,
           },
         },
       },
@@ -450,7 +437,9 @@ export async function ordersController({ ctx }: ArgsStructure) {
         ...prForOrder,
         Product: {
           ...prForOrder.Product,
-          imageUrl: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${prForOrder.Product.imageNames[0]}`,
+          imageUrl: firstGalleryImageUrl(prForOrder.Product.galleryFiles),
+          imageUrls: galleryImageUrls(prForOrder.Product.galleryFiles),
+          imageNames: galleryImageUrls(prForOrder.Product.galleryFiles),
         },
       })),
     }));

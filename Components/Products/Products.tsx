@@ -48,7 +48,7 @@ export default function Products({ categoryId, categoryContent }: Props) {
   const {
     mutate: mutate,
     data,
-    isLoading,
+    isPending: isLoading,
   } = trpc.filter.filterProduct.useMutation({});
 
   useEffect(() => {
@@ -109,11 +109,11 @@ export default function Products({ categoryId, categoryContent }: Props) {
                     imageNames={pr.imageNames}
                     price={pr.price || 0}
                     title={pr.name}
+                    brand={pr.brand}
                     pathname={`/product/${String(pr.id)}/${pr.name.replaceAll(
                       " ",
                       "-"
                     )}`}
-                    isLoading={true}
                   />
                 ))
               : Array.from(Array(8)).map((_, i) => (

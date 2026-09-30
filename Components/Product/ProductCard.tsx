@@ -8,7 +8,20 @@ interface ProductCardProps {
   imageNames: string[];
   price: number;
   pathname: string;
-  isLoading: boolean;
+  isLoading?: boolean;
+  brand?: { id: number; name: string } | null;
+}
+
+function listingImageSrc(imageName: string | undefined) {
+  if (!imageName) return "";
+  if (
+    imageName.startsWith("http://") ||
+    imageName.startsWith("https://") ||
+    imageName.startsWith("/")
+  ) {
+    return imageName;
+  }
+  return `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${imageName}`;
 }
 
 export default function ProductCard({
@@ -35,7 +48,7 @@ export default function ProductCard({
             title={title.replaceAll(" ", "-")}
             className="sm:w-full w-auto h-full rounded-[12px] sm:h-auto basis-1/4"
             style={{ objectFit: "contain" }}
-            src={`${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${imageNames[0]}`}
+            src={listingImageSrc(imageNames[0])}
             alt={title}
             quality={50}
             width={200}

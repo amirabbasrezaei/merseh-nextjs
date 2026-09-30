@@ -4,7 +4,8 @@ import { contentType } from "@/Components/Admin/AddProduct/QuillEditor";
 import { parentCategories } from "../utils/category";
 import { TRPCError } from "@trpc/server";
 import { TRPCClientError } from "@trpc/client";
-import { CategoryStatus } from "@prisma/client";
+import { CategoryStatus } from "@/generated/prisma/client";
+import { publicUrl } from "../utils/storage";
 
 export type ArgsStructure<T = null> = T extends null
   ? {
@@ -20,10 +21,11 @@ export async function categoriesController({ ctx }: ArgsStructure) {
 
   let categories = await prisma.category.findMany({
     where: { status: "ENABLED" },
+    include: { imageFile: true },
   });
   categories = categories.map((e) => ({
     ...e,
-    imageUrl: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/category/${e.imageName}`,
+    imageUrl: e.imageFile ? publicUrl(e.imageFile.key) : "",
     content: e.content.length ? JSON.parse(e.content) : [],
   }));
 
@@ -112,8 +114,8 @@ export async function categoriesController({ ctx }: ArgsStructure) {
 }
 
 export const createCategorySchema = z.object({
-  title: z.string(),
-  parentId: z.number(),
+  title: z.string().min(1),
+  parentId: z.number().optional().nullable(),
 });
 
 type CreateCategoryArgs = z.infer<typeof createCategorySchema>;
@@ -126,7 +128,7 @@ export async function createCategory({
   const newCategory = await prisma.category.create({
     data: {
       title: input.title,
-      parentCategoryId: input.parentId,
+      parentCategoryId: input.parentId ?? null,
     },
   });
 
@@ -181,17 +183,19 @@ export async function categoryInfoController({
       },
       select: {
         title: true,
-        imageName: true,
         metaDescription: true,
         content: true,
         englishTitle: true,
+        imageFile: true,
       },
     });
 
     return {
       category: {
         title: category?.title,
-        imageUrl: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/category/${category?.imageName}`,
+        imageUrl: category?.imageFile
+          ? publicUrl(category.imageFile.key)
+          : "",
         metaDescription: category?.metaDescription || "",
         englishTitle: category?.englishTitle,
         content: category?.content,

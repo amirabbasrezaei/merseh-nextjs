@@ -1,6 +1,6 @@
 
 import jwt, { Secret } from "jsonwebtoken";
-import { User, Session } from "@prisma/client";
+import { User, Session } from "@/generated/prisma/client";
 import { prisma } from "../context";
 
 import { cookies } from "next/headers";
@@ -50,7 +50,7 @@ async function createSession(userId: string): Promise<Session> {
   return createdSession;
 }
 
-function setAccessToken(res: Response, user: User): SetAccessTokenOutput {
+async function setAccessToken(res: Response, user: User): Promise<SetAccessTokenOutput> {
   const accessTokenPayload: AccessTokenPayload = {
     phoneNumber: user.phoneNumber as string,
     role: user.role,
@@ -63,7 +63,8 @@ function setAccessToken(res: Response, user: User): SetAccessTokenOutput {
       expiresIn: Date.now() + 300000,
     }
   );
- cookies().set("accessToken", accessToken, {
+  const cookieStore = await cookies();
+  cookieStore.set("accessToken", accessToken, {
     expires: new Date(Date.now() + 300000),
     httpOnly: true,
   });
@@ -88,7 +89,8 @@ async function setRefreshToken(
       expiresIn: Date.now() + 7889400000,
     }
   );
-  await cookies().set("refreshToken", refreshToken, {
+  const cookieStore = await cookies();
+  cookieStore.set("refreshToken", refreshToken, {
     expires: new Date(Date.now() + 7889400000),
     httpOnly: true,
   });
@@ -100,7 +102,7 @@ export async function signJWT({
   res,
   user,
 }: SetToken): Promise<SignJWTPayload> {
-  const { accessToken, accessTokenPayload } = setAccessToken(res, user);
+  const { accessToken, accessTokenPayload } = await setAccessToken(res, user);
   return setRefreshToken(res, user)
     .then(({ refreshToken, refreshTokenPayload }) => {
       return {

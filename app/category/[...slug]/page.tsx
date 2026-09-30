@@ -7,8 +7,8 @@ import dynamic from "next/dynamic";
 import React, { cache } from "react";
 
 export type NextPagePropsType = {
-  params: { slug: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ slug: string[] }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 export const revalidate = 3600;
@@ -36,12 +36,13 @@ const getCategory = cache(async (categoryId: string) => {
 export async function generateMetadata({
   params,
 }: NextPagePropsType): Promise<Metadata> {
-  const category = await getCategory(params.slug[0]);
+  const { slug } = await params;
+  const category = await getCategory(slug[0]);
   if (category?.category) {
     return {
       title: { absolute: `قیمت ${category.category.title}` },
       alternates: {
-        canonical: `${process.env.BASE_URL}/category/${params.slug[0]}/${(
+        canonical: `${process.env.BASE_URL}/category/${slug[0]}/${(
           category.category.title as string
         )?.replaceAll(" ", "-")}`,
       },
@@ -49,7 +50,7 @@ export async function generateMetadata({
       openGraph: {
         images: category.category.imageUrl,
         type: "article",
-        url: `${process.env.BASE_URL}/category/${params.slug[0]}/${(
+        url: `${process.env.BASE_URL}/category/${slug[0]}/${(
           category.category.title as string
         )?.replaceAll(" ", "-")}`,
       },
@@ -58,13 +59,14 @@ export async function generateMetadata({
   return {};
 }
 
-export default async function page({ params }: any) {
-  const category = await getCategory(params.slug[0]);
+export default async function page({ params }: NextPagePropsType) {
+  const { slug } = await params;
+  const category = await getCategory(slug[0]);
   return (
     <Layout>
       <Products
         categoryContent={category?.category}
-        categoryId={Number(params.slug[0])}
+        categoryId={Number(slug[0])}
       />
     </Layout>
   );

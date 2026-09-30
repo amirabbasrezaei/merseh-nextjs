@@ -4,10 +4,9 @@ import Button from "../../Button";
 import { z } from "zod";
 import { trpc } from "@/utils/trpc";
 import Comment from "./Comment";
-import { useRecoilState } from "recoil";
-import { userInfoStoreAtom } from "@/Components/UserAuth";
+import { useUserInfoStore } from "@/Components/stores/userInfoStore";
 import PopUp from "@/Components/PopUp";
-import { themeRecoilStateAtom } from "@/Components/ThemeController";
+import { useThemeStore } from "@/Components/ThemeController";
 import { AnimatePresence } from "framer-motion";
 
 type Props = {
@@ -17,9 +16,9 @@ type Props = {
 
 export default function Comments({ commentsRef, articleId }: Props) {
   const [commentInput, setCommentInput] = useState("");
-  const [userInfo] = useRecoilState(userInfoStoreAtom);
+  const userInfo = useUserInfoStore((s) => s.userInfo);
   const [showNotRegisteredPopUp, setShowNotRegisteredPopUp] = useState(false);
-  const [themeStore, setThemeStore] = useRecoilState(themeRecoilStateAtom);
+  const setThemeStore = useThemeStore.setState;
 
 
   const {

@@ -62,7 +62,7 @@ export default function Add_Address({
   const {
     mutate: mutateAddAddress,
     data: addAddressData,
-    isLoading: isPendingAddAddress,
+    isPending: isPendingAddAddress,
     error,
   } = trpc.shipping.addAddress.useMutation();
 

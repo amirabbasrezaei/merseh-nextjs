@@ -4,9 +4,15 @@ import React, { useEffect, useState } from "react";
 import Category from "./Category.admin";
 import { filterTypeArgs } from "../AddProduct/ProductEdit";
 import QuillEditor, { contentType } from "../AddProduct/QuillEditor";
-import Button from "@/Components/Button";
 import { trpc } from "@/utils/trpc";
-import Input from "@/Components/Input";
+import AdminPageHeader from "../ui/AdminPageHeader";
+import AdminPanel from "../ui/AdminPanel";
+import AdminInput from "../ui/AdminInput";
+import AdminTextarea from "../ui/AdminTextarea";
+import AdminButton from "../ui/AdminButton";
+import AdminLinkButton from "../ui/AdminLinkButton";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export interface ManageCategory extends filterTypeArgs {
   name?: string;
@@ -20,6 +26,8 @@ interface Props {
 }
 
 export default function ManageCategory({ categoryId }: Props) {
+  const router = useRouter();
+  const isCreateMode = !categoryId;
   const [lastCategoryId, setLastCategoryId] = useState<number>();
   const [filter, setFilter] = useState<ManageCategory>({
     name: "",
@@ -27,120 +35,179 @@ export default function ManageCategory({ categoryId }: Props) {
     metaDescription: "",
     content: [],
   });
-  const { isLoading, mutate, data } = trpc.product.editCategory.useMutation();
-  const { data: categoryData, error } = trpc.product.categoryInfo.useQuery({
-    categoryId: Number(categoryId),
-  });
+  const [saving, setSaving] = useState(false);
+
+  const { mutateAsync: mutateEdit } = trpc.product.editCategory.useMutation();
+  const { mutateAsync: mutateCreate } =
+    trpc.product.createCategory.useMutation();
+  const utils = trpc.useUtils();
+
+  const { data: categoryData } = trpc.product.categoryInfo.useQuery(
+    { categoryId: Number(categoryId) },
+    { enabled: !!categoryId && !Number.isNaN(Number(categoryId)) }
+  );
 
   useEffect(() => {
     setLastCategoryId(filter.categoryId);
   }, [filter.categoryId]);
 
   useEffect(() => {
-    console.log(error)
-    console.log(categoryData)
     if (categoryData?.category) {
       setFilter({
         categoryId: Number(categoryId),
-        content: JSON.parse(categoryData.category.content || ""),
+        content: JSON.parse(categoryData.category.content || "[]"),
         name: categoryData.category.title,
         metaDescription: categoryData.category.metaDescription,
         englishName: categoryData.category.englishTitle,
         parentCategories: categoryData.category.parent_categories,
       });
     }
-  }, [categoryData]);
+  }, [categoryData, categoryId]);
 
-  useEffect(() => {
-    console.log(filter);
-  }, [filter]);
+  const handleSave = async () => {
+    const name = filter.name?.trim();
+    if (!name) {
+      toast.error("نام دسته‌بندی را وارد کنید");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      if (isCreateMode && !filter.categoryId) {
+        const created = await mutateCreate({
+          title: name,
+          parentId: null,
+        });
+        await mutateEdit({
+          categoryId: created.id,
+          content: JSON.stringify(filter.content || []),
+          englishName: filter.englishName || "",
+          name,
+          metaDescription: filter.metaDescription || "",
+        });
+        toast.success("دسته‌بندی ایجاد شد");
+        await utils.product.flatCategories.invalidate();
+        await utils.product.categories.invalidate();
+        router.push(`/admin/category/${created.id}`);
+        return;
+      }
+
+      if (!filter.categoryId) {
+        toast.error("یک دسته‌بندی را انتخاب کنید یا نام دسته ریشه را وارد کنید");
+        return;
+      }
+
+      await mutateEdit({
+        categoryId: filter.categoryId,
+        content: JSON.stringify(filter.content || []),
+        englishName: filter.englishName || "",
+        name,
+        metaDescription: filter.metaDescription || "",
+      });
+      toast.success("تغییرات ذخیره شد");
+      await utils.product.flatCategories.invalidate();
+      await utils.product.categories.invalidate();
+    } catch (err: any) {
+      toast.error(err?.message || "ذخیره ناموفق بود");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
-    <section className="flex flex-row items-center h-full w-full px-10 justify-evenly">
-      <Category filter={filter} setFilter={setFilter} />
-      <div className="flex flex-col items-end gap-6">
-        <div className="flex flex-wrap w-full">
-          <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-            <label
-              className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              htmlFor="grid-first-name"
-            >
-              نام
-            </label>
-            <input
-              value={filter.name}
-              onChange={(e) => {
-                setFilter((state) => ({
-                  ...state,
-                  name: e.target.value,
-                }));
-              }}
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-              id="grid-first-name"
-              type="text"
-            />
-          </div>
-          <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-            <label
-              className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              htmlFor="grid-eng-name"
-            >
-              نام انگلیسی
-            </label>
-            <input
-              value={filter.englishName}
-              onChange={(e) => {
-                setFilter((state) => ({
-                  ...state,
-                  englishName: e.target.value,
-                }));
-              }}
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-              id="grid-eng-name"
-              type="text"
-            />
-          </div>
-        </div>
-        <div className="w-full flex flex-col gap-2">
-          <label>توضیحات متا</label>
+    <div className="relative flex w-full flex-col gap-5 pb-24">
+      <AdminPageHeader
+        title={categoryId ? "ویرایش دسته‌بندی" : "افزودن دسته‌بندی"}
+        actions={
+          <AdminLinkButton
+            href="/admin/categories"
+            variant="secondary"
+            size="sm"
+          >
+            بازگشت به لیست
+          </AdminLinkButton>
+        }
+      />
 
-          <textarea
-            value={filter.metaDescription}
-            onChange={(e) => {
-              setFilter((state) => ({
-                ...state,
-                metaDescription: e.target.value,
-              }));
-            }}
-            className="bg-gray-50 appearance-none outline-none p-4"
-          />
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[280px_1fr]">
+        <AdminPanel title="انتخاب دسته">
+          <Category filter={filter} setFilter={setFilter} />
+        </AdminPanel>
+
+        <div className="flex flex-col gap-5">
+          <AdminPanel title="اطلاعات پایه">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <AdminInput
+                label="نام"
+                value={filter.name}
+                onChange={(e) => {
+                  setFilter((state) => ({
+                    ...state,
+                    name: e.target.value,
+                  }));
+                }}
+              />
+              <AdminInput
+                label="نام انگلیسی"
+                value={filter.englishName}
+                onChange={(e) => {
+                  setFilter((state) => ({
+                    ...state,
+                    englishName: e.target.value,
+                  }));
+                }}
+                dir="ltr"
+              />
+            </div>
+            {isCreateMode && !filter.categoryId ? (
+              <p className="mt-3 text-base text-lightBlack">
+                با ذخیره، یک دسته ریشه جدید ساخته می‌شود. اگر می‌خواهید زیرمجموعه
+                بسازید، از دکمه + کنار یک دسته موجود استفاده کنید.
+              </p>
+            ) : null}
+          </AdminPanel>
+
+          <AdminPanel title="سئو">
+            <AdminTextarea
+              label="توضیحات متا"
+              value={filter.metaDescription}
+              onChange={(e) => {
+                setFilter((state) => ({
+                  ...state,
+                  metaDescription: e.target.value,
+                }));
+              }}
+              rows={3}
+            />
+          </AdminPanel>
+
+          <AdminPanel title="محتوا">
+            <QuillEditor
+              initialFlag={filter.categoryId !== lastCategoryId ? false : true}
+              content={filter.content}
+              setContent={(next: contentType[]) =>
+                setFilter((lastState) => ({
+                  ...lastState,
+                  content: next,
+                }))
+              }
+            />
+          </AdminPanel>
         </div>
-        <QuillEditor
-          initialFlag={filter.categoryId !== lastCategoryId ? false : true}
-          content={filter.content}
-          setContent={(e) =>
-            setFilter((lastState) => ({
-              ...lastState,
-              content: e as contentType[],
-            }))
-          }
-        />
-        <Button
-          onClick={() =>
-            filter?.categoryId &&
-            mutate({
-              categoryId: filter.categoryId,
-              content: JSON.stringify(filter.content),
-              englishName: filter.englishName || "",
-              name: filter.name || "",
-              metaDescription: filter.metaDescription || "",
-            })
-          }
-          isLoading={isLoading}
-          style={{ width: 300 }}
-          text="ثبت تغییرات"
-        />
       </div>
-    </section>
+
+      <div className="fixed bottom-0 left-0 right-0 z-20 flex items-center justify-end gap-3 border-t border-gray-200 bg-white/95 px-4 py-3 backdrop-blur lg:right-64">
+        <AdminButton
+          disabled={saving || !filter.name?.trim()}
+          onClick={() => void handleSave()}
+        >
+          {saving
+            ? "در حال ذخیره…"
+            : isCreateMode && !filter.categoryId
+              ? "ایجاد دسته‌بندی"
+              : "ثبت تغییرات"}
+        </AdminButton>
+      </div>
+    </div>
   );
 }

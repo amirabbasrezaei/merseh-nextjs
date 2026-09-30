@@ -4,31 +4,66 @@ import React, { useEffect, useRef, useState } from "react";
 import { trpc } from "@/utils/trpc";
 import classNames from "classnames";
 import ProductImages from "./ProductImages";
-import Button from "../Button";
-import splitNumber from "../utils/splitNumber";
-import { AnimatePresence, motion } from "framer-motion";
+import ProductSpecs, { parseDetails } from "./ProductSpecs";
+import ProductBuyPanel from "./ProductBuyPanel";
+import { motion } from "framer-motion";
 import ProductCarousel from "../Home/ProductCarousel/ProductCarousel";
-
+import Image from "next/image";
+import { toPathSlug } from "@/utils/slug";
 import useShoppingCart, { ShoppingCart } from "../useShoppingCart";
 import toast from "react-hot-toast";
 import useWindowSize from "../useWindowSize";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  Best_SVG,
-  Check,
-  Minus_Svg,
-  Off_SVG,
-  Plus_Svg,
-  TrashBin_SVG,
-  Truck_Courier_SVG,
-} from "../SVGS";
+import { Check } from "../SVGS";
 import Link from "next/link";
 import Content from "../Admin/AddProduct/ContentViewer";
+import type { contentType } from "../Admin/AddProduct/QuillEditor";
 import Comments from "./Comments";
 
 type Props = {
   productId: string;
-  productData: any;
+  productData: { product?: ProductRecord | null } | null;
+};
+
+type VariationValue = {
+  id: number;
+  name: string;
+  price: number;
+  discount: number;
+  instock: boolean;
+};
+
+type VariationGroup = {
+  id: number;
+  variationName: string;
+  variations: VariationValue[];
+};
+
+type ProductCategory = {
+  id: number;
+  title: string;
+};
+
+type ProductRecord = {
+  id: number;
+  name: string;
+  englishName?: string;
+  price: number;
+  discount: number;
+  instock: boolean;
+  metaDescription?: string;
+  details?: string[];
+  imageUrls?: string[];
+  content?: contentType[];
+  mainCategoryId?: number;
+  category?: ProductCategory[];
+  variations?: VariationGroup[];
+  brand?: {
+    id: number;
+    name: string;
+    isActive: boolean;
+    logoUrl: string | null;
+  } | null;
 };
 
 type ProductVariation = {
@@ -37,16 +72,79 @@ type ProductVariation = {
   variationValueid: number;
   variationId: number;
 } | null;
+
+function readVariation(
+  product: ProductRecord | null | undefined,
+  variationParam: string | null,
+  valueParam: string | null
+): ProductVariation {
+  const groups = product?.variations;
+  if (!groups?.length) return null;
+
+  const requestedGroupId = Number(variationParam) || groups[0].id;
+  const group = groups.find((item) => item.id === requestedGroupId) ?? groups[0];
+  const requestedValueId = Number(valueParam) || group.variations[0]?.id;
+  const value =
+    group.variations.find((item) => item.id === requestedValueId) ??
+    group.variations[0];
+  if (!value) return null;
+
+  return {
+    variationId: group.id,
+    variationValueid: value.id,
+    price: value.price,
+    discount: value.discount,
+  };
+}
+
+function selectedValue(
+  product: ProductRecord | null | undefined,
+  selected: ProductVariation
+) {
+  if (!product || !selected) return null;
+  const group = product.variations?.find((item) => item.id === selected.variationId);
+  return group?.variations.find((item) => item.id === selected.variationValueid) ?? null;
+}
+
+function mainCategory(product: ProductRecord) {
+  const categories = product.category ?? [];
+  if (!categories.length) return null;
+  return (
+    categories.find((item) => item.id === product.mainCategoryId) ?? categories[0]
+  );
+}
+
+function hasArticle(content: contentType[] | undefined) {
+  if (!content?.length) return false;
+
+  const walk = (node: contentType | null | undefined): boolean => {
+    if (!node || typeof node !== "object") return false;
+    if (node.type === "img") return true;
+    if (
+      node.type !== "a" &&
+      typeof node.content === "string" &&
+      node.content.trim().length > 0
+    ) {
+      return true;
+    }
+    const children = Array.isArray(node.childs) ? node.childs : [];
+    return children.some(walk);
+  };
+
+  return content.some(walk);
+}
+
 export default function Product({ productId, productData }: Props) {
-  const commentsRef = useRef(null);
-  const contentRef = useRef(null);
-  const [visibleSection, setVisibleSection] = useState("");
+  const product = productData?.product;
+  const commentsRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const specsRef = useRef<HTMLDivElement>(null);
   const { width } = useWindowSize();
   const params = useSearchParams();
   const router = useRouter();
   const [productInShoppingCart, setProductInShoppingCart] = useState<
     ShoppingCart["orderitems"][0] | null
-  >();
+  >(null);
   const {
     addProduct,
     getProduct,
@@ -56,512 +154,356 @@ export default function Product({ productId, productData }: Props) {
     removeProductFromOrder,
   } = useShoppingCart();
 
-  const initialProduct: ProductVariation = productData?.product?.variations
-    ?.length
-    ? {
-        variationId: 0,
-        variationValueid: 0,
-        price: 0,
-        discount: 0,
-      }
-    : null;
+  const categoryId = product?.mainCategoryId;
+  const { data: related } = trpc.product.related.useQuery(
+    { productId: Number(productId), categoryId: categoryId || 0 },
+    { enabled: typeof categoryId === "number" }
+  );
 
   const [selectedProductVariation, setSelectedProductVariation] =
-    useState<ProductVariation>(initialProduct);
+    useState<ProductVariation>(() =>
+      readVariation(
+        product,
+        params.get("variation"),
+        params.get("variationValue")
+      )
+    );
+  const [visibleSection, setVisibleSection] = useState("");
 
   useEffect(() => {
-    if (productData) {
-      setSelectedProductVariation(
-        productData?.product?.variations?.length
-          ? {
-              variationId:
-                Number(params.get("variation")) ||
-                productData?.product?.variations[0].id,
-              variationValueid:
-                Number(params.get("variationValue")) ||
-                productData?.product?.variations[0].variations[0].id,
-              price:
-                productData?.product?.variations
-                  .find((e: any) => e.id === Number(params.get("variation")))
-                  ?.variations.find(
-                    (e: any) => e.id === Number(params.get("variationValue"))
-                  )?.price ||
-                productData?.product?.variations[0]?.variations[0].price,
-              discount:
-                productData?.product?.variations
-                  .find((e: any) => e.id === Number(params.get("variation")))
-                  ?.variations.find(
-                    (e: any) => e.id === Number(params.get("variationValue"))
-                  )?.discount ||
-                productData?.product?.variations[0].variations[0]?.discount,
-            }
-          : null
-      );
-    }
-  }, [productData]);
+    setSelectedProductVariation(
+      readVariation(product, params.get("variation"), params.get("variationValue"))
+    );
+  }, [product?.id]);
 
   useEffect(() => {
-    if (productData?.product) {
-      const selectedProduct = getProduct(
-        productData.product.id,
-        selectedProductVariation?.variationValueid
-      );
-      setProductInShoppingCart(selectedProduct ? selectedProduct : null);
-    }
-  }, [selectedProductVariation, items, productData]);
+    if (!product) return;
+    const selectedProduct = getProduct(
+      product.id,
+      selectedProductVariation?.variationValueid
+    );
+    setProductInShoppingCart(selectedProduct ? selectedProduct : null);
+  }, [selectedProductVariation, items, product]);
 
-  const isElementInView = (elementRef: any) => {
-    if (elementRef.current) {
-      const rect = elementRef.current.getBoundingClientRect();
-      // const isVisible =
-      //   rect.top >= 0 &&
-      //   rect.left >= 0 &&
-      //   rect.bottom <=
-      //     (window.innerHeight || document.documentElement.clientHeight) &&
-      //   rect.right <=
-      //     (window.innerWidth || document.documentElement.clientWidth);
-
-      const isVisible = rect.top <= 0;
-      console.log(rect.bottom);
-      if (isVisible) return true;
-      return false;
-    }
-  };
+  const specRows = parseDetails(product?.details ?? []);
+  const showFullSpecs = specRows.length > 4;
+  const showArticle = hasArticle(product?.content);
+  const category = product ? mainCategory(product) : null;
+  const activeValue = selectedValue(product, selectedProductVariation);
+  const unitPrice = activeValue?.price ?? product?.price ?? 0;
+  const unitDiscount = activeValue?.discount ?? product?.discount ?? 0;
+  const inStock = activeValue ? activeValue.instock : Boolean(product?.instock);
+  const quantityInCart =
+    productInShoppingCart && productInShoppingCart.numberOfProduct > 0
+      ? productInShoppingCart.numberOfProduct
+      : null;
 
   useEffect(() => {
     const handleScroll = () => {
-      if (isElementInView(contentRef)) {
-        setVisibleSection("article");
+      const line = 96;
+      const sections = [
+        { id: "article", el: contentRef.current },
+        { id: "specs", el: specsRef.current },
+        { id: "comments", el: commentsRef.current },
+      ];
+      let current = sections.find((section) => section.el)?.id ?? "";
+      for (const section of sections) {
+        if (!section.el) continue;
+        if (section.el.getBoundingClientRect().top <= line) current = section.id;
       }
-      if (isElementInView(commentsRef)) {
-        setVisibleSection("comments");
-      }
+      if (current) setVisibleSection(current);
     };
 
-    document.querySelector("main")?.addEventListener("scroll", handleScroll);
-
-    // Initial check on component mount
+    const main = document.querySelector("main");
+    main?.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll);
     handleScroll();
 
     return () => {
-      document
-        .querySelector("main")
-        ?.removeEventListener("scroll", handleScroll);
+      main?.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [showArticle, showFullSpecs]);
 
-  console.log(productData?.product?.variations?.length);
+  const notifyAdded = (productName: string) => {
+    toast.custom(
+      (t: { visible: boolean }) =>
+        t.visible ? (
+          <motion.div
+            transition={{ duration: 0.3 }}
+            initial={
+              width > 640
+                ? { scale: 0.6, translateX: 100, opacity: 0 }
+                : { scale: 0.6, translateY: -100, opacity: 0 }
+            }
+            animate={
+              width > 640
+                ? { scale: 1, translateX: 0, opacity: 1 }
+                : { scale: 1, translateY: 0, opacity: 1 }
+            }
+            exit={
+              width > 640
+                ? { scale: 0.6, translateX: 100, opacity: 0 }
+                : { scale: 0.6, translateY: -100, opacity: 0 }
+            }
+            className="flex h-[60px] w-fit origin-top flex-row items-center justify-center gap-5 rounded-[12px] bg-white px-3 shadow-md sm:origin-right"
+          >
+            <span className="text-[12px] text-lightBlack sm:text-[15px]">
+              {`${productName} به سبد خرید اضافه شد`}
+            </span>
+            <span
+              onClick={() => {
+                toast.dismiss();
+                router.push("/cart/checkout");
+              }}
+              className="cursor-pointer text-[12px] font-normal text-green1 sm:text-[15px]"
+            >
+              مشاهده سبد خرید
+            </span>
+            <div
+              className="cursor-pointer rounded-[10px] bg-gray-100 p-2"
+              onClick={() => toast.dismiss()}
+            >
+              <Check classname="h-auto w-5 fill-black1" />
+            </div>
+          </motion.div>
+        ) : null,
+      {
+        position: width > 640 ? "top-left" : "top-center",
+        duration: 6000,
+      }
+    );
+  };
+
+  const addCurrentProduct = () => {
+    if (!product || !inStock) return;
+    addProduct(
+      product.name,
+      unitPrice,
+      product.id,
+      selectedProductVariation?.variationId,
+      selectedProductVariation?.variationValueid
+    ).then(() => notifyAdded(product.name));
+  };
+
+  const sectionClass = (id: string) =>
+    classNames(
+      "-mb-px border-b-2 pb-2 text-[16px] font-medium",
+      visibleSection === id
+        ? "border-green2 text-green1"
+        : "border-transparent text-lightBlack"
+    );
 
   return (
-    <>
-      <section
-        id="productSection"
-        className="flex sm:px-20 flex-col gap-10 w-full"
-      >
-        <div className="h-fit sm:h-[500px] w-full flex flex-col sm:flex-row sm:mt-[30px] items-center">
-          <div className="h-full w-full sm:basis-4/12 ">
-            {productData?.product ? (
-              <ProductImages imageUrls={productData.product.imageUrls} />
-            ) : (
-              <div className="sm:w-[500px] w-full h-[500px] bg-gray-100 animate-pulse rounded-[8px]"></div>
-            )}
-          </div>
-
-          <div className="h-full  w-full sm:basis-5/12 p-4 flex flex-col gap-[50px]">
-            <div className="flex flex-col gap-10">
-              {productData?.product ? (
-                <h1 className="text-[33px] font-[600] text-black1">
-                  {productData?.product?.name}
-                </h1>
-              ) : (
-                <div className="w-[200px] h-[30px] bg-gray-100 animate-pulse rounded-[4px]"></div>
-              )}
-
-              {productData?.product ? (
-                productData?.product?.variations.map((variation: any) => (
-                  <div
-                    key={variation.id}
-                    className="flex flex-row items-center gap-2"
-                  >
-                    <span className="ml-4 text-[18px] text-[#252525] font-[500]">
-                      {variation.variationName}
-                    </span>
-                    <div className="flex flex-col gap-5">
-                      <div className="flex items-center gap-4">
-                        {variation.variations.map(
-                          (variationType: any, variationTypeIndex: number) => (
-                            <div
-                              key={variationType.id}
-                              className="flex items-center gap-2"
-                            >
-                              <div className="w-[21px] cursor-pointer h-[21px] flex items-center justify-center border-2 border-[#DFDFDF] rounded-full">
-                                <input
-                                  checked={
-                                    selectedProductVariation?.variationId ===
-                                      variation.id &&
-                                    selectedProductVariation?.variationValueid ===
-                                      variationType.id
-                                  }
-                                  onChange={(e) =>
-                                    e.target.checked &&
-                                    setSelectedProductVariation({
-                                      price: variationType.price,
-                                      variationId: variation.id,
-                                      variationValueid: variationType.id,
-                                      discount: variationType.discount,
-                                    })
-                                  }
-                                  className={classNames(
-                                    "appearance-none cursor-pointer text-center center w-[15px]  h-[15px] rounded-full",
-                                    selectedProductVariation?.variationId ===
-                                      variation.id &&
-                                      selectedProductVariation?.variationValueid ===
-                                        variationType.id
-                                      ? "checked:bg-green1"
-                                      : ""
-                                  )}
-                                  type="radio"
-                                />
-                              </div>
-                              <span
-                                onClick={() =>
-                                  setSelectedProductVariation({
-                                    price: variationType.price,
-                                    variationId: variation.id,
-                                    variationValueid: variationType.id,
-                                    discount: variationType.discount,
-                                  })
-                                }
-                                className="text-[15px] cursor-pointer text-[#353535] font-[400]"
-                              >
-                                {variationType.name}
-                              </span>
-                            </div>
-                          )
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="flex flex-row gap-5">
-                  <div className="flex flex-row gap-2 items-center">
-                    <div className="w-[70px] h-6 bg-gray-100 animate-pulse rounded-[4px]"></div>
-                  </div>
-                  <div className="flex flex-row gap-2 items-center">
-                    <div className="w-6 h-6 rounded-full bg-gray-100 animate-pulse"></div>
-                    <div className="w-[60px] h-6 bg-gray-100 animate-pulse rounded-[4px]"></div>
-                  </div>
-                  <div className="flex flex-row gap-2 items-center">
-                    <div className="w-6 h-6 rounded-full bg-gray-100 animate-pulse"></div>
-                    <div className="w-[60px] h-6 bg-gray-100 animate-pulse rounded-[4px]"></div>
-                  </div>
-                </div>
-              )}
-            </div>
-            {productData?.product?.details.length ? (
-              <div className="leading-loose h-full flex flex-col   list-disc ">
-                <h2 className="text-[17px] font-[500] mb-1 text-black1">
-                  ویژگی‌ها
-                </h2>
-                <ul className="list-disc text-[#4c4c4c] font-[400] text-[17px] list-inside marker:text-green2">
-                  {productData?.product?.details.map((det: any, i: number) => (
-                    <li key={i}>{det}</li>
-                  ))}
-                </ul>
-              </div>
-            ) : !productData ? (
-              <div className="flex flex-col gap-5">
-                <div className="animate-pulse bg-gray-100 w-[200px] h-[20px] rounded-sm" />
-                <div className="animate-pulse bg-gray-100 w-[200px] h-[20px] rounded-sm" />
-                <div className="animate-pulse bg-gray-100 w-[200px] h-[20px] rounded-sm" />
-              </div>
-            ) : null}
-          </div>
-          <div className="h-full flex flex-col items-center gap-4 justify-center w-full sm:basis-3/12 ">
-            <div className="w-full py-6 gap-5 border border-[#EAEAEA] rounded-[8px] flex flex-col items-center justify-center ">
-              <div className="flex flex-row items-center justify-center  w-[80%]">
-                {!productData ? (
-                  <div className="animate-pulse h-8 w-full bg-gray-100" />
-                ) : (
-                  <div className="flex flex-col">
-                    {(productData?.product?.discount &&
-                      !selectedProductVariation?.price) ||
-                    selectedProductVariation?.discount ? (
-                      <div className="flex flex-row items-center justify-between">
-                        <span className="line-through text-[13px] text-lightBlack">
-                          {selectedProductVariation?.price
-                            ? splitNumber(selectedProductVariation.price)
-                            : productData?.product?.price
-                            ? splitNumber(productData.product.price)
-                            : 0}
-                        </span>
-                        <span className="bg-green1 rounded-[10px] px-[6px] py-[2px] text-white text-[15px] font-[300]">
-                          {(
-                            (selectedProductVariation?.price
-                              ? selectedProductVariation?.discount /
-                                selectedProductVariation?.price
-                              : productData?.product?.price
-                              ? productData.product.discount /
-                                productData.product.price
-                              : 0) * 100
-                          ).toFixed(0)}
-                          %
-                        </span>
-                      </div>
-                    ) : null}
-                    <div className="flex flex-row items-center justify-center gap-1">
-                      <span className="text-[#3c3c3c] text-[30px] font-[500]">
-                        {selectedProductVariation?.price
-                          ? splitNumber(
-                              selectedProductVariation.price -
-                                selectedProductVariation.discount
-                            )
-                          : productData?.product?.price
-                          ? splitNumber(
-                              productData.product.price -
-                                productData.product.discount
-                            )
-                          : 0}
-                      </span>
-                      <span className="text-black1 text-[13px]">تومان</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="w-full flex flex-col items-center justify-center gap-5">
-              {productInShoppingCart ? (
-                <motion.div className="flex flex-row w-full justify-evenly bg-gray-50 py-2 rounded-[8px]">
-                  <button
-                    className=""
-                    onClick={(e) => {
-                      e.preventDefault();
-                      productData?.product &&
-                        incrementProductNumber(
-                          selectedProductVariation?.variationValueid,
-                          productData.product.id
-                        );
-                    }}
-                  >
-                    <Plus_Svg classname="w-6 fill-green2" />
-                  </button>
-                  <span className="text-[23px]">
-                    {productInShoppingCart.numberOfProduct}
-                  </span>
-                  <button
-                    className=""
-                    onClick={(e) => {
-                      e.preventDefault();
-                      productData?.product &&
-                        (productInShoppingCart.numberOfProduct > 1
-                          ? decrementProductNumber(
-                              selectedProductVariation?.variationValueid,
-                              productData.product.id
-                            )
-                          : removeProductFromOrder(
-                              selectedProductVariation?.variationValueid,
-                              productData.product.id
-                            ));
-                    }}
-                  >
-                    {productInShoppingCart.numberOfProduct > 1 ? (
-                      <Minus_Svg classname="w-6 fill-green2" />
-                    ) : (
-                      <TrashBin_SVG classname="stroke-red-600 w-6" />
-                    )}
-                  </button>
-                </motion.div>
-              ) : (
-                <motion.div className="w-full">
-                  <Button
-                    text="افزودن به سبد خرید"
-                    className="w-full"
-                    isLoading={!productData}
-                    onClick={() =>
-                      productData?.product &&
-                      addProduct(
-                        productData.product.name,
-                        selectedProductVariation?.price
-                          ? selectedProductVariation.price
-                          : productData?.product?.price
-                          ? productData?.product.price
-                          : 0,
-                        productData.product.id,
-                        selectedProductVariation?.variationId,
-                        selectedProductVariation?.variationValueid
-                      ).then(() => {
-                        toast.custom(
-                          (t) =>
-                            t.visible ? (
-                              <motion.div
-                                transition={{ duration: 0.3 }}
-                                initial={
-                                  width > 640
-                                    ? {
-                                        scale: 0.6,
-                                        translateX: 100,
-                                        opacity: 0,
-                                      }
-                                    : {
-                                        scale: 0.6,
-                                        translateY: -100,
-                                        opacity: 0,
-                                      }
-                                }
-                                animate={
-                                  width > 640
-                                    ? {
-                                        scale: 1,
-                                        translateX: 0,
-                                        opacity: 1,
-                                      }
-                                    : {
-                                        scale: 1,
-                                        translateY: 0,
-                                        opacity: 1,
-                                      }
-                                }
-                                exit={
-                                  width > 640
-                                    ? {
-                                        scale: 0.6,
-                                        translateX: 100,
-                                        opacity: 0,
-                                      }
-                                    : {
-                                        scale: 0.6,
-                                        translateY: -100,
-                                        opacity: 0,
-                                      }
-                                }
-                                className="h-[60px] origin-top sm:origin-right w-fit gap-5 px-3 bg-white flex flex-row items-center justify-center shadow-md rounded-[12px]"
-                              >
-                                <span className="text-lightBlack text-[12px] sm:text-[15px]">{`${name} به سبد خرید اضافه شد`}</span>
-                                <span
-                                  onClick={() => {
-                                    toast.dismiss();
-                                    router.push("/cart/checkout");
-                                  }}
-                                  className="cursor-pointer text-green1 font-[400] text-[12px] sm:text-[15px]"
-                                >
-                                  مشاهده سبد خرید
-                                </span>
-                                <div
-                                  className="cursor-pointer rounded-[10px] p-2 bg-gray-100"
-                                  onClick={() => toast.dismiss()}
-                                >
-                                  <Check classname="fill-black1 w-5 h-auto  " />
-                                </div>
-                              </motion.div>
-                            ) : null,
-                          {
-                            position: width > 640 ? "top-left" : "top-center",
-                            duration: 6000,
-                          }
-                        );
-                      })
-                    }
-                  />
-                </motion.div>
-              )}
-              {productInShoppingCart &&
-              productInShoppingCart.numberOfProduct > 0 ? (
-                <Link href={"/cart/checkout"}>
-                  <span className="text-green2">مشاهده سبد خرید</span>
-                </Link>
-              ) : null}
-            </div>
-          </div>
-        </div>
-        <div className="w-full  bg-gray-50  text-[1.4em] font-[500] text-gray-700 h-fit rounded-lg flex items-center flex-col gap-5 md:flex-row justify-evenly">
-          <div className="flex flex-row gap-4 h-[100px] ">
-            <Truck_Courier_SVG classname="fill-green2 w-12" />
-            <div className="flex flex-col justify-center items-start">
-              <span>ارسال سریع</span>
-              <span className="text-[15px] text-gray-500 ">
-                همکاری با پیک + شرکت های پستی
-              </span>
-            </div>
-          </div>
-          <div className="flex flex-row gap-4 h-[100px]">
-            <Off_SVG classname="fill-green2 w-12" />
-            <div className="flex flex-col justify-center items-start">
-              <span>تضمین قیمت</span>
-              <span className="text-[15px] text-gray-500 ">
-                بهترین کیفیت ممکن با کمترین قیمت
-              </span>
-            </div>
-          </div>
-          <div className="flex flex-row gap-4 h-[100px]">
-            <Best_SVG classname="w-12 fill-green2" />
-            <div className="flex flex-col justify-center items-start">
-              <span>تولید مرسه</span>
-              <span className="text-[15px] text-gray-500 ">
-                تولید شده از محصولات درجه یک
-              </span>
-            </div>
-          </div>
-        </div>
-        <div className="md:px-20 flex flex-col gap-4">
-          <div className="flex flex-row gap-6">
-            <button
-              onClick={() =>
-                contentRef?.current &&
-                // @ts-ignore
-                contentRef?.current?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                  inline: "nearest",
-                })
-              }
-              className={classNames(
-                "text-[16px] font-[500] ",
-                visibleSection === "article" ? "text-green1" : "text-lightBlack"
-              )}
-            >
-              معرفی
-            </button>
-            <button
-              onClick={() =>
-                commentsRef?.current &&
-                // @ts-ignore
-                commentsRef?.current?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                  inline: "nearest",
-                })
-              }
-              className={classNames(
-                "text-[16px] font-[500] ",
-                visibleSection === "comments"
-                  ? "text-green1"
-                  : "text-lightBlack"
-              )}
-            >
-              دیدگاه ها
-            </button>
-          </div>
-          <hr />
-          {productData?.product ? (
-            <div className="w-full h-fit" ref={contentRef}>
-              <Content contentForView={productData?.product.content} />
-            </div>
+    <section id="productSection" className="flex w-full flex-col gap-12 sm:px-6">
+      <div className="flex w-full flex-col items-start gap-8 lg:flex-row lg:gap-12">
+        <div className="w-full lg:w-1/2">
+          {product ? (
+            <ProductImages
+              imageUrls={product.imageUrls ?? []}
+              alt={product.name}
+            />
           ) : (
-            Array.from(Array(2)).map((_, i) => (
-              <div className="flex flex-col gap-3 my-5" key={i}>
-                <div className="bg-gray-100 w-[150px] h-[26px] rounded-[7px]"></div>
-                <div className="bg-gray-100 w-full h-[20px] rounded-[4px]"></div>
-                <div className="bg-gray-100 w-full h-[20px] rounded-[4px]"></div>
-                <div className="bg-gray-100 w-full h-[20px] rounded-[4px]"></div>
-              </div>
-            ))
+            <div className="aspect-square w-full animate-pulse rounded-2xl bg-gray-100" />
           )}
         </div>
 
+        <div className="flex w-full flex-col gap-6 lg:w-1/2">
+          {product ? (
+            <div className="flex flex-col gap-3">
+              {category ? (
+                <Link
+                  href={`/category/${category.id}/${toPathSlug(category.title)}`}
+                  className="w-fit text-[13px] text-lightBlack"
+                >
+                  {category.title}
+                </Link>
+              ) : null}
+              {product.brand ? (
+                product.brand.isActive ? (
+                  <Link
+                    href={`/brand/${product.brand.id}/${toPathSlug(product.brand.name)}`}
+                    className="flex w-fit items-center gap-2 rounded-full border border-[#eeeeee] px-3 py-1 text-[13px] text-[#5f5f5f]"
+                  >
+                    {product.brand.logoUrl ? (
+                      <Image
+                        src={product.brand.logoUrl}
+                        alt=""
+                        width={28}
+                        height={28}
+                        quality={70}
+                        className="h-7 w-7 rounded-full object-contain"
+                      />
+                    ) : null}
+                    {product.brand.name}
+                  </Link>
+                ) : (
+                  <span className="text-[13px] text-[#5f5f5f]">
+                    {product.brand.name}
+                  </span>
+                )
+              ) : null}
+              <h1 className="text-[28px] font-semibold leading-snug text-black1">
+                {product.name}
+              </h1>
+              {product.englishName?.trim() ? (
+                <p className="text-[13px] text-lightBlack">{product.englishName}</p>
+              ) : null}
+              {product.metaDescription?.trim() ? (
+                <p className="text-[15px] leading-7 text-[#5f5f5f]">
+                  {product.metaDescription}
+                </p>
+              ) : null}
+            </div>
+          ) : (
+            <div className="h-[30px] w-[200px] animate-pulse rounded bg-gray-100" />
+          )}
+
+          {product?.variations?.length ? (
+            <div className="flex flex-col gap-4">
+              {product.variations.map((variation) => (
+                <div key={variation.id} className="flex flex-col gap-2">
+                  <span className="text-[14px] font-medium text-[#252525]">
+                    {variation.variationName}
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {variation.variations.map((variationType) => {
+                      const selected =
+                        selectedProductVariation?.variationId === variation.id &&
+                        selectedProductVariation?.variationValueid ===
+                          variationType.id;
+                      return (
+                        <button
+                          key={variationType.id}
+                          type="button"
+                          onClick={() =>
+                            setSelectedProductVariation({
+                              price: variationType.price,
+                              variationId: variation.id,
+                              variationValueid: variationType.id,
+                              discount: variationType.discount,
+                            })
+                          }
+                          className={classNames(
+                            "rounded-full border px-3 py-1.5 text-[14px]",
+                            selected
+                              ? "border-green2 bg-green1/10"
+                              : "border-[#e5e5e5]",
+                            !variationType.instock
+                              ? "text-lightBlack"
+                              : selected
+                                ? "text-black1"
+                                : "text-[#353535]"
+                          )}
+                        >
+                          {variationType.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : null}
+
+          {specRows.length ? <ProductSpecs rows={specRows} /> : null}
+
+          {product ? (
+            <ProductBuyPanel
+              price={unitPrice}
+              discount={unitDiscount}
+              inStock={inStock}
+              quantityInCart={quantityInCart}
+              onAdd={addCurrentProduct}
+              onIncrement={() =>
+                incrementProductNumber(
+                  selectedProductVariation?.variationValueid,
+                  product.id
+                )
+              }
+              onDecrement={() =>
+                decrementProductNumber(
+                  selectedProductVariation?.variationValueid,
+                  product.id
+                )
+              }
+              onRemove={() =>
+                removeProductFromOrder(
+                  selectedProductVariation?.variationValueid,
+                  product.id
+                )
+              }
+            />
+          ) : null}
+        </div>
+      </div>
+
+      <div className="flex w-full max-w-[720px] flex-col gap-10">
+        <nav className="flex flex-row gap-6 border-b border-[#eeeeee]">
+          {showArticle ? (
+            <button
+              type="button"
+              onClick={() =>
+                contentRef.current?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                })
+              }
+              className={sectionClass("article")}
+            >
+              معرفی
+            </button>
+          ) : null}
+          {showFullSpecs ? (
+            <button
+              type="button"
+              onClick={() =>
+                specsRef.current?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                })
+              }
+              className={sectionClass("specs")}
+            >
+              ویژگی‌ها
+            </button>
+          ) : null}
+          <button
+            type="button"
+            onClick={() =>
+              commentsRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              })
+            }
+            className={sectionClass("comments")}
+          >
+            دیدگاه‌ها
+          </button>
+        </nav>
+
+        {showArticle && product?.content ? (
+          <div ref={contentRef} className="scroll-mt-6">
+            <Content contentForView={product.content} />
+          </div>
+        ) : null}
+
+        {showFullSpecs ? (
+          <div ref={specsRef} className="flex scroll-mt-6 flex-col gap-4">
+            <h2 className="text-[22px] font-medium text-black1">ویژگی‌ها</h2>
+            <ProductSpecs rows={specRows} />
+          </div>
+        ) : null}
+
         <Comments commentsRef={commentsRef} productId={productId} />
-        <ProductCarousel title="دیگران هم خریده اند" sliderStartDelay={0} />
-      </section>
-    </>
+      </div>
+
+      {related?.products?.length ? (
+        <ProductCarousel
+          title="دیگران هم خریده اند"
+          products={related.products}
+        />
+      ) : null}
+    </section>
   );
 }

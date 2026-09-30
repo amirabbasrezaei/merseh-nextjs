@@ -30,7 +30,7 @@ export default function MagHeaderSearch() {
   const [isClient, setisClient] = useState(false);
   const { height } = useWindowSize();
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const { data, isLoading, mutate } = trpc.filter.search.useMutation();
+  const { data, isPending: isLoading, mutate } = trpc.filter.search.useMutation();
   const [isSearchClicked, setSearchClicked] = useState(false)
   // for mobile purpose
   const [showSearch, setShowSearch] = useState(false);

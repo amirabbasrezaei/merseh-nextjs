@@ -2,6 +2,8 @@ import { z } from "zod";
 import { ArgsStructure } from "./category.controller";
 import { TRPCClientError } from "@trpc/client";
 import { childrenCategories, parentCategories } from "../utils/category";
+import { galleryImageUrls, galleryInclude } from "../utils/storage";
+import { mapStoreBrand } from "../utils/productCard";
 
 export const FilterProductArgsSchema = z.object({
   categoryId: z.number().optional(),
@@ -23,6 +25,7 @@ export async function filterProductController({
     });
     const filterProducts = await prisma.product.findMany({
       where: {
+        status: "PUBLISHED",
         name: { contains: searchTerm },
         category: categoryId
           ? { some: { id: { in: [categoryId, ...categoryChildrens] } } }
@@ -31,13 +34,16 @@ export async function filterProductController({
       select: {
         id: true,
         price: true,
-        imageNames: true,
         ProductVariation: {
           include: {
             values: true,
           },
         },
         name: true,
+        brand: {
+          select: { id: true, name: true, isActive: true },
+        },
+        ...galleryInclude(),
       },
     });
 
@@ -54,7 +60,15 @@ export async function filterProductController({
     console.log(categoryId);
 
     return {
-      products: filterProducts,
+      products: filterProducts.map((product) => {
+        const urls = galleryImageUrls(product.galleryFiles);
+        return {
+          ...product,
+          imageNames: urls,
+          imageUrls: urls,
+          brand: mapStoreBrand(product.brand),
+        };
+      }),
       categoryInfo: {
         title: category?.title,
         content: category?.content?.length ? JSON.parse(category.content) : [],

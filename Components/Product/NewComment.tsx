@@ -4,9 +4,8 @@ import Button from "../Button";
 import { Send_SVG } from "../SVGS";
 import { AnimatePresence } from "framer-motion";
 import PopUp from "../PopUp";
-import { useRecoilState } from "recoil";
-import { userInfoStoreAtom } from "../UserAuth";
-import { themeRecoilStateAtom } from "../ThemeController";
+import { useUserInfoStore } from "../stores/userInfoStore";
+import { useThemeStore } from "../ThemeController";
 
 export default function NewComment({
   productId,
@@ -20,12 +19,12 @@ export default function NewComment({
 }) {
   const [value, setValue] = useState<string | null>(null);
   const [showNotRegisteredPopUp, setShowNotRegisteredPopUp] = useState(false);
-  const [userInfo] = useRecoilState(userInfoStoreAtom);
-  const [themeStore, setThemeStore] = useRecoilState(themeRecoilStateAtom);
+  const userInfo = useUserInfoStore((s) => s.userInfo);
+  const setThemeStore = useThemeStore.setState;
   const {
     data: addCommentData,
     mutate: mutateAddComment,
-    isLoading,
+    isPending: isLoading,
   } = trpc.product.addComment.useMutation();
 
   const { refetch: refetchComments } = trpc.product.productComments.useQuery({

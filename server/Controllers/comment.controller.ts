@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { ArgsStructure } from "./category.controller";
 import z from "zod";
-import type { Comment } from "@prisma/client";
+import type { Comment } from "@/generated/prisma/client";
 
 export const add_product_comment_schema = z.object({
   productId: z.number(),

@@ -1,26 +1,30 @@
-import { Comment_SVG, Edit_Svg } from "@/Components/SVGS";
-import { trpc } from "@/utils/trpc";
+"use client";
 
+import { Edit_Svg } from "@/Components/SVGS";
+import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import { AdminListRow } from "../../ui/AdminList";
+import AdminSelect from "../../ui/AdminSelect";
+import AdminBadge, { statusTone } from "../../ui/AdminBadge";
+
 interface Props {
   title: string;
   id: string;
   commentCount?: number;
-  selectOptions: object[];
+  selectOptions: { value: string; name: string }[];
   currentStatus: string;
 }
 
 export default function Item({
   title,
   id,
-  commentCount,
   selectOptions,
   currentStatus,
 }: Props) {
   const {
     mutate: mutateChangeStatus,
-    isLoading,
+    isPending: isLoading,
     data,
   } = trpc.product.changeCategoryStatus.useMutation();
 
@@ -31,52 +35,52 @@ export default function Item({
     }
   }, [data]);
 
+  const statusName =
+    selectOptions?.find((item) => item.value === status)?.name || status;
+
   return (
-    <div className="border flex flex-row w-full p-5 rounded-md justify-between">
-      <Link href={`/category/${id}`}>
-        <span>{title}</span>
-      </Link>
-      <div className="flex flex-row gap-10 items-center">
-        {commentCount ? (
-          <div className="flex flex-row gap-1">
-            <span>{commentCount}</span>
-            <Comment_SVG classname="w-6 h-6 fill-black" />
-          </div>
-        ) : null}
+    <AdminListRow>
+      <div className="flex min-w-0 items-center gap-3">
+        <Link
+          href={`/category/${id}`}
+          className="truncate text-base font-medium text-black1 hover:text-green2"
+        >
+          {title}
+        </Link>
+        <AdminBadge tone={statusTone(status)}>{statusName}</AdminBadge>
+      </div>
+      <div className="flex shrink-0 flex-row items-center gap-2">
         <div className="relative">
           {isLoading ? (
-            <div className="absolute top-0 w-full h-full bg-gray-100 animate-pulse" />
+            <div className="absolute inset-0 animate-pulse rounded-lg bg-gray-100" />
           ) : null}
-          <select
+          <AdminSelect
+            className="!w-auto min-w-[120px] py-1.5"
+            value={status}
             onChange={(e) =>
               mutateChangeStatus({
                 categoryId: id,
                 status: (e.currentTarget.value as "") || "DISABLED",
               })
             }
-            className="block   w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
           >
             {selectOptions?.length
-              ? selectOptions.map((item: any) => (
-                  <option
-                    selected={item.value === status}
-                    key={item.value}
-                    value={item.value}
-                    className=""
-                  >
+              ? selectOptions.map((item) => (
+                  <option key={item.value} value={item.value}>
                     {item.name}
                   </option>
                 ))
               : null}
-          </select>
+          </AdminSelect>
         </div>
         <Link
           href={`/admin/category/${id}`}
-          className="bg-gray-100 rounded-full w-7 h-7 flex items-center justify-center"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+          title="ویرایش"
         >
-          <Edit_Svg classname="w-5" />
+          <Edit_Svg classname="w-4" />
         </Link>
       </div>
-    </div>
+    </AdminListRow>
   );
 }

@@ -1,54 +1,18 @@
-import { browser } from "process";
 import { useEffect, useState } from "react";
-import { atom, useRecoilState } from "recoil";
-import { themeRecoilStateAtom } from "./ThemeController";
-import { userInfoStoreAtom } from "./UserAuth";
+import { useThemeStore } from "./ThemeController";
+import { useUserInfoStore } from "./stores/userInfoStore";
+import {
+  useShoppingCartStore,
+  type ShoppingCart,
+} from "./stores/shoppingCartStore";
 import { trpc } from "@/utils/trpc";
 
-export type ShoppingCart = {
-  orderitems:
-    | {
-        name: string;
-        productId: number;
-        variationId?: number;
-        variationValueId?: number;
-        price: number;
-        numberOfProduct: number;
-        imageUrl?: string;
-        variationValueName?: string;
-      }[];
-  showCart: boolean;
-  updateActiveOrder: boolean;
-  price?: { totalPrice: number };
-  activeOrderId?: number;
-};
-
-let local_storage: string = JSON.stringify({
-  orderitems: [],
-  showCart: false,
-  updateActiveOrder: false,
-});
-
-if (browser) {
-  local_storage = localStorage.getItem("shopCart") || local_storage;
-}
-
-export const shopingCartStateAtom = atom<ShoppingCart>({
-  key: "ShopingCart",
-  default:
-    typeof localStorage !== undefined
-      ? // @ts-ignore
-        JSON.parse(local_storage)
-        ? JSON.parse(local_storage)
-        : { orderitems: [], showCart: false, updateActiveOrder: false }
-      : { orderitems: [], showCart: false, updateActiveOrder: false },
-  effects: [],
-});
+export type { ShoppingCart };
 
 export default function useShoppingCart() {
   const [updateOrder, setUpdateOrder] = useState(false);
-  const [_, setThemeStore] = useRecoilState(themeRecoilStateAtom);
-  const [userInfo] = useRecoilState(userInfoStoreAtom);
+  const setThemeStore = useThemeStore.setState;
+  const userInfo = useUserInfoStore((s) => s.userInfo);
 
   const { data: activeOrderData, refetch } = trpc.order.getActiveOrder.useQuery(
     undefined,
@@ -62,7 +26,8 @@ export default function useShoppingCart() {
     data: updateActiveOrderData,
   } = trpc.order.updateActiveOrder.useMutation({ retry: 2 });
 
-  const [shoppingCart, setShoppingCart] = useRecoilState(shopingCartStateAtom);
+  const shoppingCart = useShoppingCartStore();
+  const setShoppingCart = useShoppingCartStore((s) => s.setShoppingCart);
 
   useEffect(() => {
     refetch().then(() => {
@@ -80,7 +45,7 @@ export default function useShoppingCart() {
   useEffect(() => {
     if (activeOrderData?.activeOrder) {
       const activeShoppingCart: ShoppingCart["orderitems"] =
-        activeOrderData.activeOrder.ProductForOrder.map((product) => ({
+        activeOrderData.activeOrder.ProductForOrder.map((product: any) => ({
           name: product.Product.name,
           numberOfProduct: product.numberOfproduct,
           price: product.ProductVariationValue?.price
@@ -93,7 +58,7 @@ export default function useShoppingCart() {
           variationValueId: product.productVariationValueId
             ? product.productVariationValueId
             : undefined,
-          imageUrl: product.Product.imageUrls[0],
+          imageUrl: product.Product.imageUrls?.[0] || "",
           variationValueName: product.ProductVariationValue?.name,
         }));
 
@@ -127,7 +92,7 @@ export default function useShoppingCart() {
   useEffect(() => {
     if (updateActiveOrderData?.activeOrder) {
       const activeShoppingCart: ShoppingCart["orderitems"] =
-        updateActiveOrderData.activeOrder.ProductForOrder.map((product) => ({
+        updateActiveOrderData.activeOrder.ProductForOrder.map((product: any) => ({
           name: product.Product.name,
           numberOfProduct: product.numberOfproduct,
           price: product.ProductVariationValue?.price
@@ -140,7 +105,7 @@ export default function useShoppingCart() {
           variationValueId: product.productVariationValueId
             ? product.productVariationValueId
             : undefined,
-          imageUrl: product.Product.imageUrls[0],
+          imageUrl: product.Product.imageUrls?.[0] || "",
           variationValueName: product.ProductVariationValue?.name,
         }));
       localStorage.setItem(

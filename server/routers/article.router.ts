@@ -1,14 +1,20 @@
 import {
+  adminArticlesListController,
+  adminArticlesListInput,
   article_for_sitemap,
   articlesController,
   createArticleController,
   createArticleInput,
+  deleteArticleController,
+  deleteArticleInput,
   editArticleController,
   editArticleInput,
   getArticleController,
   getArticleController_admin,
   getArticleInput,
   recentArticlesController,
+  setArticleStatusController,
+  setArticleStatusInput,
 } from "../Controllers/article.controller";
 import {
   add_article_comment_controller,
@@ -45,4 +51,13 @@ export const articleRouter = router({
   getArticleAdmin: adminProtectedProcedure
     .input(getArticleInput)
     .query(getArticleController_admin),
+  adminList: adminProtectedProcedure
+    .input(adminArticlesListInput)
+    .query(adminArticlesListController),
+  setArticleStatus: adminProtectedProcedure
+    .input(setArticleStatusInput)
+    .mutation(setArticleStatusController),
+  deleteArticle: adminProtectedProcedure
+    .input(deleteArticleInput)
+    .mutation(deleteArticleController),
 });

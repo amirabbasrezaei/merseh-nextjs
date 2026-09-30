@@ -1,9 +1,11 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-// import { createPortal } from "react-dom";
 import { trpc } from "@/utils/trpc";
 import classNames from "classnames";
 import { createPortal } from "react-dom";
+import AdminButton from "../ui/AdminButton";
 
 type ProductCallToAction = {
   productId: string;
@@ -12,135 +14,148 @@ type ProductCallToAction = {
 };
 
 interface Props {
-  setValue: (e: any) => void;
+  onInsert: (html: string) => void;
 }
 
-export default function SelectProduct({ setValue }: Props) {
+export default function SelectProduct({ onInsert }: Props) {
   const [isClient, setIsClient] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState<
     ProductCallToAction[]
   >([]);
   const { data } = trpc.product.detailedProductList.useQuery(undefined, {
-    cacheTime: 0,
+    gcTime: 0,
   });
 
   useEffect(() => {
     setIsClient(true);
-  }, [selectedProducts]);
+  }, []);
 
   return (
     <div>
-      {isClient && isOpen && document !== undefined
+      {isClient && isOpen
         ? createPortal(
             <motion.div
               key="portal"
-              animate={{
-                opacity: 1,
-                backdropFilter: "blur(2px) brightness(90%)",
-              }}
-              exit={{
-                opacity: 0,
-                backdropFilter: "blur(0px) brightness(100%)",
-              }}
-              initial={false}
-              transition={{ duration: 0.3 }}
-              className="fixed w-full h-screen left-0 top-0 right-0 bottom-0 z-40 flex items-center justify-center"
-              onClick={(e) => {
-                setIsOpen(false);
-              }}
-              style={{ zIndex: 20 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              initial={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+              onClick={() => setIsOpen(false)}
             >
               <motion.div
-                initial={{ translateY: 100 }}
-                animate={{ translateY: 0 }}
-                exit={{ translateY: -50 }}
-                transition={{
-                  duration: 0.5,
-                  type: "spring",
-                  bounce: 0.3,
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                className="bg-white rounded-md p-5"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.2 }}
+                onClick={(e) => e.stopPropagation()}
+                className="flex max-h-[80vh] w-full max-w-3xl flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg"
               >
-                <div className="w-full h-full grid  grid-cols-4 gap-5 p-10">
+                <div className="flex items-center justify-between border-b border-gray-100 px-5 py-3">
+                  <h3 className="text-sm font-semibold text-black1">
+                    انتخاب محصول برای افزودن
+                  </h3>
+                  <AdminButton
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    بستن
+                  </AdminButton>
+                </div>
+                <div className="grid flex-1 grid-cols-1 gap-2 overflow-auto p-4 sm:grid-cols-2 md:grid-cols-3">
                   {data?.productSchema?.length
-                    ? data.productSchema.map((pr, i) => (
-                        <div
-                          className={classNames(
-                            " rounded-md p-3 cursor-pointer",
-                            selectedProducts.find(
-                              (e) => e.productId === pr.product_id
-                            )
-                              ? "bg-green1"
-                              : "bg-gray-100"
-                          )}
-                          key={i}
-                          onClick={() => {
-                            const isInList = selectedProducts.find(
-                              (e) =>
-                                e.productId === pr.product_id ||
-                                (e.productId === pr.product_id &&
-                                  e.variationValueId === pr.variationValueId)
-                            );
-                            if (isInList) {
-                              setSelectedProducts((state) =>
-                                state.filter((e) => {
-                                  if (isInList.variationValueId) {
-                                    return isInList.productId !== e.productId;
-                                  }
-                                })
+                    ? data.productSchema.map((pr, i) => {
+                        const selected = selectedProducts.find(
+                          (e) => e.productId === pr.product_id
+                        );
+                        return (
+                          <button
+                            type="button"
+                            className={classNames(
+                              "rounded-lg border p-3 text-right text-sm transition-colors",
+                              selected
+                                ? "border-green2/40 bg-green2/5 text-green2"
+                                : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+                            )}
+                            key={i}
+                            onClick={() => {
+                              const isInList = selectedProducts.find(
+                                (e) =>
+                                  e.productId === pr.product_id ||
+                                  (e.productId === pr.product_id &&
+                                    e.variationValueId === pr.variationValueId)
                               );
-                              return;
-                            }
-                            setSelectedProducts((state) => [
-                              ...state,
-                              {
-                                productId: pr.product_id,
-                                variationId: pr?.variationId,
-                                variationValueId: pr?.variationValueId,
-                              },
-                            ]);
-                          }}
-                        >
-                          <span>
+                              if (isInList) {
+                                setSelectedProducts((state) =>
+                                  state.filter((e) => {
+                                    if (isInList.variationValueId) {
+                                      return isInList.productId !== e.productId;
+                                    }
+                                    return e.productId !== pr.product_id;
+                                  })
+                                );
+                                return;
+                              }
+                              setSelectedProducts((state) => [
+                                ...state,
+                                {
+                                  productId: pr.product_id,
+                                  variationId: pr?.variationId,
+                                  variationValueId: pr?.variationValueId,
+                                },
+                              ]);
+                            }}
+                          >
                             {pr.product_name +
                               (pr?.variationValueName
                                 ? ` - ${pr.variationValueName}`
                                 : "")}
-                          </span>
-                        </div>
-                      ))
-                    : null}
+                          </button>
+                        );
+                      })
+                    : (
+                      <p className="col-span-full py-8 text-center text-sm text-lightBlack">
+                        محصولی یافت نشد
+                      </p>
+                    )}
                 </div>
-                <div className="flex w-full items-center justify-center">
-                  <button
+                <div className="flex items-center justify-end gap-2 border-t border-gray-100 px-5 py-3">
+                  <AdminButton
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    انصراف
+                  </AdminButton>
+                  <AdminButton
+                    size="sm"
                     onClick={() => {
-                      setValue(
-                        (state: any) =>
-                          state +
-                          `<p>/ctap/${selectedProducts.map(
-                            (e) => e.productId
-                          )}/*ctap/</p>`
+                      onInsert(
+                        `<p>/ctap/${selectedProducts
+                          .map((e) => e.productId)
+                          .join(",")}/*ctap/</p>`
                       );
                       setSelectedProducts([]);
                       setIsOpen(false);
                     }}
-                    className="bg-green1 px-4 py-2 rounded-md text-white"
                   >
                     افزودن کالاها
-                  </button>
+                  </AdminButton>
                 </div>
               </motion.div>
             </motion.div>,
             document.body
           )
         : null}
-      <span onClick={() => setIsOpen(true)} className="cursor-pointer">
+      <button
+        type="button"
+        onClick={() => setIsOpen(true)}
+        className="rounded-md px-2 py-1 text-sm text-gray-700 hover:bg-gray-100"
+      >
         افزودن محصول
-      </span>
+      </button>
     </div>
   );
 }

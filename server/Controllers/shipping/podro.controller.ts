@@ -2,7 +2,7 @@ import axios from "axios";
 import z from "zod";
 import { ArgsStructure } from "../category.controller";
 import { headers } from "next/headers";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@/generated/prisma/client";
 import { TRPCError } from "@trpc/server";
 const PODRO_BASE_URL = "https://portal.podro.com/napi/logistics";
 const PODRO_HEADER = {

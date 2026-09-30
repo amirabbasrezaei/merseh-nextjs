@@ -3,16 +3,142 @@ import z from "zod";
 import {
   CallToActionProductType,
   ContentType,
-  imageContentType,
+  ContentStatusSchema,
   isImageContent,
 } from "./product.controller";
-import uploadFile from "../utils/uploadFile";
 import { TRPCError } from "@trpc/server";
-import { contentType } from "@/Components/Admin/AddProduct/QuillEditor";
+import {
+  galleryImageUrls,
+  galleryInclude,
+  publicUrl,
+  uploadFromBase64,
+  uploadManyFromBase64,
+  firstGalleryImageUrl,
+  deleteStoredFile,
+} from "../utils/storage";
+
+const PUBLISHED = "PUBLISHED" as const;
+
+function isAdminUser(user: unknown) {
+  return !!(user && typeof user === "object" && (user as any).role === "ADMIN");
+}
+
+function collectContentFileIds(nodes: any[]): string[] {
+  const ids: string[] = [];
+  const walk = (list: any[]) => {
+    for (const node of list || []) {
+      if (isImageContent(node?.content) && node.content.fileId) {
+        ids.push(node.content.fileId);
+      }
+      if (Array.isArray(node?.childs)) walk(node.childs);
+    }
+  };
+  walk(nodes);
+  return [...new Set(ids)];
+}
+
 const imageType = z.object({
   base64: z.string(),
   name: z.string(),
 });
+
+async function persistContentImages(nodes: any[], folder: string) {
+  const result = [];
+  for (const e of nodes) {
+    if (isImageContent(e.content)) {
+      const existingFileId = e.content.fileId;
+      const src = e.content.src || "";
+      const isRemote = src.startsWith("http://") || src.startsWith("https://");
+
+      if (existingFileId && (isRemote || !src)) {
+        result.push({
+          type: e.type,
+          childs: e.childs,
+          content: {
+            fileId: existingFileId,
+            format: e.content.format,
+            name: e.content.name,
+          },
+        });
+        continue;
+      }
+
+      if (src && !isRemote) {
+        const file = await uploadFromBase64(
+          {
+            base64: src,
+            name: e.content.name || "content-image",
+          },
+          folder
+        );
+        if (file) {
+          result.push({
+            type: e.type,
+            childs: e.childs,
+            content: {
+              fileId: file.id,
+              format: e.content.format,
+              name: e.content.name || file.originalName,
+            },
+          });
+          continue;
+        }
+      }
+
+      result.push({
+        type: e.type,
+        childs: e.childs,
+        content: {
+          fileId: existingFileId,
+          format: e.content.format,
+          name: e.content.name,
+        },
+      });
+      continue;
+    }
+    result.push(e);
+  }
+  return result;
+}
+
+async function resolveContentImagesForRead(prisma: any, nodes: any[]) {
+  return Promise.all(
+    nodes.map(async (e: any) => {
+      if (e.type === "img" || e.type === "image" || isImageContent(e.content)) {
+        const fileId = e.content?.fileId as string | undefined;
+        let src = e.content?.src || "";
+        if (fileId) {
+          const file = await prisma.file.findUnique({ where: { id: fileId } });
+          if (file) src = publicUrl(file.key);
+        }
+        return {
+          ...e,
+          type: e.type === "image" ? "img" : e.type,
+          content: {
+            src,
+            name: e.content?.name,
+            fileId,
+            format: e.content?.format,
+          },
+        };
+      }
+      return e;
+    })
+  );
+}
+
+function mapArticleWithGalleryUrls<T extends { galleryFiles?: any[] }>(
+  article: T
+) {
+  const urls = galleryImageUrls(article.galleryFiles);
+  const { galleryFiles, ...rest } = article as T & { galleryFiles?: any[] };
+  return {
+    ...rest,
+    images: urls,
+    imageUrls: urls,
+    imageFileIds: (galleryFiles || []).map((gf: any) => gf.fileId),
+  };
+}
 
 export const createArticleInput = z.object({
   title: z.string(),
@@ -23,74 +149,39 @@ export const createArticleInput = z.object({
 });
 
 type CreateArticle = z.infer<typeof createArticleInput>;
+
 export async function createArticleController({
   ctx: { prisma },
   input,
 }: ArgsStructure<CreateArticle>) {
-  const article = await prisma.article.create({
-    data: {
-      content: JSON.stringify(input.content),
-      title: input.title,
-      englishTitle: input.englishTitle,
-      metaDescription: input.metaDescription,
-    },
-  });
-
-  /// handle image upload
   try {
-    await uploadFile({
-      images: input.images,
-      uploadDirectory: "articleMainImages",
-    }).then(() => {
-      (async () =>
-        await prisma.article.update({
-          where: {
-            id: article.id,
-          },
-          data: {
-            images: input.images.map((img) => img.name),
-          },
-        }))();
+    const galleryFiles = await uploadManyFromBase64(
+      input.images,
+      "article/gallery"
+    );
+    const persistedContent = await persistContentImages(
+      input.content,
+      "article/content"
+    );
+
+    const article = await prisma.article.create({
+      data: {
+        content: JSON.stringify(persistedContent),
+        title: input.title,
+        englishTitle: input.englishTitle,
+        metaDescription: input.metaDescription,
+        status: "DRAFT",
+        galleryFiles: {
+          create: galleryFiles.map((file, index) => ({
+            fileId: file.id,
+            sortOrder: index,
+          })),
+        },
+      },
+      include: galleryInclude(),
     });
 
-    /// handle content image upload
-    try {
-      const filterContentImages = input.content.map((e) =>
-        isImageContent(e.content) && !e.content.src.includes("https://")
-          ? { base64: e.content.src, name: e.content.name }
-          : { base64: "", name: "" }
-      );
-      uploadFile({
-        images: filterContentImages,
-        uploadDirectory: "articleContentImages",
-      }).then(() => {
-        const changedContent = input.content.map((e) => {
-          if (isImageContent(e.content)) {
-            return {
-              content: {
-                name: e.content?.name
-                  ? e.content.name
-                  : e.content.src.split("/").at(-1),
-              },
-              type: e.type,
-            };
-          }
-          return e;
-        });
-
-        (async () =>
-          await prisma.article.update({
-            where: {
-              id: article.id,
-            },
-            data: {
-              content: JSON.stringify(changedContent),
-            },
-          }))();
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    return { article: mapArticleWithGalleryUrls(article), message: null };
   } catch (error) {
     console.log(error);
     throw new TRPCError({
@@ -104,101 +195,53 @@ export const editArticleInput = z.object({
   articleId: z.number(),
   title: z.string(),
   images: z.array(imageType),
-  // categoryId: z.string(),
-  // parentCategories: z.array(z.number()).optional(),
   content: z.array(ContentType),
   metaDescription: z.string(),
   englishTitle: z.string(),
 });
 
 export type EditArticleInput = z.infer<typeof editArticleInput>;
+
 export async function editArticleController({
   ctx: { prisma },
   input,
 }: ArgsStructure<EditArticleInput>) {
-  /// edit simple article infos
-
   try {
-    await prisma.article.update({
-      where: {
-        id: input.articleId,
-      },
-      data: {
-        updated_at: new Date(Date.now()),
-        title: input.title,
-        metaDescription: input.metaDescription,
-        englishTitle: input.englishTitle,
-      },
-    });
-  } catch (error) {
-    throw new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
-      message: JSON.stringify(error || "{}"),
-    });
-  }
+    const persistedContent = await persistContentImages(
+      input.content,
+      "article/content"
+    );
 
-  try {
-    if (input.images?.length) {
-      await uploadFile({
-        images: input.images,
-        uploadDirectory: "articleMainImages",
-      }).then(() => {
-        (async () =>
-          await prisma.article.update({
-            where: { id: input.articleId },
-            data: {
-              images: input.images.map((img) => img.name),
-            },
-          }))();
-      });
-    }
-  } catch (error) {
-    throw new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
-      message: JSON.stringify(error || "{}"),
-    });
-  }
-
-  try {
-    type stype = {
-      type: string;
-      childs: any;
-      content: { src: string; name: string; format: string };
+    const data: any = {
+      updated_at: new Date(Date.now()),
+      title: input.title,
+      metaDescription: input.metaDescription,
+      englishTitle: input.englishTitle,
+      content: JSON.stringify(persistedContent),
     };
-    const filterContentImages = input.content.map((e) => {
-      if (isImageContent(e.content) && !e.content.src.includes("https://")) {
-        return { base64: e.content.src, name: e.content.name };
-      }
-      return { base64: "", name: "" };
-    });
-    uploadFile({
-      images: filterContentImages,
-      uploadDirectory: "articleContentImages",
-    }).then(() => {
-      const changedContent = input.content.map((e) => {
-        if (isImageContent(e.content)) {
-          return {
-            content: {
-              name: e.content?.name
-                ? e.content.name
-                : e.content.src.split("/").at(-1),
-            },
-            type: e.type,
-          };
-        }
-        return e;
-      });
 
-      (async () =>
-        await prisma.article.update({
-          where: {
-            id: input.articleId,
-          },
-          data: {
-            content: JSON.stringify(changedContent),
-          },
-        }))();
+    if (input.images?.length) {
+      const galleryFiles = await uploadManyFromBase64(
+        input.images,
+        "article/gallery"
+      );
+      const existingCount = await prisma.articleGalleryFile.count({
+        where: { articleId: input.articleId },
+      });
+      data.galleryFiles = {
+        create: galleryFiles.map((file, index) => ({
+          fileId: file.id,
+          sortOrder: existingCount + index,
+        })),
+      };
+    }
+
+    await prisma.article.update({
+      where: { id: input.articleId },
+      data,
     });
+
+    return { status: "ok" };
   } catch (error) {
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
@@ -210,34 +253,35 @@ export async function editArticleController({
 export const getArticleInput = z.object({
   articleId: z.number(),
 });
+
 type GetArticle = z.infer<typeof getArticleInput>;
+
 export async function getArticleController({
-  ctx: { prisma },
+  ctx,
   input,
 }: ArgsStructure<GetArticle>) {
+  const { prisma } = ctx;
   try {
     const article = await prisma.article.findUnique({
       where: { id: input.articleId },
-      include: { comments: true },
+      include: { comments: true, ...galleryInclude() },
     });
 
     if (!article) {
-      return { article: null, message: "article doesn't found", error: "" };
+      throw new TRPCError({ code: "NOT_FOUND", message: "مقاله یافت نشد" });
+    }
+
+    const admin = isAdminUser(ctx.user);
+    if (article.status !== PUBLISHED && !admin) {
+      throw new TRPCError({ code: "NOT_FOUND", message: "مقاله یافت نشد" });
     }
 
     const prepareContent = async (content: any) => {
+      const resolved = await resolveContentImagesForRead(prisma, content);
       const resultContent: any[] = [];
 
-      for (let node of content) {
-        if (node.type === "img") {
-          resultContent.push({
-            content: {
-              src: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/articleContentImages/${node.content.name}`,
-              name: node.content.name,
-            },
-            type: "img",
-          });
-        } else if (
+      for (let node of resolved) {
+        if (
           node.type === "p" &&
           node.childs?.length &&
           typeof node.childs[0]?.content === "string" &&
@@ -248,13 +292,14 @@ export async function getArticleController({
             .replace("/*ctap/", "")
             .split(",")
             .map((e: any) => Number(e));
-          // return { type: "p", content: "", childs: [{ type: "p", content: "ssfsdf", childs: [] }] }
 
           try {
             const get_products = await prisma.product.findMany({
               where: {
                 id: { in: get_ids },
+                status: PUBLISHED,
               },
+              include: galleryInclude(),
             });
             resultContent.push({
               type: "p",
@@ -267,7 +312,7 @@ export async function getArticleController({
                       price: pr.price,
                       product_id: pr.id,
                       product_name: pr.name,
-                      imageurl: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/productImages/${pr.imageNames[0]}`,
+                      imageurl: firstGalleryImageUrl(pr.galleryFiles),
                     })) as z.infer<typeof CallToActionProductType>[]
                   )}/*ctap/`,
                   childs: [],
@@ -283,22 +328,26 @@ export async function getArticleController({
       }
       return resultContent;
     };
+
+    const imageUrls = galleryImageUrls(article.galleryFiles);
     const result = {
       id: article.id,
-      imageUrls: article.images.map(
-        (imgName) =>
-          `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/articleMainImages/${imgName}`
-      ),
+      imageUrls,
+      images: imageUrls,
+      imageFileIds: article.galleryFiles.map((gf) => gf.fileId),
       title: article.title,
       metaDescription: article.metaDescription,
       created_at: article.created_at,
       updated_at: article.updated_at,
       englishTitle: article.englishTitle,
+      status: article.status,
+      isPreview: article.status !== PUBLISHED,
       content: await prepareContent(JSON.parse(article.content)),
     };
 
     return { article: result, message: null };
   } catch (error) {
+    if (error instanceof TRPCError) throw error;
     return { article: null, message: JSON.stringify(error || "{}") };
   }
 }
@@ -310,35 +359,29 @@ export async function getArticleController_admin({
   try {
     const article = await prisma.article.findUnique({
       where: { id: input.articleId },
-      include: { comments: true },
+      include: { comments: true, ...galleryInclude() },
     });
 
     if (!article) {
       return { article: null, message: "article doesn't found", error: "" };
     }
+
+    const imageUrls = galleryImageUrls(article.galleryFiles);
     const result = {
       id: article.id,
-      imageUrls: article.images.map(
-        (imgName) =>
-          `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/articleMainImages/${imgName}`
-      ),
+      imageUrls,
+      images: imageUrls,
+      imageFileIds: article.galleryFiles.map((gf) => gf.fileId),
       title: article.title,
       metaDescription: article.metaDescription,
       created_at: article.created_at,
       updated_at: article.updated_at,
       englishTitle: article.englishTitle,
-      content: JSON.parse(article.content).map((e: any) => {
-        if (e.type === "img") {
-          return {
-            content: {
-              src: `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/articleContentImages/${e.content.name}`,
-              name: e.content.name,
-            },
-            type: "img",
-          };
-        }
-        return e;
-      }),
+      status: article.status,
+      content: await resolveContentImagesForRead(
+        prisma,
+        JSON.parse(article.content)
+      ),
     };
     return { article: result, message: null };
   } catch (error) {
@@ -349,24 +392,22 @@ export async function getArticleController_admin({
 export async function articlesController({ ctx: { prisma } }: ArgsStructure) {
   try {
     const articles = await prisma.article.findMany({
+      where: { status: PUBLISHED },
       orderBy: { created_at: "desc" },
+      include: galleryInclude(),
     });
 
     const haveImageArticles = articles.map((article) => ({
-      ...article,
+      ...mapArticleWithGalleryUrls(article),
       content:
         (
           (JSON.parse(article.content).filter(
-            (e: any) => e.type === "p" && e.childs[0].type === "#text"
+            (e: any) => e.type === "p" && e.childs?.[0]?.type === "#text"
           )[0]?.childs[0]?.content as string) || ""
         )
           .split(" ")
           .slice(0, 25)
           .join(" ") + "..." || "",
-      images: article.images.map(
-        (img) =>
-          `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/articleMainImages/${img}`
-      ),
     }));
 
     return { articles: haveImageArticles, message: null };
@@ -381,40 +422,35 @@ export async function recentArticlesController({
   try {
     const [recentArticles, suggestedArticels] = await prisma.$transaction([
       prisma.article.findMany({
+        where: { status: PUBLISHED },
         orderBy: { created_at: "desc" },
         take: 4,
+        include: galleryInclude(),
       }),
       prisma.article.findMany({
-        where: { isSuggested: true },
+        where: { isSuggested: true, status: PUBLISHED },
         orderBy: { created_at: "desc" },
         take: 3,
+        include: galleryInclude(),
       }),
     ]);
 
     const recentArticlesWithImage = recentArticles.map((article) => ({
-      ...article,
+      ...mapArticleWithGalleryUrls(article),
       content:
         (
           (JSON.parse(article.content).filter(
-            (e: any) => e.type === "p" && e.childs[0].type === "#text"
+            (e: any) => e.type === "p" && e.childs?.[0]?.type === "#text"
           )[0]?.childs[0]?.content as string) || ""
         )
           .split(" ")
           .slice(0, 20)
           .join(" ") + "..." || "",
-      images: article.images.map(
-        (img) =>
-          `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/articleMainImages/${img}`
-      ),
     }));
 
     const suggestedArticlesWithImage = suggestedArticels.map((article) => ({
-      ...article,
+      ...mapArticleWithGalleryUrls(article),
       content: "",
-      images: article.images.map(
-        (img) =>
-          `${process.env.NEXT_PUBLIC_STATIC_FILES_ENDPOINT}/articleMainImages/${img}`
-      ),
     }));
 
     return {
@@ -430,6 +466,7 @@ export async function recentArticlesController({
 export async function article_for_sitemap({ ctx: { prisma } }: ArgsStructure) {
   try {
     const articles = await prisma.article.findMany({
+      where: { status: PUBLISHED },
       select: {
         id: true,
         title: true,
@@ -443,4 +480,106 @@ export async function article_for_sitemap({ ctx: { prisma } }: ArgsStructure) {
   } catch (error) {
     return { articles: null, message: JSON.stringify(error || "{}") };
   }
+}
+
+export const adminArticlesListInput = z
+  .object({
+    status: ContentStatusSchema.optional(),
+  })
+  .optional();
+
+export async function adminArticlesListController({
+  ctx: { prisma },
+  input,
+}: ArgsStructure<z.infer<typeof adminArticlesListInput>>) {
+  try {
+    const articles = await prisma.article.findMany({
+      where: input?.status ? { status: input.status } : undefined,
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        updated_at: true,
+        englishTitle: true,
+        comments: { select: { id: true } },
+      },
+      orderBy: { updated_at: "desc" },
+    });
+
+    return {
+      articles,
+      statusOptions: [
+        { value: "DRAFT", title: "پیش‌نویس" },
+        { value: "PUBLISHED", title: "منتشر شده" },
+        { value: "ARCHIVED", title: "آرشیو" },
+      ],
+      message: null,
+    };
+  } catch (error) {
+    return {
+      articles: null,
+      statusOptions: null,
+      message: JSON.stringify(error || "{}"),
+    };
+  }
+}
+
+export const setArticleStatusInput = z.object({
+  articleId: z.number(),
+  status: ContentStatusSchema,
+});
+
+export async function setArticleStatusController({
+  ctx: { prisma },
+  input,
+}: ArgsStructure<z.infer<typeof setArticleStatusInput>>) {
+  const article = await prisma.article.update({
+    where: { id: input.articleId },
+    data: { status: input.status, updated_at: new Date() },
+    select: { id: true, status: true },
+  });
+  return { article };
+}
+
+export const deleteArticleInput = z.object({
+  articleId: z.number(),
+});
+
+export async function deleteArticleController({
+  ctx: { prisma },
+  input,
+}: ArgsStructure<z.infer<typeof deleteArticleInput>>) {
+  const article = await prisma.article.findUnique({
+    where: { id: input.articleId },
+    include: galleryInclude(),
+  });
+  if (!article) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "مقاله یافت نشد" });
+  }
+
+  let contentFileIds: string[] = [];
+  try {
+    contentFileIds = collectContentFileIds(JSON.parse(article.content || "[]"));
+  } catch {
+    contentFileIds = [];
+  }
+  const galleryFileIds = article.galleryFiles.map((gf) => gf.fileId);
+
+  await prisma.$transaction(async (tx) => {
+    await tx.comment.deleteMany({ where: { articleId: input.articleId } });
+    await tx.articleGalleryFile.deleteMany({
+      where: { articleId: input.articleId },
+    });
+    await tx.article.delete({ where: { id: input.articleId } });
+  });
+
+  for (const fileId of [...new Set([...galleryFileIds, ...contentFileIds])]) {
+    try {
+      await deleteStoredFile(fileId);
+    } catch (error) {
+      console.error("Failed deleting article file", fileId, error);
+    }
+  }
+
+  return { status: "ok" as const };
 }

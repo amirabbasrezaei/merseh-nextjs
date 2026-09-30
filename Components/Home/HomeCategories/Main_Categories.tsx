@@ -1,57 +1,43 @@
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
+"use client";
+
 import { trpc } from "@/utils/trpc";
-import { motion } from "framer-motion";
 import CategoryItem from "./CategoryItem.mainCategory";
-import classNames from "classnames";
+import SectionHeader from "../ui/SectionHeader";
 
 export default function Main_Categories() {
   const { data, isLoading } = trpc.product.categories.useQuery();
-  return (
-    <section className="flex flex-col w-full gap-5">
-      <div className="flex flex-row visible sm:hidden justify-between max-w-full">
-        <span className="text-[18px]  font-[500] text-black1 ">دسته‌بندی</span>
-        <Link href={"/mcategory"}>
-          <span className="text-[#006645]">سایر دسته‌بندی‌ها</span>
-        </Link>
-      </div>
+  const categories = data?.[0]?.subCategories ?? [];
+  const showCategories = !isLoading && categories.length > 0;
 
-      {!isLoading && data?.length && data[0]?.subCategories?.length ? (
-        <motion.div
-          variants={{
-            open: {
-              transition: { staggerChildren: 0.2, type: "spring" },
-            },
-          }}
-          initial={"close"}
-          animate={"open"}
-          className="sm:h-auto h-fit flex flex-row  items-start sm:justify-evenly gap-6 sm:gap-3 overflow-x-scroll"
-          style={{ scrollbarWidth: "none" }}
-        >
-          { data !== undefined ? data[0]?.subCategories?.map((category, index) => (
+  return (
+    <div className="flex w-full flex-col gap-4">
+      <SectionHeader
+        id="home-categories"
+        title="دسته‌بندی"
+        href="/mcategory"
+        linkLabel="سایر دسته‌بندی‌ها"
+      />
+      {showCategories ? (
+        <div className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto">
+          {categories.map((category) => (
             <CategoryItem
               key={category.id}
               id={category.id}
               image_url={category.imageUrl}
               title={category.title}
             />
-          )) : null}
-        </motion.div>
+          ))}
+        </div>
       ) : (
-        <div className="flex flex-row   justify-between box-content   w-full gap-3  max-w-[100%] ">
-          {Array.from(Array(5)).map((e, index) => (
-        
+        <div className="no-scrollbar flex gap-4 overflow-hidden" aria-hidden>
+          {Array.from({ length: 5 }, (_, index) => (
             <div
               key={index}
-              style={{ width: 160.28 }}
-              className={classNames(`    aspect-square basis-1/2  rounded-[30px] lg:rounded-[50px] md:rounded-[40px]    bg-[#f1f1f1]   animate-pulse`, `duration-[${index}ms]` )}
-            >
-              
-            </div>
+              className="aspect-square w-[120px] shrink-0 animate-pulse rounded-tile bg-hover1 md:w-[160px]"
+            />
           ))}
         </div>
       )}
-    </section>
+    </div>
   );
 }

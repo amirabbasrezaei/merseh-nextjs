@@ -8,8 +8,8 @@ import React, {
 } from "react";
 import { trpc } from "@/utils/trpc";
 import classNames from "classnames";
-import Router from "next/router";
-import { useRouter } from "next/navigation";
+import { Loading_SVG } from "../SVGS";
+import { authButtonClass } from "./authStyles";
 
 interface Props {
   setLoginStatus: Dispatch<SetStateAction<number>>;
@@ -17,23 +17,24 @@ interface Props {
   isModal: boolean;
 }
 
+const CODE_LENGTH = 5;
+
 export default function Verify({
   phoneNumber,
   setLoginStatus,
   isModal,
 }: Props) {
-  const router = useRouter();
   const {
     mutate: mutateVerifyLoginCode,
-    isSuccess: isVerifyLoginCodeSuccess,
-    isLoading,
+    isPending: isLoading,
     data,
     error,
   } = trpc.user.verifyLoginCode.useMutation({ retry: 2 });
 
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [code, setCode] = useState<string>("");
   const utils = trpc.useUtils();
+
   useEffect(() => {
     if (data?.accessToken) {
       if (isModal) {
@@ -43,76 +44,72 @@ export default function Verify({
   }, [data, error]);
 
   useEffect(() => {
-    if (code.length === 5) {
+    if (code.length === CODE_LENGTH) {
       mutateVerifyLoginCode({ code, phoneNumber });
     }
   }, [code]);
 
+  const digits = Array.from({ length: CODE_LENGTH }, (_, index) =>
+    code.charAt(index)
+  );
+
   return (
-    <div className=" justify-center items-center  w-full">
-      <div autoFocus className="relative rounded-[8px]   w-full h-[45px]">
+    <div className="flex w-full flex-col items-center">
+      <div className="relative w-full">
         <input
           ref={inputRef}
-          className="flex text-black1 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none h-[45px] appearance-none rounded-[8px]  px-5 outline-none  border border-[#E6E6E6] w-full bg-transparent text-transparent absolute z-20 right-0 top-0 left-0 bottom-0 "
+          className="absolute inset-0 z-10 cursor-text opacity-0"
           autoFocus
           value={code}
-          onChange={(e) => setCode(e.currentTarget.value)}
-          key={"hiddenTextInput"}
-          autoComplete="sms-otp"
-          maxLength={5}
+          onChange={(e) =>
+            setCode(e.currentTarget.value.replace(/\D/g, "").slice(0, CODE_LENGTH))
+          }
+          autoComplete="one-time-code"
+          inputMode="numeric"
+          maxLength={CODE_LENGTH}
           dir="ltr"
         />
-        <div className="w-full px-3 z-10 h-full justify-evenly items-center flex flex-row-reverse gap-2">
-          <div className="basis-1/12 flex h-full rounded-lg justify-center items-center">
-            <span className="text-xl  text-gray-500 text-center ">
-              {code.length > 0 && code.charAt(0)}
-            </span>
-          </div>
-          <hr className="text-[40px] border-[1px] w-3 border-[#d2d2d2] " />
-          <div className="basis-1/12 flex h-full rounded-lg justify-center items-center">
-            <span className="text-xl  text-gray-500 text-center ">
-              {code.length > 0 && code.charAt(1)}
-            </span>
-          </div>
-          <hr className="text-[40px] border-[1px] w-3 border-[#d2d2d2]" />
-          <div className="basis-1/12 flex h-full rounded-lg justify-center items-center">
-            <span className="text-xl  text-gray-500 text-center ">
-              {code.length > 0 && code.charAt(2)}
-            </span>
-          </div>
-          <hr className="text-[40px] border-[1px] w-3 border-[#d2d2d2]" />
-
-          <div className="basis-1/12 flex h-full rounded-lg justify-center items-center">
-            <span className="text-xl  text-gray-500 text-center ">
-              {code.length > 0 && code.charAt(3)}
-            </span>
-          </div>
-          <hr className="text-[40px] border-[1px] w-3 border-[#d2d2d2]" />
-
-          <div className="basis-1/12 flex h-full rounded-lg justify-center items-center">
-            <span className="text-xl  text-gray-500 text-center ">
-              {code.length > 0 && code.charAt(4)}
-            </span>
-          </div>
+        <div className="flex flex-row justify-center gap-2" dir="ltr">
+          {digits.map((digit, index) => {
+            const isActive = code.length === index;
+            const isFilled = digit.length > 0;
+            return (
+              <div
+                key={index}
+                className={classNames(
+                  "flex h-12 w-11 items-center justify-center rounded-xl border text-[18px] font-[500] text-black1",
+                  isActive
+                    ? "border-green2 ring-2 ring-green2/20"
+                    : isFilled
+                      ? "border-green2/40"
+                      : "border-[#E6E6E6]"
+                )}
+              >
+                {digit}
+              </div>
+            );
+          })}
         </div>
       </div>
       <button
+        type="button"
+        disabled={isLoading || code.length !== CODE_LENGTH}
         onClick={() => mutateVerifyLoginCode({ code, phoneNumber })}
-        className={classNames(
-          "flex   h-[45px] w-full mt-4 rounded-[8px] items-center justify-center text-white ",
-          isLoading ? "" : "bg-green1"
-        )}
+        className={`${authButtonClass(isLoading || code.length !== CODE_LENGTH)} mt-5`}
       >
-        <span className=" text-white text-center text-[15px]">
-          تائید رمز یکبار مصرف
-        </span>
+        {isLoading ? (
+          <Loading_SVG classname="h-auto w-8" />
+        ) : (
+          <span>تائید رمز یکبار مصرف</span>
+        )}
       </button>
-      <div
-        className="w-full mt-4 cursor-pointer"
+      <button
+        type="button"
+        className="mt-4 w-full cursor-pointer text-[13px] text-lightBlack hover:text-green2"
         onClick={() => setLoginStatus(0)}
       >
-        <span className="text-gray-600 text-[13px]">تغییر شماره</span>
-      </div>
+        تغییر شماره
+      </button>
     </div>
   );
 }

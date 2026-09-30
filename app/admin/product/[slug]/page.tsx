@@ -1,15 +1,11 @@
 import ProductEdit from "@/Components/Admin/AddProduct/ProductEdit";
-import Layout from "@/Components/Layout/Layout";
 import React from "react";
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
-export default function page({ params }: Props) {
-  return (
-    <Layout footer={false} header={false}>
-      <ProductEdit productId={params.slug} />
-    </Layout>
-  );
+export default async function page({ params }: Props) {
+  const { slug } = await params;
+  return <ProductEdit productId={slug} />;
 }

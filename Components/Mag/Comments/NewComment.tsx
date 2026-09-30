@@ -16,7 +16,7 @@ export default function NewComment({
   const {
     data: addCommentData,
     mutate: mutateAddComment,
-    isLoading,
+    isPending: isLoading,
   } = trpc.article.addComment.useMutation();
 
   const { refetch: refetchComments } = trpc.article.comments.useQuery({

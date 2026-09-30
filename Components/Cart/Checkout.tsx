@@ -1,18 +1,16 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Button from "../Button";
-import { useRecoilState } from "recoil";
-
 import Image from "next/image";
 import Link from "next/link";
 import { Minus_Svg, Plus_Svg } from "../SVGS";
 import splitNumber from "../utils/splitNumber";
 import { trpc } from "@/utils/trpc";
-import { themeRecoilStateAtom } from "../ThemeController";
+import { useThemeStore } from "../ThemeController";
 import useShoppingCart from "../useShoppingCart";
 
 export default function Checkout() {
-  const [themeStore, setThemeStore] = useRecoilState(themeRecoilStateAtom);
+  const setThemeStore = useThemeStore.setState;
   const [isClient, setIsClient] = useState(false);
   const {
     decrementProductNumber,

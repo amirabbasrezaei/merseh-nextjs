@@ -24,15 +24,21 @@ import {
   AddProductControllerArgSchema,
   ProductCartInfoInputSchema,
   addProductController,
+  adminProductsListInput,
+  deleteProductController,
+  deleteProductInput,
   detailedProductList,
   editProductController,
   editProductInputSchema,
   forTorobProductController,
   getProductController,
   getProductInputSchema,
-  productCarouselController,
   productCartInfoController,
+  relatedProductsController,
+  relatedProductsInput,
   productsController,
+  setProductStatusController,
+  setProductStatusInput,
   short_info_products_controller,
 } from "../Controllers/product.controller";
 import {
@@ -54,11 +60,12 @@ export const productRouter = router({
   createCategory: adminProtectedProcedure
     .input(createCategorySchema)
     .mutation(createCategory),
-  // get product image for shopping cart
   productCartInfo: publicProcedure
     .input(ProductCartInfoInputSchema)
     .query(productCartInfoController),
-  productCarousel: publicProcedure.query(productCarouselController),
+  related: publicProcedure
+    .input(relatedProductsInput)
+    .query(relatedProductsController),
   products: publicProcedure.query(productsController),
   productsForTorob: publicProcedure.query(forTorobProductController),
   detailedProductList: publicProcedure.query(detailedProductList),
@@ -83,8 +90,16 @@ export const productRouter = router({
   categoryInfo: publicProcedure
     .input(categoryInfoSchema)
     .query(categoryInfoController),
-  shortInfoProducts: publicProcedure.query(short_info_products_controller),
+  shortInfoProducts: adminProtectedProcedure
+    .input(adminProductsListInput)
+    .query(short_info_products_controller),
   changeCategoryStatus: adminProtectedProcedure
     .input(ChangeCategoryStatusSchema)
     .mutation(change_category_status),
+  setProductStatus: adminProtectedProcedure
+    .input(setProductStatusInput)
+    .mutation(setProductStatusController),
+  deleteProduct: adminProtectedProcedure
+    .input(deleteProductInput)
+    .mutation(deleteProductController),
 });

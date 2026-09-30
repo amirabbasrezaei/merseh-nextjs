@@ -104,7 +104,7 @@ export default function Footer() {
         </Link>
       </div>
       <span>
-        طراحی شده توسط <span className="font-[700]">مرسه</span>
+        طراحی شده توسط <span className="font-[700]">عباس رضائی</span>
       </span>
     </footer>
   );

@@ -1,12 +1,6 @@
 import ArticleEdit from "@/Components/Admin/Article/ArticleEdit";
-import Layout from "@/Components/Layout/Layout";
-import { Metadata } from "next";
 import React from "react";
 
 export default function page() {
-  return (
-    <Layout footer={false} header={false}>
-      <ArticleEdit />
-    </Layout>
-  );
+  return <ArticleEdit />;
 }

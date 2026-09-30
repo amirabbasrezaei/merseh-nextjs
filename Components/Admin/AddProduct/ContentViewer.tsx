@@ -25,16 +25,18 @@ export function ContentViewer({ contentForView }: Props) {
                   >
                     <Image
                       src={
-                        !(node.content.src as string)?.includes("https://")
-                          ? `data:image/${node.content.format},${node.content.src}`
-                          : node.content.src
+                        (node.content.src as string)?.startsWith("http://") ||
+                        (node.content.src as string)?.startsWith("https://") ||
+                        (node.content.src as string)?.startsWith("data:")
+                          ? (node.content.src as string)
+                          : `data:image/${node.content.format},${node.content.src}`
                       }
                       width={1000}
                       height={700}
                       alt={node.content.name || ""}
                       quality={100}
                       priority={false}
-                      key={node?.content?.name || ""}
+                      key={node?.content?.fileId || node?.content?.name || i}
                     />
                   </div>
                 );

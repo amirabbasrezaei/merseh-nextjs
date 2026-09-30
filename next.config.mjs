@@ -3,23 +3,45 @@ const nextConfig = {
     images: {
         remotePatterns: [
           {
+            protocol: 'http',
+            hostname: '127.0.0.1',
+            port: '9010',
+            pathname: '/**',
+          },
+          {
+            protocol: 'http',
+            hostname: 'localhost',
+            port: '9010',
+            pathname: '/**',
+          },
+          {
+            protocol: 'http',
+            hostname: '127.0.0.1',
+            port: '9000',
+            pathname: '/**',
+          },
+          {
+            protocol: 'http',
+            hostname: 'localhost',
+            port: '9000',
+            pathname: '/**',
+          },
+          {
             protocol: 'https',
             hostname: 'static.merseh.ir',
-
           },
           {
             protocol: 'https',
             hostname: 'trustseal.enamad.ir',
-
           },
           {
             protocol: 'https',
             hostname: 'portal.podro.com',
-
           },
         ],
         deviceSizes: [640, 750, 828, 1080, 1200],
         imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+        dangerouslyAllowLocalIP: true,
       },
       async headers() {
         return [

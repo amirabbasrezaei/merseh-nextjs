@@ -11,7 +11,6 @@ import {
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import classNames from "classnames";
-import { useRecoilState } from "recoil";
 import useShoppingCart from "../useShoppingCart";
 
 

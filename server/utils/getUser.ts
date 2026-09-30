@@ -1,6 +1,6 @@
 import { prisma } from "../context";
 import jwt, { Secret } from "jsonwebtoken";
-import { Session, User } from "prisma/prisma-client";
+import { Session, User } from "@/generated/prisma/client";
 import { AccessTokenPayload, RefreshTokenPayload, signJWT } from "./signJWT";
 import { TRPCError } from "@trpc/server";
 import type { TRPCError as Error } from "@trpc/server";
@@ -53,7 +53,8 @@ async function getUserSession(sessionId: string): Promise<GetUserSession> {
 }
 
 async function checkRefreshToken(): Promise<{ user: User | null }> {
-  const refreshToken = cookies().get("refreshToken")?.value;
+  const cookieStore = await cookies();
+  const refreshToken = cookieStore.get("refreshToken")?.value;
   
   if (refreshToken) {
     const verifyRefreshToken = jwt.verify(
@@ -79,8 +80,9 @@ async function checkRefreshToken(): Promise<{ user: User | null }> {
   return { user: null };
 }
 
-function checkAccessToken() {
-  const accessToken = cookies().get("accessToken")?.value;
+async function checkAccessToken() {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("accessToken")?.value;
   if (accessToken) {
     const token = jwt.verify(
       accessToken,
@@ -100,7 +102,7 @@ type GetUser = {
 };
 
 export async function getUser(res: Response): Promise<GetUser> {
-  const userWithAccessToken = checkAccessToken();
+  const userWithAccessToken = await checkAccessToken();
   if (userWithAccessToken) {
     return {
       accessToken: userWithAccessToken,
