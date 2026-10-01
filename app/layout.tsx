@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: `${process.env.BASE_URL}`,
   },
-  metadataBase: new URL("https://mehrnil.com"),
+  metadataBase: new URL(process.env.BASE_URL || "http://localhost:3000"),
   robots: { follow: true, index: true },
   openGraph: {
     locale: "fa_IR",

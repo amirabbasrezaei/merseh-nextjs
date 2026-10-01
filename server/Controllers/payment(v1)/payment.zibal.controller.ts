@@ -60,10 +60,7 @@ export async function createPaymentControllerZibal({
     const { data } = await axios.post(`${BASE_URL}/v1/request`, {
       merchant: process.env.ZIBAL_MERCHANT_CODE as string,
       amount,
-      callbackUrl:
-        process.env.NODE_ENV === "production"
-          ? "https://mehrnil.com/payment"
-          : "http://localhost:3000/payment",
+      callbackUrl: `${process.env.BASE_URL || "http://localhost:3000"}/payment`,
       mobile: user.phoneNumber,
       description: "",
       feeMode: 2,

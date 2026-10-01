@@ -24,10 +24,7 @@ export default function TRPC_Provider({
     trpc.createClient({
       links: [
         httpBatchLink({
-          url:
-            process.env.NODE_ENV === "production"
-              ? "https://mehrnil.com/api/trpc"
-              : "http://localhost:3000/api/trpc",
+          url: "/api/trpc",
         }),
       ],
     })
