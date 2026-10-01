@@ -28,7 +28,7 @@ const nextConfig = {
           },
           {
             protocol: 'https',
-            hostname: 'static.merseh.com',
+            hostname: 'static.mehrnil.com',
             pathname: '/**',
           },
           {
