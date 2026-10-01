@@ -4,6 +4,7 @@ import { bannerRouter } from "./banner.router";
 import { brandRouter } from "./brand.router";
 import { carouselRouter } from "./carousel.router";
 import { commentRouter } from "./comment.router";
+import { couponRouter } from "./coupon.router";
 import { filterRouter } from "./filter.router";
 import { mediaRouter } from "./media.router";
 import { orderRouter } from "./order.router";
@@ -25,6 +26,7 @@ export const appRouter = router({
   banner: bannerRouter,
   brand: brandRouter,
   carousel: carouselRouter,
+  coupon: couponRouter,
 });
 // export type definition of API
 export type AppRouter = typeof appRouter;

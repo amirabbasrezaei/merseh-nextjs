@@ -1,7 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { YekanBakh } from "@/app/fonts";
-import { Loading_SVG, MersehSvg, Merseh_typography, XMark_Svg } from "../SVGS";
+import BrandWordmark from "../Brand/BrandWordmark";
+import { Loading_SVG, MersehSvg, XMark_Svg } from "../SVGS";
 import { trpc } from "@/utils/trpc";
 
 import Signup from "./Signup";
@@ -10,6 +11,7 @@ import { ThemeType } from "../ThemeController";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { authButtonClass, authInputClass } from "./authStyles";
+import { useResetAccountQueries } from "./useResetAccountQueries";
 
 type Props = {
   isModal?: boolean;
@@ -26,7 +28,7 @@ export default function Auth({
   setShowAuthModal = () => ({}),
 }: Props) {
   const router = useRouter();
-  const utils = trpc.useUtils();
+  const resetAccountQueries = useResetAccountQueries();
   const [loginStatus, setLoginStatus] = useState(0);
   const [input, setInput] = useState<string>("");
   const [password, setPassword] = useState("");
@@ -40,7 +42,7 @@ export default function Auth({
   } = trpc.user.loginWithPassword.useMutation({
     onSuccess: async () => {
       if (isModal) {
-        await utils.user.userInfo.refetch();
+        await resetAccountQueries();
         setShowAuthModal((state) => ({ ...state, openAuthModal: false }));
       } else {
         router.push("/admin");
@@ -102,7 +104,7 @@ export default function Auth({
 
       <div className="mb-5 flex flex-col items-center gap-3">
         <div className="flex flex-row items-center gap-2">
-          <Merseh_typography classname="h-auto w-24" />
+          <BrandWordmark className="text-[28px] text-plum-900" />
           <MersehSvg classname="h-auto w-7" />
         </div>
         <span

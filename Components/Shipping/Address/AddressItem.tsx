@@ -1,35 +1,44 @@
-import RadioInput from "@/Components/RadioInput";
-import React, { Dispatch, SetStateAction } from "react";
+import RadioMark, { choiceCardClass } from "@/Components/Checkout/RadioMark";
+import type { UserAddress } from "@/Components/Checkout/types";
 
 interface Props {
-  title: string;
-  addressDetails: string;
-  onSelect: Dispatch<SetStateAction<string>>;
-  addressId: string;
+  address: UserAddress;
+  groupName: string;
   isSelected: boolean;
-  province: string;
-  city: string;
+  onSelect: (addressId: string) => void;
 }
 
-export default function AddressItem({
-  addressDetails,
-  title,
-  onSelect,
-  addressId,
-  isSelected,
-  province,
-  city,
-}: Props) {
+export default function AddressItem({ address, groupName, isSelected, onSelect }: Props) {
+  const receiver = `${address.reciverName} ${address.reciverFamilyName}`.trim();
+
   return (
-    <div
-      onClick={() => onSelect(addressId)}
-      className="w-full cursor-pointer px-6 py-4 h-fit flex flex-row gap-4 border border-[#EAEAEA] rounded-[8px]"
-    >
-      <RadioInput isChecked={isSelected} />
-      <div className="flex flex-col gap-4">
-        <span className="text-black1">{title}</span>
-        <span className="text-lightBlack text-[14px]">{`${province} , ${city} , ${addressDetails}`}</span>
-      </div>
-    </div>
+    <label className={choiceCardClass(isSelected)}>
+      <input
+        type="radio"
+        name={groupName}
+        value={address.id}
+        checked={isSelected}
+        onChange={() => onSelect(address.id)}
+        className="sr-only"
+      />
+      <span className="pt-0.5">
+        <RadioMark checked={isSelected} />
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col gap-1.5">
+        <span className="truncate text-h3-md text-plum-900">
+          {address.title.trim() || "آدرس بدون عنوان"}
+        </span>
+        <span className="text-caption text-lightBlack">
+          {address.Province.name}، {address.city.name}
+        </span>
+        <span className="line-clamp-2 text-small leading-6 text-plum-900/80">
+          {address.addressDetails}
+        </span>
+        <span className="flex flex-wrap gap-x-2 text-caption text-lightBlack">
+          {receiver ? <span>{receiver}</span> : null}
+          <span dir="ltr">{address.reciverPhoneNumber}</span>
+        </span>
+      </span>
+    </label>
   );
 }

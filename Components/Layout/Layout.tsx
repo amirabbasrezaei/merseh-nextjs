@@ -13,7 +13,7 @@ interface props {
   fullWidth?: boolean;
 }
 
-const Header = dynamic(() => import("../Home/Header"), { ssr: true });
+const Header = dynamic(() => import("../Header/Header"), { ssr: true });
 const Footer = dynamic(() => import("../Footer"), { ssr: true });
 const Navbar = dynamic(() => import("../Navbar/Navbar"), { ssr: true });
 
@@ -23,26 +23,26 @@ export default function Layout({
   footer = true,
   fullWidth = false,
 }: props) {
-
   return (
     <>
       <Suspense fallback={<Loading />}>
+        {/* The header must stay a direct child of this scroller for `position: sticky` to hold. */}
         <motion.main
           style={{ direction: "ltr" }}
-          className={`justify-center items-center   flex  bg-white w-screen overflow-x-hidden  sm:mb-0 mb-[100px]  h-screen`}
+          className="flex h-screen w-screen flex-col items-center overflow-x-hidden bg-white supports-[height:100dvh]:h-dvh"
         >
+          {header ? <Header /> : null}
           <div
             style={{ direction: "rtl" }}
             className={classNames(
-              "max-w-[1400px]    gap-16 sm:w-full flex-col  items-center flex overflow-y-visible bg-white h-full ",
-              fullWidth ? "w-full" : "w-[90%]"
+              "flex max-w-[1400px] flex-1 flex-col items-center bg-white pb-[calc(env(safe-area-inset-bottom)+6rem)] sm:w-full sm:pb-0",
+              fullWidth ? "w-full" : "w-[90%]",
             )}
           >
-            {header ? <Header /> : null}
             <Navbar />
 
-            <div className=" w-full grow  flex flex-col gap-16">
-              <div className=" grow">{children}</div>
+            <div className="flex w-full grow flex-col gap-16 pt-4 sm:pt-6">
+              <div className="grow">{children}</div>
               {footer ? <Footer /> : null}
             </div>
           </div>
@@ -52,7 +52,7 @@ export default function Layout({
         shallowRouting
         options={{ showSpinner: false }}
         height="4px"
-        color="#00A573"
+        color="#8A4A55"
       />
     </>
   );

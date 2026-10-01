@@ -1,60 +1,54 @@
-import React, {
-  DetailedHTMLProps,
-  HTMLAttributes,
-  HTMLInputTypeAttribute,
-  InputHTMLAttributes,
-} from "react";
-import {
-  Control,
-  useController,
-  UseControllerProps,
-  UseFormGetValues,
-} from "react-hook-form";
-import { FormTypes } from "./Shipping/Address/Add_Address";
-
-
+import classNames from "classnames";
+import { useId, type HTMLInputTypeAttribute, type InputHTMLAttributes } from "react";
+import { useController, type UseControllerProps } from "react-hook-form";
+import FieldShell from "./Checkout/FieldShell";
+import { fieldClass } from "./Checkout/ui";
+import type { FormTypes } from "./Shipping/Address/Add_Address";
 
 interface Props extends UseControllerProps<FormTypes> {
-  value?: any;
-  setValue?: any;
-  type: HTMLInputTypeAttribute | undefined;
-  className?: HTMLAttributes<HTMLInputElement>["className"];
-  formSettings?: DetailedHTMLProps<
-    InputHTMLAttributes<HTMLInputElement>,
-    HTMLInputElement
-  >;
-  placeholder?: string;
   lableText: string;
+  type?: HTMLInputTypeAttribute;
+  placeholder?: string;
+  className?: string;
+  inputMode?: InputHTMLAttributes<HTMLInputElement>["inputMode"];
+  autoComplete?: string;
+  dir?: "ltr" | "rtl";
 }
 
-export default function Input(props: Props) {
-  const {
-    type,
-    setValue,
-    value,
-    className,
-    formSettings,
-    placeholder,
-    lableText,
-  } = props;
+export default function Input({
+  lableText,
+  type = "text",
+  placeholder,
+  className,
+  inputMode,
+  autoComplete,
+  dir,
+  ...controllerProps
+}: Props) {
+  const id = useId();
+  const { field, fieldState } = useController(controllerProps);
+  const error = fieldState.error?.message;
 
-  const { field, fieldState } = useController(props);
   return (
-    <div style={{ height: 50, borderRadius: "10px" }} className=" relative ">
+    <FieldShell
+      id={id}
+      label={lableText}
+      required={Boolean(controllerProps.rules?.required)}
+      error={error}
+      className={className}
+    >
       <input
-        {...field} 
-        style={{ height: 50, borderRadius: "10px" }}
+        {...field}
+        id={id}
         type={type}
-        className={`border border-gray-200 px-2 outline-none focus:outline-green1     ${className}`}
+        dir={dir}
+        inputMode={inputMode}
+        autoComplete={autoComplete}
         placeholder={placeholder}
-      /> 
-      <span className="absolute top-[-14px] text-[14px]  right-4  bg-white px-3 text-black1">
-        {lableText}
-        {props.rules?.required  ? (
-        <span className="text-red-700">*</span>
-      ) : null}
-      </span>
-      
-    </div>
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? `${id}-error` : undefined}
+        className={classNames(fieldClass, "h-12", dir === "ltr" && "text-right")}
+      />
+    </FieldShell>
   );
 }

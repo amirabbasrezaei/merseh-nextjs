@@ -1,16 +1,18 @@
 "use client";
-import { Category_Svg, Magnifier, XMark_Svg } from "@/Components/SVGS";
+import { Magnifier, XMark_Svg } from "@/Components/SVGS";
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { trpc } from "@/utils/trpc";
-import Link from "next/link";
 import classNames from "classnames";
-import useWindowSize from "@/Components/useWindowSize";
+import { toPathSlug } from "@/utils/slug";
+import SearchResults from "./SearchResults";
 
-const animation = {
+const DEBOUNCE_MS = 400;
+
+const panelAnimation = {
   open: {
-    height: 300,
+    height: "auto",
     opacity: 1,
     zIndex: 20,
   },
@@ -21,156 +23,163 @@ const animation = {
   },
 };
 
+const inputClass =
+  "bg-ivory border border-hairline transition-colors focus:border-mauve-400 focus:bg-white text-plum-900 placeholder:text-[15px] placeholder:text-lightBlack rounded-[10px] appearance-none outline-none";
+
 export default function HeaderSearch() {
-  const [isClient, setisClient] = useState(false);
-  const { height } = useWindowSize();
+  const [isClient, setIsClient] = useState(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const { data, isPending: isLoading, mutate } = trpc.filter.search.useMutation();
-  // for mobile purpose
+  const [submittedTerm, setSubmittedTerm] = useState<string>("");
   const [showSearch, setShowSearch] = useState(false);
+  const { data, isPending, mutate } = trpc.filter.search.useMutation();
+  const { data: categoryTree } = trpc.product.categories.useQuery();
+
+  const term = searchTerm.trim();
+  const isOpen = term.length > 0;
 
   useEffect(() => {
-    setisClient(true);
-    let timeOut: any;
-    if (searchTerm.length) {
-      timeOut = setTimeout(() => {
-        mutate({ text: searchTerm });
-      }, 500);
-    }
+    setIsClient(true);
+  }, []);
 
-    return () => {
-      clearTimeout(timeOut);
-    };
-  }, [searchTerm]);
+  useEffect(() => {
+    if (!term) return;
+    const timeout = setTimeout(() => {
+      setSubmittedTerm(term);
+      mutate({ text: term });
+    }, DEBOUNCE_MS);
+    return () => clearTimeout(timeout);
+  }, [term, mutate]);
 
+  const root = categoryTree?.[0];
+  const allResultsHref = `${
+    root ? `/category/${root.id}/${toPathSlug(root.title)}` : "/category/1"
+  }?searchTerm=${encodeURIComponent(term)}`;
 
+  const close = () => {
+    setSearchTerm("");
+    setShowSearch(false);
+  };
+
+  const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key !== "Escape") return;
+    close();
+    event.currentTarget.blur();
+  };
+
+  const results = (
+    <SearchResults
+      term={term}
+      isSearching={isPending || submittedTerm !== term}
+      categories={data?.result ?? []}
+      products={data?.products ?? []}
+      allResultsHref={allResultsHref}
+      onNavigate={close}
+    />
+  );
 
   return (
     <>
-      <div className="hidden basis-6/12 h-[50px] relative sm:flex items-center justify-center">
+      <div className="relative hidden h-[50px] w-full max-w-[620px] items-center justify-center sm:flex">
         <div
           className={classNames(
-            "relative w-full h-full",
-            searchTerm.length ? "z-30" : "z-20"
+            "relative h-full w-full",
+            isOpen ? "z-30" : "z-20",
           )}
         >
           <input
             value={searchTerm}
+            aria-label="جستجو در میان کالاها"
             placeholder="جستجو در میان کالاها"
-            className="bg-[#F6F6F6] absolute   w-full h-full placeholder:text-[15px] text-black1 placeholder:text-[#8b8b8b] px-5 pr-[50px] grow rounded-[10px] appearance-none outline-none"
+            className={classNames(inputClass, "absolute h-full w-full px-5 pr-[50px]")}
             onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={onKeyDown}
           />
-          <Magnifier classname="absolute top-[15px] right-[15px] w-[20px] h-auto fill-[#363636]" />
+          <Magnifier classname="pointer-events-none absolute right-[15px] top-[15px] h-auto w-[20px] fill-mauve-700" />
         </div>
         <motion.div
           initial={false}
           style={{ overflow: "hidden" }}
-          variants={animation}
-          animate={searchTerm.length ? "open" : "hidden"}
-          className="absolute gap-5 flex flex-col justify-evenly overflow-y-scroll  bg-white w-[104%] z-[1]  pt-20 rounded-[10px] border top-[-15px]"
-          transition={{ duration: 0.3 }}
+          variants={panelAnimation}
+          animate={isOpen ? "open" : "hidden"}
+          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          className="glass-strong absolute top-[-15px] z-[1] w-[104%] rounded-[18px] pt-20"
         >
           <div
             style={{ scrollbarWidth: "thin" }}
-            className="h-full flex flex-col overflow-y-scroll p-5 pt-0 gap-3 scroll"
+            className="max-h-[min(62vh,480px)] overflow-y-auto px-5 pb-5 pt-1"
           >
-            {data?.result.length
-              ? data.result.map((item, index) => (
-                  <Link
-                    onClick={() => setSearchTerm("")}
-                    href={`/category/${item.id}/${item.title.replaceAll(" ", "-")}`}
-                    key={index}
-                    className="flex flex-row items-center gap-2"
-                  >
-                    <div>
-                      <Category_Svg classname="w-5 fill-gray-300" />
-                    </div>
-                    <span className="text-black1">{item.title}</span>
-                  </Link>
-                ))
-              : null}
+            {isOpen ? results : null}
           </div>
         </motion.div>
 
         {isClient
           ? createPortal(
               <motion.div
-                onClick={() => setSearchTerm("")}
+                onClick={close}
                 initial={false}
                 animate={
-                  searchTerm.length
+                  isOpen
                     ? { opacity: 1, backdropFilter: "blur(2px)", scale: 1 }
                     : { opacity: 0, backdropFilter: "blur(0px)", scale: 0 }
                 }
-                className="fixed z-10 w-full h-full "
-              ></motion.div>,
-              document.body
+                className="fixed z-10 h-full w-full"
+              />,
+              document.body,
             )
           : null}
       </div>
-      <div
-        onClick={() => setShowSearch(true)}
-        className="flex sm:hidden items-center justify-center h-full w-fit"
-      >
-        <Magnifier classname=" w-[20px] h-auto fill-[#363636]" />
-      </div>
 
-      {isClient && showSearch
+      <button
+        type="button"
+        onClick={() => setShowSearch(true)}
+        className="home-focus flex h-10 w-full items-center gap-2.5 rounded-full border border-hairline bg-ivory px-4 text-small text-lightBlack sm:hidden"
+      >
+        <Magnifier classname="h-auto w-[18px] flex-none fill-mauve-700" />
+        جستجو در میان کالاها
+      </button>
+
+      {isClient
         ? createPortal(
-            <motion.div
-              initial={false}
-              animate={
-                showSearch
-                  ? { translateY: 0, opacity: 1 }
-                  : { translateY: 500, opacity: 0 }
-              }
-              transition={{ bounce: 0.2, type: "tween", duration: 0.3 }}
-              className="fixed top-0 right-0 left-0 items-center py-6 w-full h-full origin-bottom bg-white z-30 flex flex-col gap-2"
-            >
+            <AnimatePresence>
               {showSearch ? (
-                <input
-                  value={searchTerm}
-                  placeholder="جستجو در میان کالاها"
-                  autoFocus
-                  className="bg-[#F6F6F6]  z-30  w-[90%] h-[50px]  placeholder:text-[15px] text-black1 placeholder:text-[#8b8b8b] px-5  rounded-[10px] appearance-none outline-none"
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              ) : null}
-              <div
-                // style={{ overflow: "hidden" }}
-                className=" flex flex-col h-full overflow-y-scroll bg-white w-full gap-5 p-5 sm:pt-20"
-              >
-                {data?.result.length
-                  ? data.result.map((item, index) => (
-                      <Link
-                        onClick={() => {
-                          setSearchTerm("");
-                          setShowSearch(false);
-                        }}
-                        href={`/category/${item.id}/${item.title}`}
-                        key={index}
-                        className="bg-gray-50 rounded-[8px] gap-3 p-4 flex flex-row items-center"
-                      >
-                        <Category_Svg classname="w-4 h-auto stroke-lightBlack" />
-                        <span className="text-black1 text-[14px] font-[400]">
-                          {item.title}
-                        </span>
-                      </Link>
-                    ))
-                  : null}
-                <div
-                  onClick={() => {
-                    setShowSearch(false);
-                    setSearchTerm("");
-                  }}
-                  className="absolute bottom-[20px] px-3 gap-1 py-1 rounded-[8px] bg-red-50 flex flex-row items-center right-3 z-30 w-fit h-fit"
+                <motion.div
+                  key="mobile-search"
+                  dir="rtl"
+                  initial={{ y: 40, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: 40, opacity: 0 }}
+                  transition={{ type: "tween", duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  className="fixed inset-0 z-50 flex flex-col bg-white"
                 >
-                  <XMark_Svg classname="w-4 h-auto fill-red-400" />
-                  <span className="text-[18px] text-black1">بستن</span>
-                </div>
-              </div>
-            </motion.div>,
-            document.body
+                  <div className="flex items-center gap-3 border-b border-hairline px-[5vw] py-3">
+                    <div className="relative flex-1">
+                      <input
+                        value={searchTerm}
+                        aria-label="جستجو در میان کالاها"
+                        placeholder="جستجو در میان کالاها"
+                        autoFocus
+                        className={classNames(inputClass, "h-12 w-full pl-4 pr-11")}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onKeyDown={onKeyDown}
+                      />
+                      <Magnifier classname="pointer-events-none absolute right-4 top-1/2 h-auto w-[18px] -translate-y-1/2 fill-mauve-700" />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={close}
+                      className="home-focus flex h-12 flex-none items-center gap-1.5 rounded-[10px] bg-blush-100 px-3 text-small font-medium text-plum-900"
+                    >
+                      <XMark_Svg classname="h-auto w-3.5 fill-mauve-700" />
+                      بستن
+                    </button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto px-[5vw] py-5">
+                    {isOpen ? results : null}
+                  </div>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>,
+            document.body,
           )
         : null}
     </>

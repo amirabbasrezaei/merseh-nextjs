@@ -1,10 +1,5 @@
 "use client";
-import {
-  Category_Svg,
-  Magnifier,
-  Merseh_nastaliq,
-  XMark_Svg,
-} from "@/Components/SVGS";
+import { Category_Svg, Magnifier, XMark_Svg } from "@/Components/SVGS";
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
@@ -59,7 +54,6 @@ export default function MagHeaderSearch() {
             searchTerm.length ? "z-30" : "z-20"
           )}
         >
-          {/* <Merseh_nastaliq classname="h-[17px] w-auto absolute top-[16px] right-[118px] z-10 fill-gray-500" /> */}
           <input
             value={searchTerm}
             placeholder="جستجو"

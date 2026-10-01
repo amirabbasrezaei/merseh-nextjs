@@ -362,10 +362,11 @@ export async function userInfoController({
     }
     return {
       name: findUser.name,
-      familyName: findUser.familyName ,
+      familyName: findUser.familyName,
+      email: findUser.email,
       isVerified: findUser.isVerified,
-      phoneNumber: findUser.phoneNumber
-
+      phoneNumber: findUser.phoneNumber,
+      createdAt: findUser.createdAt,
     };
   } catch (error) {
     throw new TRPCError({
@@ -373,6 +374,54 @@ export async function userInfoController({
       message: "problem in finding user",
     });
   }
+}
+
+//// update own profile (name / family name / email)
+
+export const UpdateProfileSchema = z.object({
+  name: z.string().trim().min(1, "نام را وارد کنید").max(20, "نام حداکثر ۲۰ کاراکتر است"),
+  familyName: z.string().trim().max(50, "نام خانوادگی حداکثر ۵۰ کاراکتر است"),
+  email: z.union([z.literal(""), z.string().trim().email("ایمیل معتبر نیست")]),
+});
+export type UpdateProfile = z.infer<typeof UpdateProfileSchema>;
+
+export async function updateProfileController({
+  ctx,
+  input,
+}: UserRouterArgsController<UpdateProfile>): Promise<UserInfoResponse> {
+  const userId = ctx.user?.userId as string | undefined;
+  if (!userId) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  const email = input.email.trim() || null;
+  if (email) {
+    const existing = await ctx.prisma.user.findUnique({ where: { email } });
+    if (existing && existing.id !== userId) {
+      throw new TRPCError({
+        code: "CONFLICT",
+        message: "این ایمیل قبلاً ثبت شده است",
+      });
+    }
+  }
+
+  const updated = await ctx.prisma.user.update({
+    where: { id: userId },
+    data: {
+      name: input.name,
+      familyName: input.familyName || null,
+      email,
+    },
+  });
+
+  return {
+    name: updated.name,
+    familyName: updated.familyName,
+    email: updated.email,
+    isVerified: updated.isVerified,
+    phoneNumber: updated.phoneNumber,
+    createdAt: updated.createdAt,
+  };
 }
 
 //// update admin account (phone / password)

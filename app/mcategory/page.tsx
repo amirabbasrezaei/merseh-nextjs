@@ -1,13 +1,13 @@
 import Layout from "@/Components/Layout/Layout";
 import MobileCategory from "@/Components/Navbar/MobileCategory";
 import { Metadata } from "next";
-import React from "react";
+import { SITE_NAME } from "@/utils/site";
 
 export function generateMetadata(): Metadata {
   return {
     title: { absolute: "دسته بندی کالاها" },
     description:
-      "دسته بندی انواع کالاهای فروشگاه مرسه مانند روغن زیتون، روغن کنجد، روغن آرگان، روغن آفتابگردان و ...",
+      `دسته‌بندی کالاهای فروشگاه آنلاین ${SITE_NAME}؛ محصولات آرایشی، بهداشتی و مراقبت پوست و مو را بر اساس دسته پیدا کنید.`,
     alternates: {
       canonical: `${process.env.BASE_URL}/mcategory`,
     },
@@ -16,7 +16,7 @@ export function generateMetadata(): Metadata {
 
 export default function page() {
   return (
-    <Layout footer={false} header={false} fullWidth={true}>
+    <Layout footer={false} fullWidth>
       <MobileCategory />
     </Layout>
   );

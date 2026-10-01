@@ -31,6 +31,8 @@ export function mapProductCard<
     id: number;
     name: string;
     price: number;
+    discount: number;
+    freeShipping?: boolean;
     galleryFiles?: { file: { key: string } }[];
     brand?: StoreBrand;
   },
@@ -40,6 +42,8 @@ export function mapProductCard<
     id: product.id,
     name: product.name,
     price: product.price,
+    discount: product.discount,
+    freeShipping: product.freeShipping ?? false,
     imageUrl: imageNames[0] || "",
     imageNames,
     brand: mapStoreBrand(product.brand ?? null),

@@ -1,132 +1,122 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import {
-  Category_Svg,
-  Home_Svg,
-  MersehSvg,
-  Profile_Light_Svg,
-  Profile_Svg,
-  Shop_Cart,
-} from "../SVGS";
+
+import { type ComponentType, useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import classNames from "classnames";
+import { Category_Svg, Home_Svg, Profile_Svg, Shop_Cart } from "../SVGS";
+import GlassThumb from "../ui/GlassThumb";
 import useShoppingCart from "../useShoppingCart";
 
+const CART_HREF = "/cart/checkout";
+
+/** The SVGs mix filled and outlined artwork, so the tint targets either fill or stroke. */
+const PAINT = {
+  fill: { active: "fill-mauve-700", idle: "fill-plum-900/80" },
+  stroke: { active: "stroke-mauve-700", idle: "stroke-plum-900/80" },
+} as const;
+
+type Tab = {
+  href: string;
+  label: string;
+  Icon: ComponentType<{ classname?: string }>;
+  iconClass: string;
+  paint: keyof typeof PAINT;
+  isActive: (path: string) => boolean;
+};
+
+const TABS: Tab[] = [
+  {
+    href: "/",
+    label: "خانه",
+    Icon: Home_Svg,
+    iconClass: "-my-[3px] h-[30px]",
+    paint: "fill",
+    isActive: (path) => path === "/" || path.includes("product"),
+  },
+  {
+    href: "/mcategory",
+    label: "دسته‌بندی",
+    Icon: Category_Svg,
+    iconClass: "h-[21px]",
+    paint: "stroke",
+    isActive: (path) => path === "/mcategory" || path.startsWith("/category/"),
+  },
+  {
+    href: CART_HREF,
+    label: "سبد خرید",
+    Icon: Shop_Cart,
+    iconClass: "h-6",
+    paint: "fill",
+    isActive: (path) => path === CART_HREF,
+  },
+  {
+    href: "/profile",
+    label: "حساب کاربری",
+    Icon: Profile_Svg,
+    iconClass: "h-[22px]",
+    paint: "stroke",
+    isActive: (path) => path.split("/")[1] === "profile",
+  },
+];
 
 export default function Navbar() {
-  const {items} = useShoppingCart()
   const path = usePathname();
+  const { items } = useShoppingCart();
   const [isClient, setIsClient] = useState(false);
-
-
 
   useEffect(() => {
     setIsClient(true);
-  }, [isClient]);
+  }, []);
+
+  const cartCount = isClient ? items.length : 0;
 
   return (
-    <div
-      style={{ boxShadow: "rgb(237 237 237) 0px 0px 14px" }}
-      className="fixed w-full   bottom-0 z-10 right-0 left-0  bg-white sm:hidden sm:h-0 h-[60px] flex flex-row items-center"
+    <nav
+      aria-label="منوی پایین"
+      className="fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+0.75rem)] z-20 sm:hidden"
     >
-      <Link
-        href={"/"}
-        className="basis-1/4 w-full h-fit  flex flex-col items-center justify-center"
-      >
-        <Home_Svg
-          classname={classNames(
-            "h-[35px] w-auto flex items-center my-[-3px] justify-center",
-            path === "/" ||
-              path.includes("products") ||
-              path.includes("product")
-              ? "fill-green1"
-              : "fill-[#363636]"
-          )}
-        />
-        <span
-          className={classNames(
-            path === "/" ||
-              path.includes("products") ||
-              path.includes("product")
-              ? " text-[#006645]"
-              : " text-[#363636]",
-            "text-[10px]"
-          )}
-        >
-          خانه
-        </span>
-      </Link>
-      <Link
-        href={"/mcategory"}
-        className="basis-1/4 w-full flex flex-col items-center justify-center"
-      >
-        <Category_Svg
-          classname={classNames(
-            "h-[25px] w-auto ",
-            path === "/mcategory" ? "stroke-green1" : "stroke-[#363636]"
-          )}
-        />
-        <span
-          className={classNames(
-            path === "/mcategory" ? " text-green1" : " text-[#363636]",
-            "text-[10px]"
-          )}
-        >
-          دسته بندی‌
-        </span>
-      </Link>
-      <Link
-        href={"/cart/checkout"}
-        className="basis-1/4 w-full flex flex-col  items-center justify-center relative"
-      >
-        <Shop_Cart
-          classname={classNames(
-            "h-[28px] w-auto ",
-            path === "/cart/checkout" ? "fill-green1" : "fill-[#363636]"
-          )}
-        />
-        {items?.length &&
-        path !== "/cart/checkout" &&
-        isClient ? (
-          <div className=" absolute top-[-7px] right-[29px] ">
-            <svg className="fill-green1 w-4 h-4 flex items justify-center animate-pulse">
-              <circle r="3" cx="10" cy="10" className="" />
-            </svg>
-          </div>
-        ) : null}
-        <span
-          className={classNames(
-            path === "/cart/checkout" ? " text-green1" : " text-[#363636]",
-            "text-[10px]"
-          )}
-        >
-          سبد خرید
-        </span>
-      </Link>
-      <Link
-        href={"/profile"}
-        className="basis-1/4 w-full flex flex-col items-center justify-center"
-      >
-        <Profile_Svg
-          classname={classNames(
-            "h-[26px] w-auto ",
-            path.split("/")[1] === "profile"
-              ? "stroke-green1"
-              : "stroke-[#363636]"
-          )}
-        />
-        <span
-          className={classNames(
-            path.split("/")[1] === "profile"
-              ? " text-green1"
-              : " text-[#363636]",
-            "text-[10px]"
-          )}
-        >
-          حساب کاربری
-        </span>
-      </Link>
-    </div>
+      <ul className="glass flex h-16 items-stretch rounded-full p-1.5">
+        {TABS.map(({ href, label, Icon, iconClass, paint, isActive }) => {
+          const active = isActive(path);
+          const showCartDot = href === CART_HREF && cartCount > 0 && !active;
+
+          return (
+            <li key={href} className="flex flex-1">
+              <Link
+                href={href}
+                aria-current={active ? "page" : undefined}
+                aria-label={showCartDot ? `${label}، ${cartCount} کالا` : undefined}
+                className={classNames(
+                  "home-focus relative isolate flex flex-1 flex-col items-center justify-center gap-1 rounded-full text-[10px] font-medium transition-colors",
+                  active ? "text-mauve-700" : "text-plum-900/80",
+                )}
+              >
+                {active ? (
+                  <GlassThumb
+                    layoutId="navbar-active-tab"
+                    className="bg-blush-100/70 [background-image:none]"
+                  />
+                ) : null}
+                <Icon
+                  classname={classNames(
+                    "w-auto transition-colors",
+                    iconClass,
+                    PAINT[paint][active ? "active" : "idle"],
+                  )}
+                />
+                {label}
+                {showCartDot ? (
+                  <span
+                    aria-hidden
+                    className="absolute end-[calc(50%-17px)] top-2 h-2 w-2 rounded-full bg-mauve-600 ring-2 ring-white"
+                  />
+                ) : null}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
   );
 }

@@ -1,86 +1,75 @@
 import { articles } from "./data/articles";
 import { IMAGES } from "./data/images";
 import { richContent } from "./content";
+import { fetchMohanaHomeBanners } from "./mohana";
 import { uploadImageFromUrl } from "./media";
 import type { CatalogResult, EditorialResult, SeedPrisma } from "./types";
+
+function categoryHref(catalog: CatalogResult, slugPart: string) {
+  const match = [...catalog.categoriesBySlug.entries()].find(([slug]) =>
+    slug.includes(slugPart)
+  );
+  if (!match) return null;
+  return `/category/${match[1]}/${match[0]}`;
+}
+
+function localBannerHref(remoteHref: string, catalog: CatalogResult) {
+  let decoded = remoteHref;
+  try {
+    decoded = decodeURIComponent(remoteHref);
+  } catch {
+    decoded = remoteHref;
+  }
+
+  const rules: Array<[RegExp, string]> = [
+    [/محصولات-مو|(?:^|\/)مو(?:\/|$)/u, "محصولات-مو"],
+    [/محصولات-پوست|glass-skin|anua|medicube|ordinary|rhode/i, "محصولات-پوست"],
+    [/لوازم-آرایشی|sheglam|cosrx|e-l-f|elf/i, "لوازم-آرایشی"],
+    [/محصولات-بدن/, "محصولات-بدن"],
+  ];
+
+  for (const [pattern, slugPart] of rules) {
+    if (!pattern.test(decoded)) continue;
+    const href = categoryHref(catalog, slugPart);
+    if (href) return href;
+  }
+
+  return categoryHref(catalog, "لوازم-آرایشی") ?? "/";
+}
 
 export async function seedEditorial(
   prisma: SeedPrisma,
   catalog: CatalogResult
 ): Promise<EditorialResult> {
-  const herbalId = catalog.categoriesBySlug.get("herbal-oils");
-  const skinId = catalog.categoriesBySlug.get("skin-care");
-  const hairId = catalog.categoriesBySlug.get("hair-care");
-  const sunId = catalog.categoriesBySlug.get("sunscreen");
-  const argan = catalog.productsByEngName.get("Merseh Pure Argan Oil");
-
-  if (!herbalId || !skinId || !hairId || !sunId || !argan) {
-    throw new Error("Catalog is missing categories or argan oil for banners");
+  if (!catalog.categoriesBySlug.size || !catalog.productsByEngName.size) {
+    throw new Error("Catalog is missing categories or products for banners");
   }
 
-  const bannerSpecs = [
-    {
-      placement: "HERO" as const,
-      title: "روغن‌های گیاهی مرسه",
-      href: `/category/${herbalId}/روغن‌های-گیاهی`,
-      sortOrder: 0,
-      imageKey: "heroOils" as const,
-      fileName: "banner-hero-oils.jpg",
-    },
-    {
-      placement: "HERO" as const,
-      title: "روتین پوست روشن",
-      href: `/category/${skinId}/مراقبت-پوست`,
-      sortOrder: 1,
-      imageKey: "heroSpa" as const,
-      fileName: "banner-hero-skin.jpg",
-    },
-    {
-      placement: "HERO" as const,
-      title: "آرگان خالص",
-      href: `/product/${argan.id}/روغن-آرگان-خالص-مرسه`,
-      sortOrder: 2,
-      imageKey: "heroMakeup" as const,
-      fileName: "banner-hero-argan.jpg",
-    },
-    {
-      placement: "SIDE" as const,
-      title: "ضدآفتاب روزانه",
-      href: `/category/${sunId}/ضدآفتاب`,
-      sortOrder: 0,
-      imageKey: "sideSerum" as const,
-      fileName: "banner-side-sun.jpg",
-    },
-    {
-      placement: "SIDE" as const,
-      title: "مراقبت مو",
-      href: `/category/${hairId}/مراقبت-مو`,
-      sortOrder: 1,
-      imageKey: "sideHair" as const,
-      fileName: "banner-side-hair.jpg",
-    },
-  ];
+  const homeBanners = await fetchMohanaHomeBanners();
+  const sortByPlacement = { HERO: 0, SIDE: 0 };
 
-  for (const banner of bannerSpecs) {
+  for (const banner of homeBanners) {
     const image = await uploadImageFromUrl(
       prisma,
-      IMAGES[banner.imageKey],
+      banner.imageUrl,
       "banner",
-      banner.fileName
+      banner.imageUrl.split("/").pop() || "banner.jpg"
     );
+    const sortOrder = sortByPlacement[banner.placement];
+    sortByPlacement[banner.placement] += 1;
     await prisma.banner.create({
       data: {
         placement: banner.placement,
-        title: banner.title,
-        href: banner.href,
-        sortOrder: banner.sortOrder,
+        title: null,
+        href: localBannerHref(banner.remoteHref, catalog),
+        sortOrder,
         isActive: true,
         imageFileId: image.id,
       },
     });
   }
 
-  console.log(`Seeded ${bannerSpecs.length} banners`);
+  console.log(`Seeded ${homeBanners.length} Mohana banners`);
 
   const articlesByEnglishTitle = new Map<string, number>();
 
@@ -118,9 +107,10 @@ export async function seedEditorial(
   console.log(`Seeded ${articles.length} articles`);
 
   const shippingSpecs = [
-    { name: "پست پیشتاز", imageKey: "packages" as const, file: "post.jpg" },
-    { name: "تیپاکس", imageKey: "warehouse" as const, file: "tipax.jpg" },
-    { name: "پادرو", imageKey: "delivery" as const, file: "podro.jpg" },
+    { name: "پست پیشتاز", imageKey: "packages" as const, file: "post.jpg", price: 65000, isActive: true, sortOrder: 1 },
+    { name: "تیپاکس", imageKey: "warehouse" as const, file: "tipax.jpg", price: 85000, isActive: true, sortOrder: 2 },
+    { name: "چاپار", imageKey: "delivery" as const, file: "chapar.jpg", price: 75000, isActive: true, sortOrder: 3 },
+    { name: "پادرو", imageKey: "delivery" as const, file: "podro.jpg", price: 0, isActive: false, sortOrder: 99 },
   ];
 
   const shippingByName = new Map<string, string>();
@@ -135,6 +125,9 @@ export async function seedEditorial(
     const created = await prisma.shippingPartner.create({
       data: {
         name: partner.name,
+        price: partner.price,
+        isActive: partner.isActive,
+        sortOrder: partner.sortOrder,
         imageFileId: image.id,
       },
     });

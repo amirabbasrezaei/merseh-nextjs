@@ -8,6 +8,8 @@ export const ADMIN_NAV_ITEMS = [
   { href: "/admin/comments", slug: "comments", label: "دیدگاه‌ها" },
   { href: "/admin/users", slug: "users", label: "کاربران" },
   { href: "/admin/orders", slug: "orders", label: "سفارش‌ها" },
+  { href: "/admin/shipping", slug: "shipping", label: "روش‌های ارسال" },
+  { href: "/admin/coupons", slug: "coupons", label: "کدهای تخفیف" },
   { href: "/admin/settings", slug: "settings", label: "حساب ادمین" },
 ] as const;
 

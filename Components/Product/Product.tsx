@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { trpc } from "@/utils/trpc";
 import classNames from "classnames";
 import ProductImages from "./ProductImages";
-import ProductSpecs, { parseDetails } from "./ProductSpecs";
+import ProductSpecs, { parseDetails, SpecHighlights } from "./ProductSpecs";
 import ProductBuyPanel from "./ProductBuyPanel";
 import { motion } from "framer-motion";
 import ProductCarousel from "../Home/ProductCarousel/ProductCarousel";
@@ -15,6 +15,7 @@ import toast from "react-hot-toast";
 import useWindowSize from "../useWindowSize";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Check } from "../SVGS";
+import { Eyebrow } from "../Home/ui/SectionHeader";
 import Link from "next/link";
 import Content from "../Admin/AddProduct/ContentViewer";
 import type { contentType } from "../Admin/AddProduct/QuillEditor";
@@ -51,6 +52,7 @@ type ProductRecord = {
   price: number;
   discount: number;
   instock: boolean;
+  freeShipping?: boolean;
   metaDescription?: string;
   details?: string[];
   imageUrls?: string[];
@@ -200,7 +202,7 @@ export default function Product({ productId, productData }: Props) {
 
   useEffect(() => {
     const handleScroll = () => {
-      const line = 96;
+      const line = 140;
       const sections = [
         { id: "article", el: contentRef.current },
         { id: "specs", el: specsRef.current },
@@ -282,88 +284,98 @@ export default function Product({ productId, productData }: Props) {
       unitPrice,
       product.id,
       selectedProductVariation?.variationId,
-      selectedProductVariation?.variationValueid
+      selectedProductVariation?.variationValueid,
+      {
+        discount: unitDiscount,
+        imageUrl: product.imageUrls?.[0],
+        freeShipping: product.freeShipping,
+      }
     ).then(() => notifyAdded(product.name));
   };
 
   const sectionClass = (id: string) =>
     classNames(
-      "-mb-px border-b-2 pb-2 text-[16px] font-medium",
+      "home-focus text-small transition-colors",
       visibleSection === id
-        ? "border-green2 text-green1"
-        : "border-transparent text-lightBlack"
+        ? "font-medium text-plum-900"
+        : "text-lightBlack hover:text-plum-900"
     );
 
   return (
-    <section id="productSection" className="flex w-full flex-col gap-12 sm:px-6">
-      <div className="flex w-full flex-col items-start gap-8 lg:flex-row lg:gap-12">
-        <div className="w-full lg:w-1/2">
+    <section id="productSection" className="flex w-full flex-col gap-16">
+      <div className="flex flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(22rem,26rem)] lg:items-start lg:gap-x-12 lg:gap-y-14">
+        <div className="order-1 min-w-0 lg:col-start-1 lg:row-start-1">
           {product ? (
             <ProductImages
               imageUrls={product.imageUrls ?? []}
               alt={product.name}
             />
           ) : (
-            <div className="aspect-square w-full animate-pulse rounded-2xl bg-gray-100" />
+            <div className="h-56 w-full animate-pulse rounded-panel bg-sand sm:h-64 lg:h-80" />
           )}
         </div>
 
-        <div className="flex w-full flex-col gap-6 lg:w-1/2">
+        <div className="order-2 flex w-full flex-col gap-7 lg:sticky lg:top-28 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
           {product ? (
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-4">
               {category ? (
                 <Link
                   href={`/category/${category.id}/${toPathSlug(category.title)}`}
-                  className="w-fit text-[13px] text-lightBlack"
+                  className="home-focus w-fit rounded"
                 >
-                  {category.title}
+                  <Eyebrow>{category.title}</Eyebrow>
                 </Link>
               ) : null}
-              {product.brand ? (
-                product.brand.isActive ? (
-                  <Link
-                    href={`/brand/${product.brand.id}/${toPathSlug(product.brand.name)}`}
-                    className="flex w-fit items-center gap-2 rounded-full border border-[#eeeeee] px-3 py-1 text-[13px] text-[#5f5f5f]"
-                  >
-                    {product.brand.logoUrl ? (
-                      <Image
-                        src={product.brand.logoUrl}
-                        alt=""
-                        width={28}
-                        height={28}
-                        quality={70}
-                        className="h-7 w-7 rounded-full object-contain"
-                      />
-                    ) : null}
-                    {product.brand.name}
-                  </Link>
-                ) : (
-                  <span className="text-[13px] text-[#5f5f5f]">
-                    {product.brand.name}
-                  </span>
-                )
-              ) : null}
-              <h1 className="text-[28px] font-semibold leading-snug text-black1">
+              <h1 className="text-pretty text-display text-plum-900 md:text-display-md">
                 {product.name}
               </h1>
-              {product.englishName?.trim() ? (
-                <p className="text-[13px] text-lightBlack">{product.englishName}</p>
+              {product.brand || product.englishName?.trim() ? (
+                <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-caption text-lightBlack">
+                  {product.brand ? (
+                    product.brand.isActive ? (
+                      <Link
+                        href={`/brand/${product.brand.id}/${toPathSlug(product.brand.name)}`}
+                        className="home-focus inline-flex items-center gap-1.5 font-medium text-plum-900 hover:text-mauve-700"
+                      >
+                        {product.brand.logoUrl ? (
+                          <Image
+                            src={product.brand.logoUrl}
+                            alt=""
+                            width={20}
+                            height={20}
+                            quality={70}
+                            className="h-5 w-5 rounded-full object-contain"
+                          />
+                        ) : null}
+                        {product.brand.name}
+                      </Link>
+                    ) : (
+                      <span className="font-medium text-plum-900">{product.brand.name}</span>
+                    )
+                  ) : null}
+                  {product.brand && product.englishName?.trim() ? (
+                    <span aria-hidden className="h-1 w-1 rounded-full bg-mauve-400" />
+                  ) : null}
+                  {product.englishName?.trim() ? (
+                    <span>{product.englishName}</span>
+                  ) : null}
+                </p>
               ) : null}
               {product.metaDescription?.trim() ? (
-                <p className="text-[15px] leading-7 text-[#5f5f5f]">
+                <p className="text-body text-plum-900/75">
                   {product.metaDescription}
                 </p>
               ) : null}
             </div>
           ) : (
-            <div className="h-[30px] w-[200px] animate-pulse rounded bg-gray-100" />
+            <div className="h-8 w-48 animate-pulse rounded-full bg-sand" />
           )}
 
           {product?.variations?.length ? (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-5">
               {product.variations.map((variation) => (
                 <div key={variation.id} className="flex flex-col gap-2">
-                  <span className="text-[14px] font-medium text-[#252525]">
+                  <span className="text-small font-medium text-plum-900">
                     {variation.variationName}
                   </span>
                   <div className="flex flex-wrap gap-2">
@@ -385,15 +397,11 @@ export default function Product({ productId, productData }: Props) {
                             })
                           }
                           className={classNames(
-                            "rounded-full border px-3 py-1.5 text-[14px]",
+                            "home-focus rounded-full px-4 py-2 text-small ring-1 transition-colors",
                             selected
-                              ? "border-green2 bg-green1/10"
-                              : "border-[#e5e5e5]",
-                            !variationType.instock
-                              ? "text-lightBlack"
-                              : selected
-                                ? "text-black1"
-                                : "text-[#353535]"
+                              ? "bg-plum-900 font-medium text-ivory ring-plum-900"
+                              : "bg-white text-plum-900 ring-hairline hover:bg-blush-100 hover:ring-mauve-400",
+                            !variationType.instock && "opacity-50"
                           )}
                         >
                           {variationType.name}
@@ -406,13 +414,15 @@ export default function Product({ productId, productData }: Props) {
             </div>
           ) : null}
 
-          {specRows.length ? <ProductSpecs rows={specRows} /> : null}
+          {specRows.length ? <SpecHighlights rows={specRows} /> : null}
 
           {product ? (
             <ProductBuyPanel
+              productName={product.name}
               price={unitPrice}
               discount={unitDiscount}
               inStock={inStock}
+              freeShipping={Boolean(product.freeShipping)}
               quantityInCart={quantityInCart}
               onAdd={addCurrentProduct}
               onIncrement={() =>
@@ -436,67 +446,72 @@ export default function Product({ productId, productData }: Props) {
             />
           ) : null}
         </div>
-      </div>
 
-      <div className="flex w-full max-w-[720px] flex-col gap-10">
-        <nav className="flex flex-row gap-6 border-b border-[#eeeeee]">
-          {showArticle ? (
+        <div className="order-3 flex min-w-0 flex-col gap-14 lg:col-start-1 lg:row-start-2">
+          <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            {showArticle ? (
+              <button
+                type="button"
+                onClick={() =>
+                  contentRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  })
+                }
+                className={sectionClass("article")}
+              >
+                معرفی
+              </button>
+            ) : null}
+            {showFullSpecs ? (
+              <button
+                type="button"
+                onClick={() =>
+                  specsRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  })
+                }
+                className={sectionClass("specs")}
+              >
+                ویژگی‌ها
+              </button>
+            ) : null}
             <button
               type="button"
               onClick={() =>
-                contentRef.current?.scrollIntoView({
+                commentsRef.current?.scrollIntoView({
                   behavior: "smooth",
                   block: "start",
                 })
               }
-              className={sectionClass("article")}
+              className={sectionClass("comments")}
             >
-              معرفی
+              دیدگاه‌ها
             </button>
+          </nav>
+
+          {showArticle && product?.content ? (
+            <div ref={contentRef} className="flex scroll-mt-36 flex-col gap-4">
+              <Eyebrow>محصول</Eyebrow>
+              <h2 className="text-h2 text-plum-900 md:text-h2-md">معرفی</h2>
+              <div className="min-w-0 max-w-3xl [&_img]:h-auto [&_img]:max-w-full">
+                <Content contentForView={product.content} />
+              </div>
+            </div>
           ) : null}
+
           {showFullSpecs ? (
-            <button
-              type="button"
-              onClick={() =>
-                specsRef.current?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                })
-              }
-              className={sectionClass("specs")}
-            >
-              ویژگی‌ها
-            </button>
+            <div ref={specsRef} className="flex scroll-mt-36 flex-col gap-4">
+              <Eyebrow>جزئیات</Eyebrow>
+              <h2 className="text-h2 text-plum-900 md:text-h2-md">ویژگی‌ها</h2>
+              <ProductSpecs rows={specRows} />
+            </div>
           ) : null}
-          <button
-            type="button"
-            onClick={() =>
-              commentsRef.current?.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
-              })
-            }
-            className={sectionClass("comments")}
-          >
-            دیدگاه‌ها
-          </button>
-        </nav>
-
-        {showArticle && product?.content ? (
-          <div ref={contentRef} className="scroll-mt-6">
-            <Content contentForView={product.content} />
-          </div>
-        ) : null}
-
-        {showFullSpecs ? (
-          <div ref={specsRef} className="flex scroll-mt-6 flex-col gap-4">
-            <h2 className="text-[22px] font-medium text-black1">ویژگی‌ها</h2>
-            <ProductSpecs rows={specRows} />
-          </div>
-        ) : null}
-
-        <Comments commentsRef={commentsRef} productId={productId} />
+        </div>
       </div>
+
+      <Comments commentsRef={commentsRef} productId={productId} />
 
       {related?.products?.length ? (
         <ProductCarousel

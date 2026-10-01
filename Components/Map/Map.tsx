@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import styleJSON from "@/public/style.json";
 import MapView, { Marker } from "react-map-gl";
 import { Location_Pin, MersehSvg } from "../SVGS";
+import { SITE_NAME } from "@/utils/site";
 import { Coordinate } from "../Shipping/Address/Add_Address";
 
 
@@ -55,7 +56,7 @@ export default function Map({ setCoordinate, coordinate }: Props) {
             style={{ top: 0, left: 0, position: "absolute" }}
           >
             <div className="flex flex-col h-fit w-fit justify-between items-center gap-2">
-              <Location_Pin classname="w-9 h-9 fill-green1" />
+              <Location_Pin classname="w-9 h-9 fill-mauve-700" />
               <svg className="fill-black1  w-1 h-1">
                 <circle cy="2" cx="2" r="2" />
               </svg>
@@ -72,7 +73,7 @@ export default function Map({ setCoordinate, coordinate }: Props) {
             <div className="bg-white rounded-lg w-fit gap-2 h-fit p-2 flex flex-row items-center">
               <MersehSvg classname="w-5 h-auto" />
               <span className="text-[10px] text-black1 font-[500]">
-                مرسه اینجاست!
+                {SITE_NAME} اینجاست!
               </span>
             </div>
             <svg

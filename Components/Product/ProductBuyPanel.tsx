@@ -1,12 +1,15 @@
 import Link from "next/link";
-import Button from "../Button";
-import splitNumber from "../utils/splitNumber";
-import { Minus_Svg, Plus_Svg, TrashBin_SVG } from "../SVGS";
+import classNames from "classnames";
+import { getPriceInfo } from "../utils/pricing";
+import Price from "../Checkout/Price";
+import QuantityStepper from "../Checkout/QuantityStepper";
 
 type Props = {
+  productName: string;
   price: number;
   discount: number;
   inStock: boolean;
+  freeShipping: boolean;
   quantityInCart: number | null;
   onAdd: () => void;
   onIncrement: () => void;
@@ -15,83 +18,80 @@ type Props = {
 };
 
 export default function ProductBuyPanel({
+  productName,
   price,
   discount,
   inStock,
+  freeShipping,
   quantityInCart,
   onAdd,
   onIncrement,
   onDecrement,
   onRemove,
 }: Props) {
-  const payable = Math.max(price - discount, 0);
-  const percent = price > 0 ? Math.round((discount / price) * 100) : 0;
-  const showDiscount = discount > 0 && price > 0;
+  const { payable, percent, hasDiscount } = getPriceInfo(price, discount);
 
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-[#EAEAEA] p-5">
+    <div className="flex flex-col gap-5 rounded-panel bg-ivory p-5 sm:p-6">
       <div className="flex items-end justify-between gap-4">
-        <div className="flex flex-col">
-          {showDiscount ? (
+        <div className="flex flex-col gap-1">
+          {hasDiscount ? (
             <div className="flex items-center gap-2">
-              <span className="text-[13px] text-lightBlack line-through">
-                {splitNumber(price)}
-              </span>
-              <span className="rounded-[10px] bg-green1 px-1.5 py-0.5 text-[13px] font-light text-white">
+              <Price value={price} strike className="text-small text-lightBlack" />
+              <span className="rounded-full bg-mauve-700 px-2 py-0.5 text-caption font-medium text-white">
                 {percent}%
               </span>
             </div>
           ) : null}
-          <div className="flex items-baseline gap-1">
-            <span className="text-[30px] font-medium text-[#3c3c3c]">
-              {splitNumber(payable)}
-            </span>
-            <span className="text-[13px] text-black1">تومان</span>
-          </div>
+          <Price value={payable} className="text-display font-medium text-plum-900" />
         </div>
         <span
-          className={
-            inStock ? "text-[14px] text-green2" : "text-[14px] text-lightBlack"
-          }
+          className={classNames(
+            "rounded-full bg-white px-3 py-1 text-caption font-medium",
+            inStock ? "text-mauve-700" : "text-lightBlack"
+          )}
         >
           {inStock ? "موجود" : "ناموجود"}
         </span>
       </div>
 
+      <ul className="flex flex-wrap gap-2">
+        <li className="rounded-full bg-white px-3 py-1 text-caption text-plum-900/80">
+          ارسال با پیک و پست
+        </li>
+        {freeShipping ? (
+          <li className="rounded-full bg-blush-100 px-3 py-1 text-caption font-medium text-mauve-700">
+            ارسال رایگان
+          </li>
+        ) : null}
+      </ul>
+
       {quantityInCart ? (
-        <div className="flex w-full flex-row items-center justify-evenly rounded-[8px] bg-gray-50 py-2">
-          <button type="button" aria-label="افزایش" onClick={onIncrement}>
-            <Plus_Svg classname="w-6 fill-green2" />
-          </button>
-          <span className="text-[23px]">{quantityInCart}</span>
-          <button
-            type="button"
-            aria-label={quantityInCart > 1 ? "کاهش" : "حذف"}
-            onClick={quantityInCart > 1 ? onDecrement : onRemove}
+        <div className="flex flex-col items-center gap-3">
+          <QuantityStepper
+            quantity={quantityInCart}
+            productName={productName}
+            onIncrement={onIncrement}
+            onDecrement={onDecrement}
+            onRemove={onRemove}
+          />
+          <Link
+            href="/cart/checkout"
+            className="home-focus text-small font-medium text-mauve-700"
           >
-            {quantityInCart > 1 ? (
-              <Minus_Svg classname="w-6 fill-green2" />
-            ) : (
-              <TrashBin_SVG classname="stroke-red-600 w-6" />
-            )}
-          </button>
+            مشاهده سبد خرید
+          </Link>
         </div>
       ) : (
-        <Button
-          text="افزودن به سبد خرید"
-          className="w-full"
-          isDisabled={!inStock}
+        <button
+          type="button"
+          disabled={!inStock}
           onClick={onAdd}
-        />
+          className="home-focus home-motion inline-flex h-12 w-full items-center justify-center rounded-full bg-plum-900 px-5 text-small font-medium text-ivory hover:bg-mauve-700 disabled:cursor-not-allowed disabled:bg-mauve-400"
+        >
+          افزودن به سبد خرید
+        </button>
       )}
-
-      {quantityInCart ? (
-        <Link href="/cart/checkout" className="text-center text-green2">
-          مشاهده سبد خرید
-        </Link>
-      ) : null}
-
-      <p className="text-center text-[13px] text-lightBlack">ارسال با پیک و پست</p>
     </div>
   );
 }

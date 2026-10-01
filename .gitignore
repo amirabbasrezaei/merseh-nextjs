@@ -29,6 +29,7 @@ yarn-error.log*
 # local env files
 .env
 .env*.local
+.env.production
 
 # vercel
 .vercel
@@ -39,4 +40,7 @@ next-env.d.ts
 
 # prisma
 /generated/prisma
+
+# database dumps from the production backup container
+/backups
 

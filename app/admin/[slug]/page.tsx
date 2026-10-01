@@ -8,6 +8,8 @@ import Banners from "@/Components/Admin/Dashboard/Banners";
 import Brands from "@/Components/Admin/Dashboard/Brands";
 import Carousels from "@/Components/Admin/Dashboard/Carousels";
 import AccountSettings from "@/Components/Admin/Dashboard/AccountSettings";
+import ShippingMethods from "@/Components/Admin/Dashboard/ShippingMethods";
+import Coupons from "@/Components/Admin/Dashboard/Coupons";
 import React from "react";
 
 export const revalidate = 60;
@@ -22,6 +24,8 @@ const PANES: Record<string, React.ComponentType> = {
   comments: Comments,
   users: Users,
   orders: Orders,
+  shipping: ShippingMethods,
+  coupons: Coupons,
   settings: AccountSettings,
 };
 

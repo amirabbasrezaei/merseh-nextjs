@@ -3,6 +3,7 @@ import { Context } from "../../context";
 import axios from "axios";
 import { TRPCError } from "@trpc/server";
 import { sendSMSCodeController } from "../sms.controller";
+import { syncActiveOrder } from "../order.controller";
 
 const BASE_URL = "https://gateway.zibal.ir";
 
@@ -18,69 +19,72 @@ type PaymentRouterArgsController<T = null> = T extends null
 export const createPaymentSchemaZibal = z.object({
   orderId: z.number(),
 });
-type CreatePaymentPayloadZibal =
-  | {
-      pay_link?: string;
-      message?: string;
-    }
-  | any;
 
 export type CreatePaymentZibal = z.infer<typeof createPaymentSchemaZibal>;
+
+type CreatePaymentResult = { pay_link: string | null; error: string | null };
+
+const MIN_ZIBAL_AMOUNT_RIAL = 1000;
+
+function paymentError(error: string): CreatePaymentResult {
+  return { pay_link: null, error };
+}
 
 export async function createPaymentControllerZibal({
   ctx,
   input,
-}: PaymentRouterArgsController<CreatePaymentZibal>) {
+}: PaymentRouterArgsController<CreatePaymentZibal>): Promise<CreatePaymentResult> {
   const { user, prisma } = ctx;
 
+  const checkout = await syncActiveOrder(prisma, user.userId);
+  if (!checkout || checkout.activeOrder.id !== input.orderId) {
+    return paymentError("سبد خرید تغییر کرده است. صفحه را دوباره باز کنید.");
+  }
+  if (!checkout.activeOrder.items.length) {
+    return paymentError("سبد خرید شما خالی است.");
+  }
+  if (checkout.notice) return paymentError(checkout.notice);
+  if (!checkout.activeOrder.addressId) {
+    return paymentError("آدرس ارسال را انتخاب کنید.");
+  }
+  if (!checkout.activeOrder.shippingPartnerId) {
+    return paymentError("روش ارسال را انتخاب کنید.");
+  }
+
+  const amount = checkout.price.payable * 10;
+  if (amount < MIN_ZIBAL_AMOUNT_RIAL) {
+    return paymentError("مبلغ قابل پرداخت کمتر از حداقل درگاه است.");
+  }
+
   try {
-    const findOrder = await prisma.order.findUnique({
-      where: {
-        id: input.orderId,
-      },
-      include: {
-        OrderShipping: true,
-      },
-    });
-    
-    const body = {
+    const { data } = await axios.post(`${BASE_URL}/v1/request`, {
       merchant: process.env.ZIBAL_MERCHANT_CODE as string,
-      amount:
-        (findOrder?.finalPrice || 0) * 10 +
-        (findOrder?.OrderShipping?.price || 0) * 10,
+      amount,
       callbackUrl:
-        process.env.NODE_ENV === "production" 
+        process.env.NODE_ENV === "production"
           ? "https://merseh.com/payment"
           : "http://localhost:3000/payment",
       mobile: user.phoneNumber,
       description: "",
       feeMode: 2,
-      // linkToPay: true,
-      orderId: String(input.orderId),
-    };
-
-    const { data } = await axios.post(`${BASE_URL}/v1/request`, body);
-    console.log(body);
-    console.log(data);
-    if (data) {
-      try {
-        const updatedPayment = await ctx.prisma.payment.create({
-          data: {
-            userId: user.userId,
-            value: findOrder?.finalPrice || 0,
-            orderId: input.orderId,
-            trackId: String(data.trackId),
-          },
-        });
-        return { pay_link: `${BASE_URL}/start/${data.trackId}`, error: null };
-      } catch (error) {
-        return { pay_link: null, error };
-      }
+      orderId: String(checkout.activeOrder.id),
+    });
+    if (!data?.trackId) {
+      return paymentError("اتصال به درگاه پرداخت ناموفق بود.");
     }
 
+    await prisma.payment.create({
+      data: {
+        userId: user.userId,
+        value: checkout.price.payable,
+        orderId: checkout.activeOrder.id,
+        trackId: String(data.trackId),
+      },
+    });
     return { pay_link: `${BASE_URL}/start/${data.trackId}`, error: null };
   } catch (error) {
-    return { pay_link: null, error };
+    console.error(error);
+    return paymentError("اتصال به درگاه پرداخت ناموفق بود.");
   }
 }
 
@@ -158,7 +162,12 @@ export async function inquiryPaymentControllerZibal({
               where: {
                 id: findOrder.id,
               },
-              data: { status: "PAYED" },
+              data: {
+                status: "PAYED",
+                ...(findOrder.couponId
+                  ? { coupon: { update: { usedCount: { increment: 1 } } } }
+                  : {}),
+              },
             }),
           ]);
         } catch (error) {

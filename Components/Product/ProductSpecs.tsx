@@ -15,30 +15,48 @@ export function parseDetails(details: string[]): SpecRow[] {
   });
 }
 
+export function SpecHighlights({ rows }: { rows: SpecRow[] }) {
+  const items = rows.slice(0, 4);
+  if (!items.length) return null;
+
+  return (
+    <dl className="grid grid-cols-2 gap-x-6 gap-y-4">
+      {items.map((row, index) => (
+        <div key={`${row.label}-${index}`} className="flex min-w-0 flex-col gap-0.5">
+          <dt className="text-caption text-lightBlack">
+            {row.value ? row.label : "ویژگی"}
+          </dt>
+          <dd className="text-small font-medium text-plum-900">
+            {row.value ?? row.label}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 export default function ProductSpecs({ rows }: { rows: SpecRow[] }) {
   if (!rows.length) return null;
 
   return (
-    <dl className="grid grid-cols-1 gap-x-8 sm:grid-cols-2">
-      {rows.map((row, index) => (
-        <div
-          key={`${row.label}-${index}`}
-          className={
-            row.value
-              ? "flex flex-col gap-0.5 border-b border-[#f0f0f0] py-2.5"
-              : "flex flex-col gap-0.5 border-b border-[#f0f0f0] py-2.5 sm:col-span-2"
-          }
-        >
-          {row.value ? (
-            <>
-              <dt className="text-[13px] text-lightBlack">{row.label}</dt>
-              <dd className="text-[15px] text-black1">{row.value}</dd>
-            </>
-          ) : (
-            <dd className="text-[15px] text-black1">{row.label}</dd>
-          )}
-        </div>
-      ))}
-    </dl>
+    <div className="rounded-panel bg-ivory px-5 py-1 sm:px-8">
+      <dl>
+        {rows.map((row, index) => (
+          <div
+            key={`${row.label}-${index}`}
+            className="grid grid-cols-1 gap-1 border-b border-hairline py-3.5 last:border-b-0 sm:grid-cols-[minmax(0,11rem)_minmax(0,1fr)] sm:items-baseline sm:gap-6"
+          >
+            {row.value ? (
+              <>
+                <dt className="text-caption text-lightBlack">{row.label}</dt>
+                <dd className="text-small text-plum-900">{row.value}</dd>
+              </>
+            ) : (
+              <dd className="text-small text-plum-900 sm:col-span-2">{row.label}</dd>
+            )}
+          </div>
+        ))}
+      </dl>
+    </div>
   );
 }

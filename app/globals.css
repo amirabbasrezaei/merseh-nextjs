@@ -2,6 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .glass,
+  .glass-strong {
+    --glass-top: rgb(255 255 255 / 0.62);
+    --glass-bottom: rgb(252 248 245 / 0.48);
+    background: linear-gradient(180deg, var(--glass-top), var(--glass-bottom));
+    border: 1px solid rgb(255 255 255 / 0.55);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.75),
+      inset 0 -1px 0 rgb(255 255 255 / 0.18),
+      0 10px 30px -12px rgb(59 35 48 / 0.22);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    backdrop-filter: blur(22px) saturate(180%);
+  }
+
+  .glass-strong {
+    --glass-top: rgb(255 255 255 / 0.9);
+    --glass-bottom: rgb(252 248 245 / 0.84);
+  }
+
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass,
+    .glass-strong {
+      background: rgb(252 248 245 / 0.97);
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .glass,
+    .glass-strong {
+      background: #fcf8f5;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+}
+
 @layer utilities {
   .no-scrollbar {
     -ms-overflow-style: none;
@@ -13,25 +50,75 @@
   }
 
   .home-motion {
-    transition-property: transform, opacity, box-shadow;
-    transition-duration: 200ms;
-    transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    transition-property: transform, opacity, box-shadow, color, background-color, filter;
+    transition-duration: 300ms;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .home-focus:focus-visible {
-    outline: 2px solid #00a573;
-    outline-offset: 2px;
+    outline: 2px solid #8a4a55;
+    outline-offset: 3px;
   }
 
   .home-enter {
-    animation: home-enter 200ms ease-out both;
+    animation: home-enter 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .home-reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 900ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .home-reveal.is-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Breaks out of the width-capped layout to the viewport edges while keeping content aligned. */
+  .bleed {
+    margin-inline: calc(50% - 50vw);
+    padding-inline: calc(50vw - 50%);
+  }
+
+  /* Semicircle top sized from the tile's width; --arch-ratio is width / height. */
+  .arch {
+    --arch-ratio: 0.75;
+    border-radius: 50% 50% 18px 18px / calc(50% * var(--arch-ratio))
+      calc(50% * var(--arch-ratio)) 18px 18px;
+  }
+
+  .home-marquee {
+    animation: home-marquee 50s linear infinite;
+  }
+
+  .home-marquee-wrap {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 8%,
+      #000 92%,
+      transparent
+    );
+  }
+
+  .home-marquee-wrap:hover .home-marquee,
+  .home-marquee-wrap:focus-within .home-marquee {
+    animation-play-state: paused;
+  }
+
+  .home-dot-progress {
+    transform-origin: right center;
+    animation: home-dot 8s linear;
   }
 }
 
 @keyframes home-enter {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(16px);
   }
 
   to {
@@ -40,13 +127,53 @@
   }
 }
 
+@keyframes home-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes home-dot {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .home-motion {
     transition: none !important;
   }
 
-  .home-enter {
+  .home-enter,
+  .home-dot-progress {
     animation: none !important;
+  }
+
+  .home-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .home-marquee {
+    animation: none !important;
+  }
+
+  .home-marquee-copy {
+    display: none;
+  }
+
+  .home-marquee-wrap {
+    overflow-x: auto !important;
+    mask-image: none;
   }
 
   .home-zoom,

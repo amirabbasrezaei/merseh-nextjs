@@ -26,11 +26,13 @@ type BannerItem = {
 
 function BannerPanel({
   title,
+  sizeHint,
   placement,
   banners,
   onRefresh,
 }: {
   title: string;
+  sizeHint: string;
   placement: Placement;
   banners: BannerItem[];
   onRefresh: () => void;
@@ -89,6 +91,7 @@ function BannerPanel({
         <span className="text-sm font-medium text-gray-700">
           افزودن بنر جدید
         </span>
+        <span className="text-xs text-gray-500">{sizeHint}</span>
         <input
           ref={fileRef}
           type="file"
@@ -246,12 +249,14 @@ export default function BannersAdmin() {
     <div className="flex flex-col gap-6">
       <BannerPanel
         title="کاروسل اصلی (Hero)"
+        sizeHint="اندازه پیشنهادی: ۱۶۸۰ × ۹۴۵ پیکسل (۱۶:۹). در موبایل کمی از بالا و پایین بریده می‌شود."
         placement="HERO"
         banners={(data?.hero || []) as BannerItem[]}
         onRefresh={() => refetch()}
       />
       <BannerPanel
         title="بنرهای کناری (Side)"
+        sizeHint="اندازه پیشنهادی: ۱۰۲۰ × ۹۴۵ پیکسل (تقریباً مربع). فقط در دسکتاپ نمایش داده می‌شود."
         placement="SIDE"
         banners={(data?.side || []) as BannerItem[]}
         onRefresh={() => refetch()}

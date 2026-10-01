@@ -1,16 +1,19 @@
 {
-  "name": "merseh",
+  "name": "mehrnil",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "yarn@1.22.22",
   "scripts": {
     "dev": "next dev",
-    "build": "npx prisma generate && npx prisma migrate deploy && next build",
+    "build": "prisma generate && next build",
+    "db:migrate": "prisma migrate deploy",
     "start": "next start",
     "lint": "next lint",
     "minio:up": "docker compose up -d",
     "minio:down": "docker compose down",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
+    "deploy": "bash scripts/deploy.sh",
     "db:seed": "prisma db seed"
   },
   "dependencies": {

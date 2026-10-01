@@ -7,14 +7,15 @@ import ThemeController from "@/Components/ThemeController";
 import { Toaster } from "react-hot-toast";
 import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google";
 import Script from "next/script";
+import { SITE_NAME } from "@/utils/site";
 
 export const metadata: Metadata = {
   title: {
-    default: "فروشگاه مرسه",
-    template: "%s  - مرسه",
+    default: `فروشگاه ${SITE_NAME}`,
+    template: `%s - ${SITE_NAME}`,
   },
   description:
-    "مرسه تولید کننده انواع محصولات طبیعی شامل روغنهای گیاهی مانند روغن زیتون، روغن کنجد، روغن آفتابگردان، روغن سیاه دانه، کره گیاهی، ارده و ... می‌باشد.",
+    `${SITE_NAME} تولید کننده انواع محصولات طبیعی شامل روغنهای گیاهی مانند روغن زیتون، روغن کنجد، روغن آفتابگردان، روغن سیاه دانه، کره گیاهی، ارده و ... می‌باشد.`,
   alternates: {
     canonical: `${process.env.BASE_URL}`,
   },
@@ -22,14 +23,14 @@ export const metadata: Metadata = {
   robots: { follow: true, index: true },
   openGraph: {
     locale: "fa_IR",
-    siteName: "مرسه",
+    siteName: SITE_NAME,
     type: "website",
     countryName: "IRAN",
   },
   other: {
     currency: "IRT",
     lang: "fa",
-    "theme-color": "#00A573",
+    "theme-color": "#3B2330",
   },
 };
 

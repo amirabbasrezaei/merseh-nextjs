@@ -1,0 +1,175 @@
+# Production stack for an Ubuntu server.
+# Build and start with: bash scripts/deploy.sh
+#
+# Caddy is the only service published on the public internet (80 and 443).
+# The app and MinIO API are bound to 127.0.0.1 for local debugging.
+# Certificates are stored in the caddy_data volume.
+
+name: mehrnil
+
+services:
+  caddy:
+    image: caddy:2.10.2
+    container_name: mehrnil-caddy
+    init: true
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      CADDY_EMAIL: ${CADDY_EMAIL:?Set CADDY_EMAIL in .env}
+      CADDY_SITE_HOST: ${CADDY_SITE_HOST:?Set CADDY_SITE_HOST or run scripts/deploy.sh}
+      CADDY_FILES_HOST: ${CADDY_FILES_HOST:?Set CADDY_FILES_HOST or run scripts/deploy.sh}
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BASE_URL: ${BASE_URL}
+        NEXT_PUBLIC_FILES_ENDPOINT: ${NEXT_PUBLIC_FILES_ENDPOINT}
+        NEXT_PUBLIC_MAPBOX_PUBLIC_TOKEN: ${NEXT_PUBLIC_MAPBOX_PUBLIC_TOKEN}
+        NEXT_PUBLIC_MAPBOX_SECRET_TOKEN: ${NEXT_PUBLIC_MAPBOX_SECRET_TOKEN}
+    image: mehrnil-app:latest
+    container_name: mehrnil-app
+    init: true
+    mem_limit: ${APP_MEMORY_LIMIT:-1536m}
+    memswap_limit: ${APP_MEMORY_LIMIT:-1536m}
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      DATABASE_URL_LOCAL: ""
+      MINIO_ENDPOINT: http://minio:9000
+    ports:
+      - "127.0.0.1:${APP_PORT:-3000}:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - fetch('http://127.0.0.1:3000').then((r)=>process.exit(r.status<500?0:1)).catch(()=>process.exit(1))
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 90s
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: mehrnil-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  postgres-backup:
+    image: postgres:16-alpine
+    container_name: mehrnil-postgres-backup
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGUSER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      PGDATABASE: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
+      BACKUP_RETAIN_DAYS: ${BACKUP_RETAIN_DAYS:-14}
+      TZ: ${BACKUP_TZ:-Asia/Tehran}
+    volumes:
+      - ./backups:/backups
+      - ./docker/postgres-backup.sh:/backup.sh:ro
+    entrypoint: ["/bin/sh", "/backup.sh"]
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  minio:
+    # quay.io/minio now rejects anonymous pulls (401). This community build
+    # keeps the same server command, env vars, and /data layout.
+    image: pgsty/minio:RELEASE.2026-08-04T00-00-00Z
+    container_name: mehrnil-minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "127.0.0.1:${MINIO_PORT:-9010}:9000"
+      - "127.0.0.1:${MINIO_CONSOLE_PORT:-9011}:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?Set MINIO_ROOT_USER in .env}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in .env}
+    volumes:
+      - minio_data:/data
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  minio-init:
+    image: pgsty/mc:RELEASE.2026-09-16T00-00-00Z
+    container_name: mehrnil-minio-init
+    depends_on:
+      - minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?Set MINIO_ROOT_USER in .env}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in .env}
+      MINIO_BUCKET: ${MINIO_BUCKET:-mehrnil}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        until mc alias set local http://minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD"; do
+          echo 'Waiting for MinIO...'
+          sleep 2
+        done
+        mc mb --ignore-existing "local/$$MINIO_BUCKET"
+        mc anonymous set download "local/$$MINIO_BUCKET"
+        echo 'Bucket ready'
+    restart: "no"
+
+volumes:
+  postgres_data:
+  minio_data:
+  caddy_data:
+  caddy_config:

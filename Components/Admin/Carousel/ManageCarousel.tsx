@@ -41,6 +41,7 @@ export default function ManageCarousel({ carouselId }: Props) {
   const { data: categories } = trpc.product.flatCategories.useQuery();
   const { data: brands } = trpc.brand.list.useQuery();
 
+  const [slot, setSlot] = useState("");
   const [title, setTitle] = useState("");
   const [source, setSource] = useState<Source>("CATEGORY");
   const [categoryId, setCategoryId] = useState<number | null>(null);
@@ -68,6 +69,7 @@ export default function ManageCarousel({ carouselId }: Props) {
   useEffect(() => {
     if (!data?.carousel) return;
     const carousel = data.carousel;
+    setSlot(carousel.slot);
     setTitle(carousel.title);
     setSource(carousel.source);
     setCategoryId(carousel.categoryId);
@@ -114,6 +116,10 @@ export default function ManageCarousel({ carouselId }: Props) {
   };
 
   const handleSave = async () => {
+    if (!slot.trim()) {
+      toast.error("شناسه کاروسل را وارد کنید");
+      return;
+    }
     if (!title.trim()) {
       toast.error("نام کاروسل را وارد کنید");
       return;
@@ -128,6 +134,7 @@ export default function ManageCarousel({ carouselId }: Props) {
     }
 
     const payload = {
+      slot: slot.trim().toLowerCase(),
       title: title.trim(),
       source,
       categoryId: source === "CATEGORY" ? categoryId : null,
@@ -172,12 +179,23 @@ export default function ManageCarousel({ carouselId }: Props) {
         }
       />
 
-      <AdminPanel title="نام و لوگو">
+      <AdminPanel title="شناسه و نام">
         <AdminInput
-          label="نام"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          label="شناسه"
+          value={slot}
+          dir="ltr"
+          className="text-left font-mono"
+          placeholder="after-categories"
+          onChange={(e) => setSlot(e.target.value)}
+          hint="همین مقدار را به prop شناسه کامپوننت HomeCarousel بدهید. جای کاروسل را محل همان کامپوننت در صفحه مشخص می‌کند."
         />
+        <div className="mt-4">
+          <AdminInput
+            label="نام"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
         <div className="mt-4">
           {shownLogo ? (
             <div className="relative mb-4 h-16 w-16 overflow-hidden rounded-full border border-gray-200 bg-gray-50">

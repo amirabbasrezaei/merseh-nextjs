@@ -40,6 +40,7 @@ export default function Category({ setFilter, filter }: Props) {
             ...state,
             categoryId: created.id,
             name: created.title,
+            imageUrl: "",
           }));
         }
       },
@@ -65,6 +66,7 @@ export default function Category({ setFilter, filter }: Props) {
                     name: cat.title,
                     content: cat.content,
                     metaDescription: cat.metaDescription,
+                    imageUrl: cat.imageUrl,
                   });
                   setShowCategory((state) => !state);
                 }}

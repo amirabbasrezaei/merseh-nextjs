@@ -1,332 +1,142 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useThemeStore } from "./ThemeController";
 import { useUserInfoStore } from "./stores/userInfoStore";
 import {
   useShoppingCartStore,
+  type CartItem,
   type ShoppingCart,
 } from "./stores/shoppingCartStore";
 import { trpc } from "@/utils/trpc";
+import { isLoginError } from "./Checkout/format";
 
-export type { ShoppingCart };
+export type { ShoppingCart, CartItem };
+
+function isSameLine(
+  item: CartItem,
+  productId: number,
+  variationValueId?: number
+) {
+  return variationValueId !== undefined
+    ? item.variationValueId === variationValueId
+    : item.variationValueId === undefined && item.productId === productId;
+}
 
 export default function useShoppingCart() {
-  const [updateOrder, setUpdateOrder] = useState(false);
-  const setThemeStore = useThemeStore.setState;
   const userInfo = useUserInfoStore((s) => s.userInfo);
-
-  const { data: activeOrderData, refetch } = trpc.order.getActiveOrder.useQuery(
-    undefined,
-    {
-      retry: false,
-    }
-  );
-  const {
-    error: updateActiveOrderError,
-    mutate: mutateActiveOrder,
-    data: updateActiveOrderData,
-  } = trpc.order.updateActiveOrder.useMutation({ retry: 2 });
-
-  const shoppingCart = useShoppingCartStore();
+  const utils = trpc.useUtils();
+  const orderitems = useShoppingCartStore((s) => s.orderitems);
+  const price = useShoppingCartStore((s) => s.price);
+  const activeOrderId = useShoppingCartStore((s) => s.activeOrderId);
   const setShoppingCart = useShoppingCartStore((s) => s.setShoppingCart);
 
-  useEffect(() => {
-    refetch().then(() => {
-      if (userInfo && updateOrder) {
-        mutateActiveOrder({
-          selectedProducts:
-            shoppingCart.orderitems as ShoppingCart["orderitems"],
-        });
-
-        setUpdateOrder(false);
-      }
+  const { data: activeOrderData } = trpc.order.getActiveOrder.useQuery(
+    undefined,
+    { retry: false }
+  );
+  const {
+    mutate: mutateActiveOrder,
+    error: updateError,
+    isPending: isUpdating,
+  } = trpc.order.updateActiveOrder.useMutation({
+      retry: 2,
+      onSuccess: (view) => utils.order.getActiveOrder.setData(undefined, view),
     });
-  }, [shoppingCart, userInfo]);
 
   useEffect(() => {
-    if (activeOrderData?.activeOrder) {
-      const activeShoppingCart: ShoppingCart["orderitems"] =
-        activeOrderData.activeOrder.ProductForOrder.map((product: any) => ({
-          name: product.Product.name,
-          numberOfProduct: product.numberOfproduct,
-          price: product.ProductVariationValue?.price
-            ? product.ProductVariationValue.price
-            : product.Product.price,
-          productId: product.Product.id,
-          variationId: product.productVariationId
-            ? product.productVariationId
-            : undefined,
-          variationValueId: product.productVariationValueId
-            ? product.productVariationValueId
-            : undefined,
-          imageUrl: product.Product.imageUrls?.[0] || "",
-          variationValueName: product.ProductVariationValue?.name,
-        }));
-
-      localStorage.setItem(
-        "shopCart",
-        JSON.stringify({
-          ...shoppingCart,
-          orderitems: activeShoppingCart,
-          price: activeOrderData.price,
-        })
-      );
-      setUpdateOrder(false);
-      setShoppingCart((state: any) => ({
-        ...state,
-        orderitems: activeShoppingCart,
-        price: activeOrderData.price,
-        activeOrderId: activeOrderData.activeOrder.id,
-      }));
-    }
-  }, [activeOrderData]);
+    const activeOrder = activeOrderData?.activeOrder;
+    if (!activeOrder) return;
+    setShoppingCart((state) => ({
+      ...state,
+      orderitems: activeOrder.items,
+      price: activeOrderData.price,
+      activeOrderId: activeOrder.id,
+    }));
+  }, [activeOrderData, setShoppingCart]);
 
   useEffect(() => {
-    if (
-      JSON.parse(updateActiveOrderError?.message || JSON.stringify({ "": "" }))
-        .need_login_now
-    ) {
-      setThemeStore({ openAuthModal: true });
+    if (isLoginError(updateError?.message)) {
+      useThemeStore.setState({ openAuthModal: true });
     }
-  }, [updateActiveOrderError]);
+  }, [updateError]);
 
-  useEffect(() => {
-    if (updateActiveOrderData?.activeOrder) {
-      const activeShoppingCart: ShoppingCart["orderitems"] =
-        updateActiveOrderData.activeOrder.ProductForOrder.map((product: any) => ({
-          name: product.Product.name,
-          numberOfProduct: product.numberOfproduct,
-          price: product.ProductVariationValue?.price
-            ? product.ProductVariationValue.price
-            : product.Product.price,
-          productId: product.Product.id,
-          variationId: product.productVariationId
-            ? product.productVariationId
-            : undefined,
-          variationValueId: product.productVariationValueId
-            ? product.productVariationValueId
-            : undefined,
-          imageUrl: product.Product.imageUrls?.[0] || "",
-          variationValueName: product.ProductVariationValue?.name,
-        }));
-      localStorage.setItem(
-        "shopCart",
-        JSON.stringify({
-          ...shoppingCart,
-          orderitems: activeShoppingCart,
-          price: updateActiveOrderData.price,
-        })
-      );
-      setShoppingCart((state: any) => ({
-        ...state,
-        orderitems: activeShoppingCart,
-        price: updateActiveOrderData.price,
-      }));
-    }
-  }, [updateActiveOrderData]);
+  const commit = (next: CartItem[]) => {
+    setShoppingCart((state) => ({ ...state, orderitems: next }));
+    if (userInfo) mutateActiveOrder({ selectedProducts: next });
+  };
+
+  const changeQuantity = (
+    variationValueId: number | undefined,
+    productId: number,
+    delta: number
+  ) => {
+    commit(
+      orderitems.map((item) =>
+        isSameLine(item, productId, variationValueId)
+          ? { ...item, numberOfProduct: item.numberOfProduct + delta }
+          : item
+      )
+    );
+  };
 
   const incrementProductNumber = (
     variationValueId: number | undefined,
     productId: number
-  ) => {
-    if (variationValueId) {
-      const newValue = shoppingCart.orderitems.map(
-        (prOrder: ShoppingCart["orderitems"][0]) => {
-          if (
-            prOrder.variationValueId !== undefined &&
-            prOrder.variationValueId === variationValueId
-          ) {
-            return { ...prOrder, numberOfProduct: prOrder.numberOfProduct + 1 };
-          }
-          return prOrder;
-        }
-      );
-      setUpdateOrder(true);
-      setShoppingCart((state) => ({
-        ...state,
-        orderitems: newValue,
-      }));
-      return;
-    }
-
-    if (productId) {
-      const newValue = shoppingCart.orderitems.map(
-        (prOrder: ShoppingCart["orderitems"][0]) => {
-          if (
-            prOrder.productId !== undefined &&
-            prOrder.productId === productId
-          ) {
-            return { ...prOrder, numberOfProduct: prOrder.numberOfProduct + 1 };
-          }
-          return prOrder;
-        }
-      );
-      setUpdateOrder(true);
-      setShoppingCart((state: ShoppingCart) => ({
-        ...state,
-        orderitems: newValue,
-      }));
-    }
-  };
-
-  const addProduct = async (
-    name: string,
-    price: number,
-    productId: number,
-    variationId?: number,
-    variationValueId?: number
-  ) => {
-    const newShoppingCartItem = {
-      name,
-      price,
-      numberOfProduct: 1,
-      variationValueId,
-      variationId,
-      productId,
-    };
-
-    const findIndex_On_Variation = shoppingCart.orderitems.findIndex(
-      (e) =>
-        e.variationValueId !== undefined &&
-        e.variationValueId === newShoppingCartItem?.variationValueId
-    );
-    const findIndex_On_Product = shoppingCart.orderitems.findIndex(
-      (e) =>
-        e.productId !== undefined &&
-        e.productId === newShoppingCartItem?.productId
-    );
-    if (
-      findIndex_On_Variation !== -1 &&
-      newShoppingCartItem?.variationValueId
-    ) {
-      const temp: ShoppingCart["orderitems"] = [
-        ...shoppingCart.orderitems.slice(0, findIndex_On_Variation),
-        ...shoppingCart.orderitems.slice(findIndex_On_Variation + 1),
-        {
-          ...shoppingCart.orderitems[findIndex_On_Variation],
-          numberOfProduct:
-            shoppingCart.orderitems[findIndex_On_Variation].numberOfProduct + 1,
-        },
-      ];
-
-      const result = {
-        ...shoppingCart,
-        updateActiveOrder: true,
-        orderitems: temp,
-      };
-      setShoppingCart(result);
-      return;
-    }
-
-    if (findIndex_On_Product !== -1 && !newShoppingCartItem?.variationValueId) {
-      const temp: ShoppingCart["orderitems"] = [
-        ...shoppingCart.orderitems.slice(0, findIndex_On_Product),
-        ...shoppingCart.orderitems.slice(findIndex_On_Product + 1),
-        {
-          ...shoppingCart.orderitems[findIndex_On_Product],
-          numberOfProduct:
-            shoppingCart.orderitems[findIndex_On_Product].numberOfProduct + 1,
-        },
-      ];
-
-      const result = {
-        ...shoppingCart,
-        updateActiveOrder: true,
-        orderitems: temp,
-      };
-      setShoppingCart(result);
-      return;
-    }
-    setUpdateOrder(true);
-    setShoppingCart((state) => ({
-      ...state,
-      orderitems: [...state.orderitems, newShoppingCartItem],
-    }));
-
-    return shoppingCart.orderitems;
-  };
+  ) => changeQuantity(variationValueId, productId, 1);
 
   const decrementProductNumber = (
     variationValueId: number | undefined,
     productId: number
-  ) => {
-    if (variationValueId) {
-      const newValue = shoppingCart.orderitems.map(
-        (prOrder: ShoppingCart["orderitems"][0]) => {
-          if (prOrder.variationValueId === variationValueId) {
-            return { ...prOrder, numberOfProduct: prOrder.numberOfProduct - 1 };
-          }
-          return prOrder;
-        }
-      );
-      setUpdateOrder(true);
-      setShoppingCart((state) => ({
-        ...state,
-        orderitems: newValue,
-      }));
-      return;
-    }
-
-    if (productId) {
-      const newValue = shoppingCart.orderitems.map(
-        (prOrder: ShoppingCart["orderitems"][0]) => {
-          if (prOrder.productId === productId) {
-            return { ...prOrder, numberOfProduct: prOrder.numberOfProduct - 1 };
-          }
-          return prOrder;
-        }
-      );
-      setUpdateOrder(true);
-      setShoppingCart((state: ShoppingCart) => ({
-        ...state,
-        orderitems: newValue,
-      }));
-    }
-  };
+  ) => changeQuantity(variationValueId, productId, -1);
 
   const removeProductFromOrder = (
     variationValueId: number | undefined,
     productId: number
   ) => {
-    if (variationValueId) {
-      const remainProducts = shoppingCart.orderitems.filter(
-        (pr) => pr.variationValueId !== variationValueId
-      );
-      setUpdateOrder(true);
-      setShoppingCart((state) => ({
-        ...state,
-        orderitems: remainProducts,
-      }));
+    commit(
+      orderitems.filter(
+        (item) => !isSameLine(item, productId, variationValueId)
+      )
+    );
+  };
+
+  const syncCart = () => {
+    if (userInfo && orderitems.length) {
+      mutateActiveOrder({ selectedProducts: orderitems });
+    }
+  };
+
+  const addProduct = async (
+    name: string,
+    unitPrice: number,
+    productId: number,
+    variationId?: number,
+    variationValueId?: number,
+    details?: Pick<CartItem, "discount" | "imageUrl" | "freeShipping">
+  ) => {
+    const lineVariationValueId = variationId ? variationValueId : undefined;
+    const exists = orderitems.some((item) =>
+      isSameLine(item, productId, lineVariationValueId)
+    );
+    if (exists) {
+      changeQuantity(lineVariationValueId, productId, 1);
       return;
     }
-    if (productId) {
-      const remainProducts = shoppingCart.orderitems.filter(
-        (pr) => pr.productId !== productId
-      );
-      setUpdateOrder(true);
-      setShoppingCart((state) => ({
-        ...state,
-        orderitems: remainProducts,
-      }));
-    }
+    commit([
+      ...orderitems,
+      {
+        ...details,
+        name,
+        price: unitPrice,
+        numberOfProduct: 1,
+        productId,
+        variationId: lineVariationValueId ? variationId : undefined,
+        variationValueId: lineVariationValueId,
+      },
+    ]);
   };
 
-  const getProduct = (productId: number, productValueId?: number) => {
-    const findProduct = shoppingCart.orderitems.filter((e) => {
-      if (
-        productValueId !== undefined &&
-        productValueId === e.variationValueId
-      ) {
-        return true;
-      }
-
-      if (productValueId === undefined && productId === e.productId) {
-        return true;
-      }
-      return false;
-    });
-
-    return findProduct[0];
-  };
+  const getProduct = (productId: number, variationValueId?: number) =>
+    orderitems.find((item) => isSameLine(item, productId, variationValueId));
 
   return {
     incrementProductNumber,
@@ -334,8 +144,11 @@ export default function useShoppingCart() {
     decrementProductNumber,
     addProduct,
     getProduct,
-    finalPrice: shoppingCart.price?.totalPrice,
-    items: shoppingCart.orderitems,
-    activeOrderId: shoppingCart.activeOrderId
+    syncCart,
+    isUpdating,
+    price,
+    items: orderitems,
+    activeOrderId,
+    orderView: activeOrderData,
   };
 }

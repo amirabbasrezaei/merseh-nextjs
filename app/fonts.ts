@@ -1,4 +1,12 @@
 import localFont from "next/font/local";
+import { Cormorant_Garamond } from "next/font/google";
+
+export const brandWordmark = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: "500",
+  style: "italic",
+  display: "swap",
+});
 
 export const IRANYekanXFaNum = localFont({
   src: [

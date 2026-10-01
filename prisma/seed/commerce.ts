@@ -113,17 +113,49 @@ export async function seedCommerce(
     throw new Error("Shipping partners missing");
   }
 
-  const argan = catalog.productsByEngName.get("Merseh Pure Argan Oil");
-  const cream = catalog.productsByEngName.get("Merseh Hyaluronic Cream");
-  const spf = catalog.productsByEngName.get("Merseh Fluid Sunscreen SPF50");
-  const shampoo = catalog.productsByEngName.get("Merseh Rosemary Shampoo");
-  const toner = catalog.productsByEngName.get("Merseh Rose Toner");
-  const mascara = catalog.productsByEngName.get("Merseh Volume Mascara");
-  const jojoba = catalog.productsByEngName.get("Merseh Jojoba Oil");
-
-  if (!argan || !cream || !spf || !shampoo || !toner || !mascara || !jojoba) {
+  const picked = [...catalog.productsByEngName.values()];
+  if (picked.length < 7) {
     throw new Error("Required products missing for orders");
   }
+
+  const [argan, cream, spf, shampoo, toner, mascara, jojoba] = picked;
+  const rosemary = picked[7] ?? argan;
+
+  await prisma.product.update({
+    where: { id: jojoba.id },
+    data: { freeShipping: true },
+  });
+
+  await prisma.coupon.createMany({
+    data: [
+      { code: "WELCOME10", type: "PERCENT", value: 10 },
+      { code: "FREESHIP", type: "FREE_SHIPPING", value: 0 },
+      {
+        code: "SAVE50",
+        type: "FIXED",
+        value: 50000,
+        minSubtotal: 500000,
+      },
+    ],
+  });
+  console.log("Seeded 3 coupons");
+
+  const priced = await prisma.product.findMany({
+    where: {
+      id: { in: [...new Set(picked.slice(0, 8).map((product) => product.id))] },
+    },
+    select: { id: true, price: true, discount: true },
+  });
+  const netById = new Map(
+    priced.map((product) => [product.id, product.price - product.discount])
+  );
+  const net = (product: { id: number }) => {
+    const value = netById.get(product.id);
+    if (value === undefined) {
+      throw new Error(`Product ${product.id} missing for order pricing`);
+    }
+    return value;
+  };
 
   const sara = usersByPhone.get("09121112201")!;
   const niloofar = usersByPhone.get("09121112202")!;
@@ -132,10 +164,10 @@ export async function seedCommerce(
   const parisa = usersByPhone.get("09121112205")!;
   const kian = usersByPhone.get("09121112206")!;
 
-  const deliveredPrice = 385000 - 40000 + 312000 - 35000 + 35000;
-  const payedPrice = 345000 - 30000 + 45000;
-  const deliveringPrice = 215000 + 178000 - 15000 + 55000;
-  const activePrice = 189000 + 265000 + 35000;
+  const deliveredPrice = net(argan) + net(cream) + 35000;
+  const payedPrice = net(spf) + 45000;
+  const deliveringPrice = net(shampoo) + net(toner) + 55000;
+  const activePrice = net(mascara) + net(jojoba) + 35000;
 
   const delivered = await prisma.order.create({
     data: {
@@ -348,11 +380,6 @@ export async function seedCommerce(
       productId: shampoo.id,
     },
   });
-
-  const rosemary = catalog.productsByEngName.get("Merseh Rosemary Oil");
-  if (!rosemary) {
-    throw new Error("Rosemary oil product missing for comments");
-  }
 
   await prisma.comment.create({
     data: {

@@ -5,6 +5,7 @@ import axios from "axios";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
+import { SITE_NAME } from "@/utils/site";
 
 import { WithContext, Article as ArticleSchema } from "schema-dts";
 
@@ -134,7 +135,7 @@ export default async function page({ params }: NextPagePropsType) {
     dateModified: article.article.updated_at,
     publisher: {
       "@type": "HealthAndBeautyBusiness",
-      name: "مجله مرسه",
+      name: `مجله ${SITE_NAME}`,
       logo: {
         "@type": "ImageObject",
         url: `${process.env.NEXT_PUBLIC_FILES_ENDPOINT}/main_images/merseh_mag.png`,

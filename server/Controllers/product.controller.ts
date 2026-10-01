@@ -246,6 +246,7 @@ export async function getProductController({
         content: true,
         quantity: true,
         discount: true,
+        freeShipping: true,
         engName: true,
         category: true,
         mainCategoryId: true,
@@ -313,6 +314,7 @@ export async function getProductController({
       ),
       instock: product.quantity ? true : false,
       discount: product.discount,
+      freeShipping: product.freeShipping,
       category: product.category,
       mainCategoryId: product.mainCategoryId,
       brandId: product.brandId,
@@ -356,6 +358,7 @@ export const AddProductControllerArgSchema = z.object({
   details: z.array(z.string()),
   metaDescription: z.string(),
   brandId: z.number().int().nullable().optional(),
+  freeShipping: z.boolean().optional(),
 });
 
 type AddProductControllerArg = z.infer<typeof AddProductControllerArgSchema>;
@@ -388,6 +391,7 @@ export async function addProductController({
         mainCategoryId: Number(input.categoryId),
         details: input.details,
         brandId: input.brandId ?? null,
+        freeShipping: input.freeShipping ?? false,
         category: {
           connect: parent_categories.length
             ? [
@@ -681,6 +685,7 @@ export const editProductInputSchema = z.object({
   metaDescription: z.string(),
   details: z.array(z.string()),
   brandId: z.number().int().nullable().optional(),
+  freeShipping: z.boolean().optional(),
 });
 
 export type EditProductInput = z.infer<typeof editProductInputSchema>;
@@ -754,6 +759,7 @@ export async function editProductController({
         mainCategoryId: Number(input.categoryId),
         details: input.details,
         brandId: input.brandId ?? null,
+        freeShipping: input.freeShipping,
         category: {
           connect: parent_categories.length
             ? [

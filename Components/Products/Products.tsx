@@ -1,144 +1,120 @@
 "use client";
-import { trpc } from "@/utils/trpc";
-import React, { useEffect, useState } from "react";
 
-import { motion } from "framer-motion";
-
+import { useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
-import Filter from "./Filter";
-import { ContentViewer } from "../Admin/AddProduct/ContentViewer";
+import type { inferRouterOutputs } from "@trpc/server";
+import { trpc } from "@/utils/trpc";
+import type { AppRouter } from "@/server/routers/_app";
+import type { ProductTileData } from "../Product/ProductTile";
+import CategoryContent from "./CategoryContent";
+import CategoryHero from "./CategoryHero";
+import ListingToolbar from "./ListingToolbar";
+import ProductGrid, { ProductGridSkeleton } from "./ProductGrid";
+import SubcategoryChips from "./SubcategoryChips";
+import { findCategoryPath } from "./categoryTree";
+import { parseSort, sortProducts } from "./sortProducts";
 
-export type filterTypeArgs = {
-  categoryId?: number;
-  searchTerm?: string;
-  parentCategories?: number[];
-  needRefetch?: boolean;
-  categoryName?: string;
+export type CategoryInfo = {
+  title?: string;
+  imageUrl?: string;
+  content?: string;
 };
 
-interface Props {
+type ListedProduct =
+  inferRouterOutputs<AppRouter>["filter"]["filterProduct"]["products"][number];
+
+type Props = {
   categoryId: number;
-  categoryContent: any;
+  category?: CategoryInfo | null;
+};
+
+const shellClass = "flex w-full flex-col gap-8 sm:px-6 md:gap-10";
+
+function toTile(product: ListedProduct): ProductTileData {
+  return {
+    id: product.id,
+    name: product.name,
+    price: product.price ?? 0,
+    discount: product.discount ?? 0,
+    freeShipping: product.freeShipping,
+    imageUrl: product.imageUrls[0] ?? "",
+    imageNames: product.imageUrls,
+    brand: product.brand,
+  };
 }
-export const revalidate = 300;
 
-const ProductCard = dynamic(() => import("../Product/ProductCard"), {
-  ssr: false,
-});
+/** Server-renderable stand-in shown while the search-param driven listing hydrates. */
+export function ProductsFallback({ category }: { category?: CategoryInfo | null }) {
+  return (
+    <div className={shellClass}>
+      <CategoryHero
+        title={category?.title ?? ""}
+        imageUrl={category?.imageUrl}
+        path={[]}
+        count={null}
+      />
+      <ProductGridSkeleton />
+      {category?.content ? <CategoryContent content={category.content} /> : null}
+    </div>
+  );
+}
 
-const ProductCardSkeleton = dynamic(
-  () => import("../Product/ProductCardSkeleton"),
-  {
-    ssr: false,
-  }
-);
-
-
-
-export default function Products({ categoryId, categoryContent }: Props) {
-  const [filter, setFilter] = useState<filterTypeArgs>({
-    categoryId,
-    needRefetch: false,
-  });
+export default function Products({ categoryId, category }: Props) {
   const params = useSearchParams();
-  const router = useRouter();
+  const searchTerm = params.get("searchTerm")?.trim() ?? "";
+  const sort = parseSort(params.get("sort"));
 
-  const {
-    mutate: mutate,
-    data,
-    isPending: isLoading,
-  } = trpc.filter.filterProduct.useMutation({});
-
-  useEffect(() => {
-    const timeOut = setTimeout(() => {
-      mutate({
-        categoryId: categoryId,
-        searchTerm: params.get("searchTerm") || "",
-      });
-    }, 500);
-    return () => {
-      clearTimeout(timeOut);
-    };
-  }, [params]);
+  const { data: tree } = trpc.product.categories.useQuery();
+  const { mutate, data, isError, isPending } =
+    trpc.filter.filterProduct.useMutation();
 
   useEffect(() => {
-    if (filter.needRefetch) {
-      setFilter((state) => ({ ...state, needRefetch: false }));
-      router.push(
-        `/category/${filter.categoryId}/${filter.categoryName?.replaceAll(
-          " ",
-          "-"
-        )}`
-      );
-      // mutate({ categoryId: filter.categoryId });
-    }
-  }, [filter]);
+    mutate({ categoryId, searchTerm });
+  }, [categoryId, searchTerm, mutate]);
 
-  useEffect(() => {
-    if (data) {
-      setFilter((state) => ({
-        ...state,
-        parentCategories: data.categoryInfo.categoryParents,
-      }));
-    }
-  }, [data]);
+  const path = useMemo(
+    () => findCategoryPath(tree, categoryId),
+    [tree, categoryId],
+  );
+  const current = path.at(-1);
+  const chipsParent = current?.subCategories?.length ? current : path.at(-2);
 
-  console.log(categoryContent?.content)
+  const products = useMemo(
+    () => sortProducts((data?.products ?? []).map(toTile), sort),
+    [data, sort],
+  );
+
+  const title =
+    category?.title ?? current?.title ?? data?.categoryInfo.title ?? "";
 
   return (
-    <section className="flex sm:gap-14 gap-5 flex-col sm:flex-row w-full mt-4 sm:px-10 overflow-visible">
-      <Filter filter={filter} setFilter={setFilter} />
-      <div className="flex flex-col h-full sm:basis-9/12">
-        <div className="h-fit mb-5 flex items-center jus w-full">
-          {data?.categoryInfo?.title ? (
-            <h1 className="text-[18px] text-gray-500 font-[500]  mb-[10px] ">
-              قیمت {data.categoryInfo.title}
-            </h1>
-          ) : (
-            <div className="bg-gray-100 rounded-[5px] mb-[10px] h-8 w-[200px] animate-pulse" />
-          )}
-        </div>
-        <div className="w-full min-h-[800px] flex flex-col gap-4 items-center ">
-          <div className="sm:grid lg:grid-cols-3  flex flex-col gap-4 w-full ">
-            {data?.products?.length && !isLoading
-              ? data.products.map((pr: any, index: number) => (
-                  <ProductCard
-                    key={index}
-                    imageNames={pr.imageNames}
-                    price={pr.price || 0}
-                    title={pr.name}
-                    brand={pr.brand}
-                    pathname={`/product/${String(pr.id)}/${pr.name.replaceAll(
-                      " ",
-                      "-"
-                    )}`}
-                  />
-                ))
-              : Array.from(Array(8)).map((_, i) => (
-                  <ProductCardSkeleton key={i} />
-                ))}
-          </div>
-        </div>
-        <hr className="mt-5 border-[#ececec] mb-10" />
+    <div className={shellClass}>
+      <CategoryHero
+        title={title}
+        imageUrl={category?.imageUrl || current?.imageUrl}
+        path={path}
+        count={data ? products.length : null}
+      />
 
-        {categoryContent?.content !== undefined ? (
-          <div className="[&_h2]:text-[17px] text-[13px] [&_ul]:list-disc [&_ul]:list-inside [&_a]:text-[#7ba79a]  text-[#a8a8a8] [&_h2]:text-[#7f7f7f]   leading-loose [&_h3]:text-[#969696] [&_h3]:text-[15px] flex flex-col">
-            <ContentViewer contentForView={JSON.parse(categoryContent?.content || "[]")} />
-          </div>
-        ) : (
-          Array.from(Array(4)).map((_, i) => (
-            <motion.div className="flex flex-col gap-3 my-5" key={i}>
-              <div className="bg-gray-100 w-[150px] h-[26px] rounded-[7px] animate-pulse"></div>
-              <div className="bg-gray-100 w-full h-[20px] rounded-[4px] animate-pulse"></div>
-              <div className="bg-gray-100 w-full h-[20px] rounded-[4px] animate-pulse"></div>
-              <div className="bg-gray-100 w-full h-[20px] rounded-[4px] animate-pulse"></div>
-              <div className="bg-gray-100 w-full h-[20px] rounded-[4px] animate-pulse"></div>
-            </motion.div>
-          ))
-        )}
-      </div>
-    </section>
+      {chipsParent ? (
+        <SubcategoryChips
+          parent={chipsParent}
+          items={chipsParent.subCategories ?? []}
+          activeId={categoryId}
+        />
+      ) : null}
+
+      <section aria-label="فهرست کالاها" className="flex flex-col gap-6">
+        <ListingToolbar searchTerm={searchTerm} sort={sort} />
+        <ProductGrid
+          products={products}
+          isLoading={!data && !isError}
+          isRefreshing={isPending && Boolean(data)}
+          searchTerm={searchTerm}
+        />
+      </section>
+
+      {category?.content ? <CategoryContent content={category.content} /> : null}
+    </div>
   );
 }

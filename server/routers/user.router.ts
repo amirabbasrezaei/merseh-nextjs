@@ -4,6 +4,7 @@ import {
   SendVerifyCodeSchema,
   UpdateAdminPasswordSchema,
   UpdateAdminPhoneSchema,
+  UpdateProfileSchema,
   UserInfoResponsePayload,
   VerifyLoginCodeSchema,
   createUserController,
@@ -13,6 +14,7 @@ import {
   sendVerifyCodeController,
   updateAdminPasswordController,
   updateAdminPhoneController,
+  updateProfileController,
   userInfoController,
   users,
   verifyLoginCodeController,
@@ -42,5 +44,9 @@ export const userRouter = router({
   logout: userProtectedProcedure
     .output(LogoutPayloadSchema)
     .mutation(logoutController),
-  userInfo: userProtectedProcedure.output(UserInfoResponsePayload).query(userInfoController)
+  userInfo: userProtectedProcedure.output(UserInfoResponsePayload).query(userInfoController),
+  updateProfile: userProtectedProcedure
+    .input(UpdateProfileSchema)
+    .output(UserInfoResponsePayload)
+    .mutation(updateProfileController),
 });

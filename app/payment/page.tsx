@@ -1,63 +1,30 @@
-"use client";
+import type { Metadata } from "next";
+import Layout from "@/Components/Layout/Layout";
+import PaymentResult from "@/Components/Payment/PaymentResult";
 
-import React, { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+export const metadata: Metadata = {
+  title: "نتیجه پرداخت",
+  robots: { index: false, follow: false },
+};
 
-import Link from "next/link";
-import Success from "@/Components/Payment/Success";
-import { trpc } from "@/utils/trpc";
-import { Metadata } from "next";
-type Props = {};
+type SearchParams = Record<string, string | string[] | undefined>;
 
+/** The gateway sometimes returns HTML-escaped separators, e.g. `&amp;trackId=`. */
+function readParam(params: SearchParams, key: string) {
+  const value = params[key] ?? params[`amp;${key}`];
+  return (Array.isArray(value) ? value[0] : value) ?? null;
+}
 
-
-export default function Payment({}: Props) {
-  const router = useRouter();
-  const { data, mutate: mutateInquiry } =
-    trpc.payment.inquiryPayment.useMutation();
-  const PaymentStatusComponents = {
-    succuess: { component: () => <Success />, status: [100, 101] },
-  };
-
-  const queries = useSearchParams();
-  const map: any = {};
-
-  queries
-    .toString()
-    .split("&")
-    .map((x) => x.replace("amp%3B", ""))
-    .join("=")
-    .split("=")
-    .map((x: string, i, array) => {
-      if (i % 2 == 0) {
-        map[x] = array[i + 1];
-      }
-    });
-
-  useEffect(() => {
-    if (map.trackId) {
-      mutateInquiry({ track_id: map.trackId });
-    }
-  }, []);
-
-  useEffect(() => {
-    console.log(data);
-    if (data?.paymentStatus === "PAYED") {
-      localStorage.removeItem("shopCart");
-    }
-  }, [data]);
+export default async function PaymentPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const params = await searchParams;
 
   return (
-    <div className="h-screen w-full gap-5 flex flex-col items-center justify-center">
-      {["1", "2"].filter((item) => item === queries.get("status")).length ? (
-        <Success />
-      ) : null}
-      <button
-        onClick={() => router.push("/")}
-        className="w-fit  px-4 py-2 bg-green1 rounded-lg"
-      >
-        <span className="text-white">بازگشت به سایت</span>
-      </button>
-    </div>
+    <Layout footer={false}>
+      <PaymentResult trackId={readParam(params, "trackId")} />
+    </Layout>
   );
 }

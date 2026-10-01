@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
-import { Mag_Typography_SVG, MersehSvg, Merseh_typography } from "../../SVGS";
+import BrandWordmark from "../../Brand/BrandWordmark";
+import { SITE_NAME } from "@/utils/site";
 import "react-loading-skeleton/dist/skeleton.css";
 import UserAuth from "../../UserAuth";
 import Link from "next/link";
@@ -26,19 +27,18 @@ export default function Header() {
           >
             برندها
           </Link>
-          <Link aria-label="مرسه" href={"/"} className="h-full flex items-center ">
+          <Link aria-label={SITE_NAME} href={"/"} className="h-full flex items-center ">
             <span className="text-[15px] font-[500] text-[#4d4d4d]">
-              فروشگاه مرسه
+              فروشگاه {SITE_NAME}
             </span>
           </Link>
         </div>
         <Link
-        aria-label="مجله مرسه"
+        aria-label={`مجله ${SITE_NAME}`}
           className="basis-1/12 flex-none flex  flex-row gap-2 items-center justify-center"
           href={"/mag"}
         >
-          <Mag_Typography_SVG classname="w-[150px] h-auto fill-[#363636]  " />
-          {/* <MersehSvg classname="h-[25px] w-auto" /> */}
+          <BrandWordmark className="text-[26px] text-[#363636]" />
         </Link>
       </div>
     </header>

@@ -1,4 +1,5 @@
-import { categoryType } from "@/Components/Products/Filter";
+import { categoryType } from "@/Components/Products/categoryTree";
+import { toPathSlug } from "@/utils/slug";
 import Link from "next/link";
 import React from "react";
 
@@ -9,7 +10,7 @@ interface Props {
 }
 
 function categoryHref(id: number, title: string) {
-  return `/category/${id}/${title.replaceAll(" ", "-")}`;
+  return `/category/${id}/${toPathSlug(title)}`;
 }
 
 export default function CategoryContext({
@@ -21,12 +22,12 @@ export default function CategoryContext({
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between gap-4 border-b border-[#F0F0F0] pb-4">
-        <h2 className="text-[18px] font-[600] text-black1">{category.title}</h2>
+      <div className="flex items-center justify-between gap-4 border-b border-hairline pb-4">
+        <h2 className="text-[18px] font-[600] text-plum-900">{category.title}</h2>
         <Link
           onClick={closeMenu}
           href={categoryHref(categoryId, category.title)}
-          className="shrink-0 rounded-full bg-green1/10 px-3.5 py-1.5 text-[13px] font-[500] text-green2 transition-colors hover:bg-green1/20"
+          className="shrink-0 rounded-full bg-blush-100 px-3.5 py-1.5 text-[13px] font-[500] text-mauve-700 transition-colors hover:bg-blush-200"
         >
           مشاهده همه
         </Link>
@@ -35,7 +36,7 @@ export default function CategoryContext({
         {category.subCategories?.map((subCategory: categoryType) => (
           <div
             key={subCategory.id}
-            className="flex flex-col gap-2 rounded-xl bg-[#F7F8F7] px-4 py-3.5"
+            className="flex flex-col gap-2 rounded-xl bg-white/65 px-4 py-3.5 ring-1 ring-white/70"
           >
             <Link
               onClick={(e) => {
@@ -45,7 +46,7 @@ export default function CategoryContext({
               href={categoryHref(subCategory.id, subCategory.title)}
               className="w-fit"
             >
-              <span className="text-[15px] font-[600] text-black1 hover:text-green2">
+              <span className="text-[15px] font-[600] text-plum-900 transition-colors hover:text-mauve-700">
                 {subCategory.title}
               </span>
             </Link>
@@ -61,7 +62,7 @@ export default function CategoryContext({
                     href={categoryHref(subCat.id, subCat.title)}
                     className="w-fit rounded-md py-0.5"
                   >
-                    <span className="text-[13px] font-[400] leading-6 text-[#5C5C5C] hover:text-green2">
+                    <span className="text-[13px] font-[400] leading-6 text-lightBlack transition-colors hover:text-mauve-700">
                       {subCat.title}
                     </span>
                   </Link>

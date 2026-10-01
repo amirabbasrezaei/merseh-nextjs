@@ -1,41 +1,61 @@
-import React, { HTMLAttributes, HTMLInputTypeAttribute } from "react";
-import { UseControllerProps, useController } from "react-hook-form";
+import classNames from "classnames";
+import { useId } from "react";
+import { useController, type UseControllerProps } from "react-hook-form";
+import FieldShell from "./Checkout/FieldShell";
+import { fieldClass } from "./Checkout/ui";
+import type { FormTypes } from "./Shipping/Address/Add_Address";
 
-import { FormTypes } from "./Shipping/Address/Add_Address";
+type Option = { id: number; name: string };
 
 interface Props extends UseControllerProps<FormTypes> {
-  className?: HTMLAttributes<HTMLInputElement>["className"];
-  placeholder?: string;
   lableText: string;
-  data: any[] | null | undefined;
+  data: Option[] | null | undefined;
+  placeholder?: string;
+  className?: string;
 }
 
-export default function SelectInput(props: Props) {
-  const { lableText, data, placeholder } = props;
-  const { field } = useController(props);
+export default function SelectInput({
+  lableText,
+  data,
+  placeholder,
+  className,
+  ...controllerProps
+}: Props) {
+  const id = useId();
+  const { field, fieldState } = useController(controllerProps);
+  const error = fieldState.error?.message;
 
   return (
-    <div style={{ height: 50, borderRadius: "10px" }} className=" relative ">
+    <FieldShell
+      id={id}
+      label={lableText}
+      required={Boolean(controllerProps.rules?.required || controllerProps.rules?.validate)}
+      error={error}
+      className={className}
+    >
       <select
-        
         {...field}
-        className="block   w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+        id={id}
+        disabled={!data?.length}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? `${id}-error` : undefined}
+        className={classNames(fieldClass, "h-12 cursor-pointer appearance-none bg-no-repeat pl-10")}
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238A4A55' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")",
+          backgroundPosition: "left 1rem center",
+          backgroundSize: "1rem",
+        }}
       >
-        <option disabled  value={-1} className="">
+        <option disabled value={-1}>
           {placeholder}
         </option>
-        {data?.length
-          ? data.map((item: any, index) => (
-              <option key={index} value={item.id} className="">
-                {item.name}
-              </option>
-            ))
-          : null}
+        {data?.map((item) => (
+          <option key={item.id} value={item.id}>
+            {item.name}
+          </option>
+        ))}
       </select>
-      <span className="absolute top-[-14px] text-[14px]  right-4  bg-white px-3 text-black1">
-        {lableText}
-        {props.rules?.required ? <span className="text-red-700">*</span> : null}
-      </span>
-    </div>
+    </FieldShell>
   );
 }

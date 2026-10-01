@@ -15,7 +15,7 @@ export function generateMetadata(): Metadata {
 export default function page() {
   return (
     <Layout footer={false}>
-      <Profile />
+      <Profile section="account" />
     </Layout>
   );
 }

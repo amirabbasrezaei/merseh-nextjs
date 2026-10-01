@@ -6,6 +6,7 @@ import { Metadata, NextPage } from "next";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
+import { SITE_NAME } from "@/utils/site";
 
 export const revalidate = 3600;
 
@@ -191,7 +192,7 @@ export default async function Page({
       seller: {
         "@type": "HealthAndBeautyBusiness",
         url: process.env.BASE_URL,
-        name: "فروشگاه مرسه",
+        name: `فروشگاه ${SITE_NAME}`,
       },
     },
   };

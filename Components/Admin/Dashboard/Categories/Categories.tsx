@@ -49,6 +49,7 @@ export default function Categories() {
               key={category.id}
               title={category.title}
               id={String(category.id)}
+              imageUrl={category.imageUrl}
               currentStatus={category.status}
               selectOptions={data.statusOptions}
             />

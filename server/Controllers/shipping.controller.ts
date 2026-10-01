@@ -1,110 +1,77 @@
 import { z } from "zod";
-import { estimate_miare_price } from "./shipping/miare.controller";
+import { TRPCError } from "@trpc/server";
 import { ArgsStructure } from "./category.controller";
 import CitiesJson from "../../public/gistfile1.json";
-import { podroShippingPrices } from "./shipping/podro.controller";
 import { publicUrl } from "../utils/storage";
+import { activeCarrierWhere, carrierWhere } from "../utils/shippingCarriers";
 
-export const ShippingPricesInputSchema = z.object({
-  addressId: z.string(),
-  orderId: z.number(),
+type CarrierRecord = {
+  id: string;
+  name: string;
+  price: number;
+  isActive: boolean;
+  imageFile: { key: string } | null;
+};
+
+function mapCarrier(carrier: CarrierRecord) {
+  return {
+    id: carrier.id,
+    name: carrier.name,
+    price: carrier.price,
+    isActive: carrier.isActive,
+    imageUrl: carrier.imageFile ? publicUrl(carrier.imageFile.key) : null,
+  };
+}
+
+export async function shippingMethodsController({ ctx }: ArgsStructure) {
+  const carriers = await ctx.prisma.shippingPartner.findMany({
+    where: activeCarrierWhere,
+    orderBy: { sortOrder: "asc" },
+    include: { imageFile: { select: { key: true } } },
+  });
+  return { methods: carriers.map(mapCarrier) };
+}
+
+export async function listCarriersAdminController({ ctx }: ArgsStructure) {
+  const carriers = await ctx.prisma.shippingPartner.findMany({
+    where: carrierWhere,
+    orderBy: { sortOrder: "asc" },
+    include: { imageFile: { select: { key: true } } },
+  });
+  return { carriers: carriers.map(mapCarrier) };
+}
+
+export const updateCarrierInput = z.object({
+  id: z.string().min(1),
+  price: z.number().int().min(0),
+  isActive: z.boolean(),
 });
 
-type ShippingPricesInput = z.infer<typeof ShippingPricesInputSchema>;
-export async function getShippingPricesController({
+export async function updateCarrierController({
   ctx,
   input,
-}: ArgsStructure<ShippingPricesInput>) {
-  const { prisma, user } = ctx;
-
-  try {
-    const address = await prisma.address.findUnique({
-      where: {
-        id: input.addressId,
-        User: {
-          id: user.userId,
-        },
-      },
-    });
-
-    if (!address) {
-      return {
-        shippings: null,
-        error: null,
-        message: "need to add address",
-        needToAddAddress: true,
-      };
-    }
-
-    const order = await prisma.order.update({
-      where: {
-        id: input.orderId,
-      },
-      data: {
-        addressId: input.addressId,
-      },
-      select: { Address: { select: { city: true } }, id: true },
-    });
-
-    const coordinateBody = {
-      origin: {
-        latitude: Number(process.env.STORE_LATITUDE) as number,
-        longitude: Number(process.env.STORE_LONGITUDE) as number,
-      },
-      destination: {
-        latitude: address.latitude,
-        longitude: address.longitude,
-      },
-    };
-    const shippings = [];
-    if (order.Address?.city.podroCode === "2301") {
-      const miare = await estimate_miare_price(coordinateBody);
-      if (miare) {
-        const miarePartner = await prisma.shippingPartner.findFirst({
-          where: { name: "miare" },
-          include: { imageFile: true },
-        });
-        shippings.push({
-          shippingTypeName: "پیک موتوری",
-          shippingPartners: [
-            {
-              title: "میاره",
-              name: "miare",
-              image: miarePartner?.imageFile
-                ? publicUrl(miarePartner.imageFile.key)
-                : "",
-              price: miare.price,
-              shippingPartnerId: miarePartner?.id || 1,
-            },
-          ],
-        });
-      }
-    }
-    try {
-      const podro = await podroShippingPrices({ orderId: order.id, prisma });
-
-      if (podro?.shipping) {
-        const podro_shippings = {
-          shippingTypeName: "شرکت های پستی",
-          shippingPartners: podro.shipping.map((sh: any) => ({
-            title: sh.title,
-            name: sh.name,
-            image: sh.logo,
-            price: sh.price,
-            shippingPartnerId: sh.id,
-          })),
-        };
-
-        shippings.push(podro_shippings);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-
-    return { shippings, error: null };
-  } catch (error) {
-    return { shippings: null, error };
+}: ArgsStructure<z.infer<typeof updateCarrierInput>>) {
+  const { prisma } = ctx;
+  const carrier = await prisma.shippingPartner.findFirst({
+    where: { id: input.id, ...carrierWhere },
+    select: { id: true },
+  });
+  if (!carrier) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "روش ارسال یافت نشد" });
   }
+  if (input.isActive && input.price <= 0) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "برای فعال‌کردن، هزینه ارسال را وارد کنید",
+    });
+  }
+
+  const updated = await prisma.shippingPartner.update({
+    where: { id: carrier.id },
+    data: { price: input.price, isActive: input.isActive },
+    include: { imageFile: { select: { key: true } } },
+  });
+  return { carrier: mapCarrier(updated) };
 }
 
 export async function userAddressesController({ ctx }: ArgsStructure) {

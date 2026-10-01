@@ -1,6 +1,5 @@
 import { trpc } from "@/utils/trpc";
 import React, { useEffect, useState } from "react";
-import Button from "../Button";
 import { Send_SVG } from "../SVGS";
 import { AnimatePresence } from "framer-motion";
 import PopUp from "../PopUp";
@@ -56,7 +55,7 @@ export default function NewComment({
       }}
         value={value || ""}
         onChange={(e) => setValue(e.target.value || "")}
-        className="appearance-none p-4 w-full sm:w-[500px] h-[100px] outline-none rounded-[10px] border border-[#ECECEC] bg-[#F9F9F9] "
+        className="home-focus h-[100px] w-full appearance-none rounded-card border border-hairline bg-sand p-4 text-body text-plum-900 outline-none sm:max-w-[500px]"
       />
       {value !== null ? (
         <span
@@ -64,7 +63,7 @@ export default function NewComment({
             visibility:
               value.length < 3 || value.length > 150 ? "visible" : "hidden",
           }}
-          className="text-red-800 text-[13px]"
+          className="text-caption text-mauve-700"
         >
           {value.length < 3
             ? "طول متن حداقل 3 حرف می‌باشد. "
@@ -83,21 +82,21 @@ export default function NewComment({
               parentCommentId: parentCommentId,
             })
           }
-          className="w-fit flex flex-row gap-1 items-center  border border-[#e3e3e3] rounded-[10px] px-4 py-2"
+          className="home-focus inline-flex w-fit flex-row items-center gap-1 rounded-full border border-hairline px-4 py-2 disabled:opacity-50"
         >
-          <span className="text-[16px] text-[#636363] font-[300]">
+          <span className="text-small text-plum-900">
             ثبت دیدگاه
           </span>
-          <Send_SVG classname="fill-green2 w-5 h-auto -rotate-[135deg]" />
+          <Send_SVG classname="h-auto w-5 -rotate-[135deg] fill-mauve-700" />
         </button>
-        <button onClick={() => setShowReply(false)} className="text-gray-600">
+        <button onClick={() => setShowReply(false)} className="home-focus text-small text-lightBlack">
           انصراف
         </button>
       </div>
     </form>
     {addCommentData?.status === "ok" ? (
-        <div className="flex flex-col bg-gray-100 w-fit rounded-md p-5 gap-3">
-          <strong className="text-sky-900">
+        <div className="flex w-fit flex-col gap-2 rounded-card border border-hairline bg-ivory p-5">
+          <strong className="text-small text-plum-900">
             {userInfo?.name || ""} عزیز سپاسگذاریم بابت ثبت دیدگاه ارزشمندت :)
           </strong>
           <span>نظر شما پس از تائید توسط مدیر نمایش داده می‌شود.</span>
@@ -116,9 +115,9 @@ export default function NewComment({
                   setShowNotRegisteredPopUp(false);
                   setThemeStore((state) => ({ ...state, openAuthModal: true }));
                 }}
-                className=" px-4 py-2 rounded-md cursor-pointer hover:bg-gray-100"
+                className="home-focus cursor-pointer rounded-full px-4 py-2 hover:bg-blush-100"
               >
-                <span className="text-green2 font-[600]">ورود | ثبت نام</span>
+                <span className="text-small font-medium text-mauve-700">ورود | ثبت نام</span>
               </div>
             </div>
           </PopUp>

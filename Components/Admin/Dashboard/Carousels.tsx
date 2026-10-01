@@ -24,10 +24,6 @@ export default function Carousels() {
   const { data, isLoading } = trpc.carousel.list.useQuery();
   const carousels = data?.carousels ?? [];
 
-  const reorder = trpc.carousel.reorder.useMutation({
-    onSuccess: () => utils.carousel.list.invalidate(),
-    onError: () => toast.error("تغییر ترتیب ناموفق بود"),
-  });
   const setActive = trpc.carousel.setActive.useMutation({
     onSuccess: () => utils.carousel.list.invalidate(),
     onError: () => toast.error("تغییر وضعیت ناموفق بود"),
@@ -40,21 +36,11 @@ export default function Carousels() {
     onError: () => toast.error("حذف کاروسل ناموفق بود"),
   });
 
-  const move = (index: number, direction: -1 | 1) => {
-    const next = index + direction;
-    if (next < 0 || next >= carousels.length) return;
-    const orderedIds = carousels.map((item) => item.id);
-    const current = orderedIds[index];
-    orderedIds[index] = orderedIds[next];
-    orderedIds[next] = current;
-    reorder.mutate({ orderedIds });
-  };
-
   return (
     <div className="flex flex-col">
       <AdminPageHeader
         title="کاروسل‌ها"
-        description="بخش‌های محصول صفحه اصلی. ترتیب همین‌جا ترتیب نمایش در خانه است."
+        description="هر ردیف با شناسه‌اش به یک کامپوننت HomeCarousel در صفحه وصل می‌شود. جای نمایش را محل همان کامپوننت مشخص می‌کند."
         actions={
           <AdminLinkButton href="/admin/carousel">افزودن کاروسل</AdminLinkButton>
         }
@@ -63,7 +49,7 @@ export default function Carousels() {
         <AdminLoading />
       ) : carousels.length ? (
         <AdminList>
-          {carousels.map((carousel, index) => {
+          {carousels.map((carousel) => {
             const target =
               carousel.source === "CATEGORY"
                 ? carousel.categoryTitle
@@ -93,6 +79,10 @@ export default function Carousels() {
                       {carousel.title}
                     </Link>
                     <p className="truncate text-sm text-lightBlack">
+                      <span className="font-mono text-black1" dir="ltr">
+                        {carousel.slot}
+                      </span>
+                      {" · "}
                       {SOURCE_LABEL[carousel.source]}
                       {target ? ` · ${target}` : ""}
                     </p>
@@ -102,22 +92,6 @@ export default function Carousels() {
                   </AdminBadge>
                 </div>
                 <div className="flex shrink-0 flex-wrap items-center gap-2">
-                  <AdminButton
-                    variant="secondary"
-                    size="sm"
-                    disabled={index === 0 || reorder.isPending}
-                    onClick={() => move(index, -1)}
-                  >
-                    بالا
-                  </AdminButton>
-                  <AdminButton
-                    variant="secondary"
-                    size="sm"
-                    disabled={index === carousels.length - 1 || reorder.isPending}
-                    onClick={() => move(index, 1)}
-                  >
-                    پایین
-                  </AdminButton>
                   <AdminButton
                     variant="secondary"
                     size="sm"

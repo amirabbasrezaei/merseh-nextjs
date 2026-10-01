@@ -4,7 +4,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { trpc } from "@/utils/trpc";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { categoryType } from "@/Components/Products/Filter";
+import { categoryType } from "@/Components/Products/categoryTree";
 import { Check, Chevron_Down, Plus_Svg } from "@/Components/SVGS";
 import { ManageCategory } from "./ManageCategory";
 
@@ -71,6 +71,7 @@ export default function GetCategories({
               name: cat.title,
               content: cat.content || "",
               metaDescription: cat.metaDescription,
+              imageUrl: cat.imageUrl,
             }));
           }}
           style={{ cursor: "pointer" }} // it doesn't work with taiwlind

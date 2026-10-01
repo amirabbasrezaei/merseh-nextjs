@@ -9,11 +9,9 @@ import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
 import "swiper/css";
 import useWindowSize from "../../useWindowSize";
 import { Autoplay } from "swiper/modules";
-import {
-  Merseh_nastaliq,
-  MersehSvg_no_color,
-  Shop_Cart,
-} from "@/Components/SVGS";
+import BrandWordmark from "@/Components/Brand/BrandWordmark";
+import { SITE_NAME } from "@/utils/site";
+import { MersehSvg_no_color, Shop_Cart } from "@/Components/SVGS";
 
 interface Props {
   products: CallToActionProductType[];
@@ -105,7 +103,7 @@ export default function CallToActionProducts({ products }: Props) {
         </Swiper>
       </div>
       <div className="  flex items-center justify-start w-full mr-10 mt-5">
-        <Merseh_nastaliq classname="w-[40px] fill-[#414141]" />
+        <BrandWordmark className="text-[22px] text-[#414141]" />
       </div>
       <motion.div
         variants={parentAnimation}
@@ -142,7 +140,7 @@ export default function CallToActionProducts({ products }: Props) {
               className="bg-[#006CD0] text-white px-4 py-2 rounded-lg w-full md:w-fit flex flex-row gap-3  justify-center items-center"
               variants={childAnimation}
             >
-              <span className="font-[400]">ورود به فروشگاه مرسه</span>
+              <span className="font-[400]">ورود به فروشگاه {SITE_NAME}</span>
               <MersehSvg_no_color classname="w-6 fill-white" />
             </motion.div>
           </Link>

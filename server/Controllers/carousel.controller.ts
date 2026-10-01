@@ -22,6 +22,26 @@ const imageInput = z.object({
 
 const sourceSchema = z.enum(["CATEGORY", "BRAND", "MANUAL"]);
 
+const slotSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .min(1, "شناسه را وارد کنید")
+  .max(40)
+  .regex(
+    /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+    "شناسه فقط حروف انگلیسی کوچک، عدد و خط تیره می‌پذیرد"
+  );
+
+function isUniqueConflict(error: unknown) {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    error.code === "P2002"
+  );
+}
+
 const carouselInclude = {
   logoFile: true,
   category: { select: { id: true, title: true } },
@@ -38,11 +58,11 @@ const carouselInclude = {
 
 type CarouselRecord = {
   id: number;
+  slot: string;
   title: string;
   source: HomeCarouselSource;
   categoryId: number | null;
   brandId: number | null;
-  sortOrder: number;
   isActive: boolean;
   logoFileId: string | null;
   logoFile: { key: string } | null;
@@ -55,6 +75,7 @@ type CarouselRecord = {
       name: string;
       status: string;
       price: number;
+      discount: number;
       galleryFiles?: { file: { key: string } }[];
       brand?: { id: number; name: string; isActive: boolean } | null;
     };
@@ -78,11 +99,11 @@ function showMoreHref(carousel: {
 function mapCarouselAdmin(carousel: CarouselRecord) {
   return {
     id: carousel.id,
+    slot: carousel.slot,
     title: carousel.title,
     source: carousel.source,
     categoryId: carousel.categoryId,
     brandId: carousel.brandId,
-    sortOrder: carousel.sortOrder,
     isActive: carousel.isActive,
     logoUrl: carousel.logoFile ? publicUrl(carousel.logoFile.key) : null,
     categoryTitle: carousel.category?.title ?? null,
@@ -144,13 +165,14 @@ export async function listActiveCarouselsController({
 }: ArgsStructure) {
   const carousels = await prisma.homeCarousel.findMany({
     where: { isActive: true },
-    orderBy: { sortOrder: "asc" },
+    orderBy: { slot: "asc" },
     include: carouselInclude,
   });
 
   const resolved = await Promise.all(
     carousels.map(async (carousel) => ({
       id: carousel.id,
+      slot: carousel.slot,
       title: carousel.title,
       logoUrl: carousel.logoFile ? publicUrl(carousel.logoFile.key) : null,
       showMoreHref: showMoreHref(carousel),
@@ -167,7 +189,7 @@ export async function listCarouselsAdminController({
   ctx: { prisma },
 }: ArgsStructure) {
   const carousels = await prisma.homeCarousel.findMany({
-    orderBy: { sortOrder: "asc" },
+    orderBy: { slot: "asc" },
     include: carouselInclude,
   });
   return { carousels: carousels.map(mapCarouselAdmin) };
@@ -192,6 +214,7 @@ export async function getCarouselAdminController({
 }
 
 const carouselFields = {
+  slot: slotSchema,
   title: z.string().trim().min(1),
   source: sourceSchema,
   categoryId: z.number().int().nullable().optional(),
@@ -273,20 +296,27 @@ export async function createCarouselController({
     logoFileId = file.id;
   }
 
-  const maxOrder = await prisma.homeCarousel.aggregate({
-    _max: { sortOrder: true },
-  });
-
-  const carousel = await prisma.homeCarousel.create({
-    data: {
-      title: input.title,
-      source: input.source,
-      isActive: input.isActive ?? true,
-      sortOrder: (maxOrder._max.sortOrder ?? -1) + 1,
-      logoFileId,
-      ...links,
-    },
-  });
+  let carousel;
+  try {
+    carousel = await prisma.homeCarousel.create({
+      data: {
+        slot: input.slot,
+        title: input.title,
+        source: input.source,
+        isActive: input.isActive ?? true,
+        logoFileId,
+        ...links,
+      },
+    });
+  } catch (error) {
+    if (isUniqueConflict(error)) {
+      throw new TRPCError({
+        code: "CONFLICT",
+        message: "این شناسه قبلاً برای کاروسل دیگری استفاده شده است",
+      });
+    }
+    throw error;
+  }
 
   await replaceManualProducts(
     prisma,
@@ -338,16 +368,27 @@ export async function updateCarouselController({
     logoFileId = null;
   }
 
-  await prisma.homeCarousel.update({
-    where: { id: input.id },
-    data: {
-      title: input.title,
-      source: input.source,
-      isActive: input.isActive,
-      logoFileId,
-      ...links,
-    },
-  });
+  try {
+    await prisma.homeCarousel.update({
+      where: { id: input.id },
+      data: {
+        slot: input.slot,
+        title: input.title,
+        source: input.source,
+        isActive: input.isActive,
+        logoFileId,
+        ...links,
+      },
+    });
+  } catch (error) {
+    if (isUniqueConflict(error)) {
+      throw new TRPCError({
+        code: "CONFLICT",
+        message: "این شناسه قبلاً برای کاروسل دیگری استفاده شده است",
+      });
+    }
+    throw error;
+  }
 
   await replaceManualProducts(prisma, input.id, input.source, input.productIds);
 
@@ -360,25 +401,6 @@ export async function updateCarouselController({
     include: carouselInclude,
   });
   return { carousel: mapCarouselAdmin(saved) };
-}
-
-export const reorderCarouselsInput = z.object({
-  orderedIds: z.array(z.number().int()),
-});
-
-export async function reorderCarouselsController({
-  ctx: { prisma },
-  input,
-}: ArgsStructure<z.infer<typeof reorderCarouselsInput>>) {
-  await prisma.$transaction(
-    input.orderedIds.map((id, index) =>
-      prisma.homeCarousel.updateMany({
-        where: { id },
-        data: { sortOrder: index },
-      })
-    )
-  );
-  return { status: "ok" as const };
 }
 
 export const setCarouselActiveInput = z.object({

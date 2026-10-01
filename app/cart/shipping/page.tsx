@@ -5,7 +5,7 @@ import React from "react";
 
 export function generateMetadata(): Metadata {
   return {
-    title: "انتخاب آدرس",
+    title: "آدرس و روش ارسال",
     alternates: {
       canonical: `${process.env.BASE_URL}/cart/shipping`,
     },

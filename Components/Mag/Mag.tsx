@@ -1,6 +1,7 @@
 import React from "react";
 import RecentArticles from "./RecentArticles";
 import Link from "next/link";
+import { SITE_NAME } from "@/utils/site";
 
 export default async function Mag() {
   return (
@@ -8,7 +9,7 @@ export default async function Mag() {
       <div className="w-full flex justify-center relative">
         {/* <hr className="w-full" /> */}
         <h1 className="absolute -top-3 bg-white text-gray-500 px-4">
-          مجله مرسه
+          مجله {SITE_NAME}
         </h1>
       </div>
       <RecentArticles />

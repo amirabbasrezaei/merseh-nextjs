@@ -3,6 +3,7 @@ import { trpc } from "@/utils/trpc";
 import React from "react";
 import ArticleCard from "./ArticleCard";
 import { motion } from "framer-motion";
+import { SITE_NAME } from "@/utils/site";
 
 interface Props {
   articlesData: any
@@ -12,7 +13,7 @@ export default function Articles({articlesData}: Props) {
 
   return (
     <section className="flex flex-col w-full  items-center md:px-10">
-      <h1 className="font-[500] my-5">خواندنی های مجله مرسه</h1>
+      <h1 className="font-[500] my-5">خواندنی های مجله {SITE_NAME}</h1>
       <div className="grid  grid-cols-1 grid-rows-none xl:grid-cols-2 gap-8  md:gap-14   justify-between w-full">
         {articlesData?.articles?.length
           ? articlesData.articles.map((article: any) => (

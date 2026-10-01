@@ -1,51 +1,43 @@
-import React, {
-  DetailedHTMLProps,
-  HTMLAttributes,
-  HTMLInputTypeAttribute,
-  InputHTMLAttributes,
-} from "react";
-import {
-  Control,
-  useController,
-  UseControllerProps,
-  UseFormGetValues,
-} from "react-hook-form";
-import { FormTypes } from "./Shipping/Address/Add_Address";
+import classNames from "classnames";
+import { useId } from "react";
+import { useController, type UseControllerProps } from "react-hook-form";
+import FieldShell from "./Checkout/FieldShell";
+import { fieldClass } from "./Checkout/ui";
+import type { FormTypes } from "./Shipping/Address/Add_Address";
 
 interface Props extends UseControllerProps<FormTypes> {
-  value?: any;
-  setValue?: any;
-  className?: HTMLAttributes<HTMLInputElement>["className"];
-  formSettings?: DetailedHTMLProps<
-    InputHTMLAttributes<HTMLInputElement>,
-    HTMLInputElement
-  >;
-  placeholder?: string;
   lableText: string;
+  placeholder?: string;
+  className?: string;
 }
 
-export default function TextArea(props: Props) {
-  const { setValue, value, className, formSettings, placeholder, lableText } =
-    props;
-
-  const { field, fieldState } = useController(props);
+export default function TextArea({
+  lableText,
+  placeholder,
+  className,
+  ...controllerProps
+}: Props) {
+  const id = useId();
+  const { field, fieldState } = useController(controllerProps);
+  const error = fieldState.error?.message;
 
   return (
-    <div
-      style={{ height: "fit", borderRadius: "10px" }}
-      className="row-span-3 relative"
+    <FieldShell
+      id={id}
+      label={lableText}
+      required={Boolean(controllerProps.rules?.required)}
+      error={error}
+      className={className}
     >
       <textarea
-        style={{ height: 100, borderRadius: "10px" }}
         {...field}
-        rows={10}
-        className={`appearance-none border   border-gray-200 outline-none focus:outline-green1     ${className}`}
+        id={id}
+        rows={3}
         placeholder={placeholder}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? `${id}-error` : undefined}
+        className={classNames(fieldClass, "resize-none py-3 leading-7")}
       />
-      <span className="absolute top-[-14px] text-[14px]  right-4  bg-white px-3 text-black1">
-        {lableText}
-        {props.rules?.required ? <span className="text-red-700">*</span> : null}
-      </span>
-    </div>
+    </FieldShell>
   );
 }

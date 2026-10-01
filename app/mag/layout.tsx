@@ -1,13 +1,15 @@
 import { Metadata } from "next";
+import { SITE_NAME } from "@/utils/site";
 
+const magazineName = `مجله ${SITE_NAME}`;
 
 export const metadata: Metadata = {
   title: {
-    default: "مجله مرسه",
-    template: "%s  -  مجله مرسه",
+    default: magazineName,
+    template: `%s - ${magazineName}`,
   },
   description:
-    "مجله مرسه کاربردی ترین و جدیدترین موضوعات مربوط به حوزه سلامتی، محصولات طبیعی و ارگانیک را منتشر می‌کند",
+    `${magazineName} کاربردی ترین و جدیدترین موضوعات مربوط به حوزه سلامتی، محصولات طبیعی و ارگانیک را منتشر می‌کند`,
   alternates: {
     canonical: `${process.env.BASE_URL}/mag`,
   },
@@ -15,9 +17,9 @@ export const metadata: Metadata = {
   robots: { follow: true, index: true },
   openGraph: {
     locale: "fa_IR",
-    siteName: "مجله مرسه",
+    siteName: magazineName,
     type: "article",
-    authors: "مجله مرسه",
+    authors: magazineName,
   },
   other: {
     currency: "IRT",

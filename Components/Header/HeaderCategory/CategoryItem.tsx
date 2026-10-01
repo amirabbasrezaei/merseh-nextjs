@@ -32,15 +32,15 @@ export default function CategoryItem({
         className={classNames(
           "flex h-12 cursor-pointer flex-row items-center justify-between gap-2 rounded-xl px-3.5 transition-colors",
           isSelected
-            ? "bg-white text-green2 shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
-            : "bg-transparent text-[#4E4E4E] hover:bg-white/80"
+            ? "bg-white text-mauve-700 shadow-card"
+            : "bg-transparent text-black1 hover:bg-white/80 hover:text-plum-900"
         )}
       >
         <span className="text-inherit text-[15px] font-[500] text-nowrap">
           {categoryName}
         </span>
         {isSelected ? (
-          <Chevron_Down classname="h-auto w-2.5 shrink-0 rotate-90 fill-green2" />
+          <Chevron_Down classname="h-auto w-2.5 shrink-0 rotate-90 fill-mauve-700" />
         ) : null}
       </div>
     </Link>

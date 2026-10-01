@@ -1,26 +1,35 @@
 import Layout from "@/Components/Layout/Layout";
 import Profile from "@/Components/Profile/Profile";
+import { findProfileSectionBySlug } from "@/Components/Profile/sections";
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import React from "react";
 
-export async function generateMetadata({
-  params,
-}: {
+type Props = {
   params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  const section = findProfileSectionBySlug(slug);
+  if (!section) notFound();
+
   return {
-    title: slug === "orders" ? "سفارش ها" : "",
+    title: section.label,
     alternates: {
-      canonical: `${process.env.BASE_URL}/${slug}`,
+      canonical: `${process.env.BASE_URL}${section.href}`,
     },
   };
 }
 
-export default function page() {
+export default async function page({ params }: Props) {
+  const { slug } = await params;
+  const section = findProfileSectionBySlug(slug);
+  if (!section) notFound();
+
   return (
     <Layout footer={false}>
-      <Profile />
+      <Profile section={section.id} />
     </Layout>
   );
 }

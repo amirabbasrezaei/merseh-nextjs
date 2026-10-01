@@ -2,6 +2,7 @@
 
 import { Edit_Svg } from "@/Components/SVGS";
 import { trpc } from "@/utils/trpc";
+import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { AdminListRow } from "../../ui/AdminList";
@@ -11,6 +12,7 @@ import AdminBadge, { statusTone } from "../../ui/AdminBadge";
 interface Props {
   title: string;
   id: string;
+  imageUrl?: string;
   commentCount?: number;
   selectOptions: { value: string; name: string }[];
   currentStatus: string;
@@ -19,6 +21,7 @@ interface Props {
 export default function Item({
   title,
   id,
+  imageUrl,
   selectOptions,
   currentStatus,
 }: Props) {
@@ -41,6 +44,18 @@ export default function Item({
   return (
     <AdminListRow>
       <div className="flex min-w-0 items-center gap-3">
+        <div className="relative h-12 w-10 shrink-0 overflow-hidden rounded-lg bg-gray-100">
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt=""
+              fill
+              quality={75}
+              sizes="40px"
+              className="object-cover"
+            />
+          ) : null}
+        </div>
         <Link
           href={`/category/${id}`}
           className="truncate text-base font-medium text-black1 hover:text-green2"

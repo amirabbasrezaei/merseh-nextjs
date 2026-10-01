@@ -10,6 +10,7 @@ import { trpc } from "@/utils/trpc";
 import classNames from "classnames";
 import { Loading_SVG } from "../SVGS";
 import { authButtonClass } from "./authStyles";
+import { useResetAccountQueries } from "./useResetAccountQueries";
 
 interface Props {
   setLoginStatus: Dispatch<SetStateAction<number>>;
@@ -33,12 +34,12 @@ export default function Verify({
 
   const inputRef = useRef<HTMLInputElement>(null);
   const [code, setCode] = useState<string>("");
-  const utils = trpc.useUtils();
+  const resetAccountQueries = useResetAccountQueries();
 
   useEffect(() => {
     if (data?.accessToken) {
       if (isModal) {
-        utils.user.userInfo.refetch();
+        resetAccountQueries();
       }
     }
   }, [data, error]);

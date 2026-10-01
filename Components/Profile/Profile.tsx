@@ -1,69 +1,97 @@
 "use client";
-import { usePathname, useRouter } from "next/navigation";
-import React, { useState } from "react";
-import { Order_Svg, User_Svg } from "../SVGS";
-import classNames from "classnames";
-import ProfileInfo from "./ProfileInfo";
-import Orders from "./Orders";
 
-export default function Profile() {
-  const path = usePathname();
-  const router = useRouter();
-  const [] = useState();
+import React, { useEffect, useRef } from "react";
+import { trpc } from "@/utils/trpc";
+import { useThemeStore } from "../ThemeController";
+import { Login_icon, Profile_Svg } from "../SVGS";
+import ProfileNav from "./ProfileNav";
+import ProfileInfo from "./ProfileInfo";
+import ProfileAddresses from "./ProfileAddresses";
+import Orders from "./Orders";
+import type { ProfileSectionId } from "./sections";
+import { EmptyState, SkeletonBlock, buttonClass } from "./ui/ProfileCard";
+
+type Props = {
+  section: ProfileSectionId;
+};
+
+export default function Profile({ section }: Props) {
+  const setThemeStore = useThemeStore.setState;
+  const {
+    data: userInfo,
+    isLoading,
+    error,
+    refetch,
+  } = trpc.user.userInfo.useQuery(undefined, { retry: false });
+
+  const needsLogin = error?.data?.code === "UNAUTHORIZED";
+  const isSignedIn = Boolean(userInfo) && !error;
+
+  // Prompt only when the page is opened signed out, not after logging out here.
+  const hadUser = useRef(false);
+  useEffect(() => {
+    if (isSignedIn) hadUser.current = true;
+  }, [isSignedIn]);
+  useEffect(() => {
+    if (needsLogin && !hadUser.current) {
+      setThemeStore({ openAuthModal: true });
+    }
+  }, [needsLogin, setThemeStore]);
+
   return (
-    <section className="w-full flex flex-col  sm:flex-row sm:px-5 h-full gap-6">
-      <div className="sm:basis-1/6 gap-5 grid grid-cols-2 sm:flex flex-col items-center   h-[100px]">
-        <div
-          onClick={() => router.push("/profile")}
-          className={classNames(
-            "h-[30px] w-full cursor-pointer flex flex-row items-center justify-start pr-5 gap-1 py-7 rounded-[10px]",
-            path === "/profile" ? "bg-gray-50" : "bg-white"
-          )}
-        >
-          <User_Svg
-            classname={classNames(
-              " w-8 h-auto",
-              path === "/profile" ? "fill-green1" : "fill-lightBlack"
-            )}
+    <section className="flex w-full flex-col gap-6 sm:px-5 md:flex-row md:items-start md:gap-8">
+      <ProfileNav active={section} />
+
+      <div className="min-w-0 flex-1">
+        {isLoading ? (
+          <div className="flex flex-col gap-5">
+            <SkeletonBlock className="h-40 rounded-panel" />
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <SkeletonBlock className="h-20" />
+              <SkeletonBlock className="h-20" />
+            </div>
+            <SkeletonBlock className="h-64 rounded-tile" />
+          </div>
+        ) : isSignedIn && userInfo ? (
+          section === "account" ? (
+            <ProfileInfo user={userInfo} />
+          ) : section === "addresses" ? (
+            <ProfileAddresses />
+          ) : (
+            <Orders />
+          )
+        ) : needsLogin ? (
+          <EmptyState
+            icon={<Profile_Svg classname="h-7 w-7 stroke-mauve-700" />}
+            title="وارد حساب کاربری خود شوید"
+            description="برای مشاهده اطلاعات حساب، آدرس‌ها و سفارش‌ها ابتدا وارد شوید."
+            action={
+              <button
+                type="button"
+                onClick={() => setThemeStore({ openAuthModal: true })}
+                className={buttonClass("primary")}
+              >
+                <Login_icon classname="h-auto w-[14px] fill-white" />
+                ورود | عضویت
+              </button>
+            }
           />
-          <span
-            className={classNames(
-              path === "/profile" ? "text-black1" : "text-lightBlack",
-              "font-[500]"
-            )}
-          >
-            اطلاعات حساب
-          </span>
-        </div>
-        <div
-          onClick={() => router.push("/profile/orders")}
-          className={classNames(
-            "h-[30px] cursor-pointer w-full flex flex-row items-center justify-start pr-5 gap-1 py-7 rounded-[10px]",
-            path === "/profile/orders" ? "bg-gray-50" : "bg-white"
-          )}
-        >
-          <Order_Svg
-            classname={classNames(
-              " w-8 h-auto",
-              path === "/profile/orders" ? "fill-green1" : "fill-lightBlack"
-            )}
+        ) : (
+          <EmptyState
+            icon={<Profile_Svg classname="h-7 w-7 stroke-mauve-700" />}
+            title="دریافت اطلاعات حساب ممکن نشد"
+            description="اتصال خود را بررسی کنید و دوباره تلاش کنید."
+            action={
+              <button
+                type="button"
+                onClick={() => refetch()}
+                className={buttonClass("secondary")}
+              >
+                تلاش دوباره
+              </button>
+            }
           />
-          <span
-            className={classNames(
-              path === "/profile/orders" ? "text-black1" : "text-lightBlack",
-              "font-[500]"
-            )}
-          >
-            سفارش ها
-          </span>
-        </div>
-      </div>
-      <div className="h-full w-full sm:basis-5/6">
-        {path === "/profile" ? (
-          <ProfileInfo />
-        ) : path === "/profile/orders" ? (
-          <Orders />
-        ) : null}
+        )}
       </div>
     </section>
   );

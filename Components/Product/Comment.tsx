@@ -46,9 +46,9 @@ export default function Comment({
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="border w-full  py-5 px-5 rounded-[10px] flex flex-col gap-4">
+      <div className="flex w-full flex-col gap-4 rounded-card border border-hairline bg-white px-5 py-5">
         <div className="flex flex-row justify-between">
-          <span className="text-[13px] text-lightBlack">{`${authorName} ${authorLastName}`}</span>
+          <span className="text-caption text-lightBlack">{`${authorName} ${authorLastName}`}</span>
           <div
             onClick={() =>
               mutateEditComment({
@@ -65,7 +65,7 @@ export default function Comment({
             )}
           </div>
         </div>
-        <p className="text-[16px] text-black1">{content}</p>
+        <p className="text-body text-plum-900">{content}</p>
         <AnimatePresence mode="sync">
           {!showReply ? (
             <motion.div
@@ -79,7 +79,7 @@ export default function Comment({
                 className="flex flex-row gap-1 justify-center items-center"
               >
                 <Reply_SVG classname="w-4 h-auto stroke-1 fill-[#535353]" />
-                <span className="text-[#535353]">پاسخ</span>
+                <span className="text-small text-plum-900/70">پاسخ</span>
               </button>
             </motion.div>
           ) : (

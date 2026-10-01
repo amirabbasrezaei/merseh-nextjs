@@ -15,6 +15,7 @@ import AdminTextarea from "../ui/AdminTextarea";
 import AdminSelect from "../ui/AdminSelect";
 import AdminButton from "../ui/AdminButton";
 import AdminLinkButton from "../ui/AdminLinkButton";
+import AdminCheckbox from "../ui/AdminCheckbox";
 import type { ManageCategory } from "../Category/ManageCategory";
 
 type Props = {
@@ -59,6 +60,7 @@ export default function ProductEdit({ productId }: Props) {
     "DRAFT"
   );
   const [brandId, setBrandId] = useState<number | null>(null);
+  const [freeShipping, setFreeShipping] = useState(false);
   const { data: brandsData } = trpc.brand.list.useQuery();
   const { data } = trpc.product.getproduct.useQuery(
     { productId: Number(productId) },
@@ -88,6 +90,7 @@ export default function ProductEdit({ productId }: Props) {
       setMetaDescription(data?.product.metaDescription);
       setFilter({ categoryId: data.product.mainCategoryId });
       setBrandId(data.product.brandId ?? null);
+      setFreeShipping(data.product.freeShipping);
     }
   }, [data]);
 
@@ -223,6 +226,7 @@ export default function ProductEdit({ productId }: Props) {
               metaDescription: metaDescription,
               details: productDetails,
               brandId,
+              freeShipping,
             };
             mutateEditProduct(editProductBody);
           } else {
@@ -238,6 +242,7 @@ export default function ProductEdit({ productId }: Props) {
               details: productDetails,
               metaDescription: metaDescription,
               brandId,
+              freeShipping,
             });
           }
         }
@@ -287,6 +292,13 @@ export default function ProductEdit({ productId }: Props) {
               </option>
             ))}
           </AdminSelect>
+          <AdminCheckbox
+            label="ارسال رایگان"
+            hint="اگر همه کالاهای سبد ارسال رایگان داشته باشند، هزینه ارسال صفر می‌شود."
+            checked={freeShipping}
+            onChange={(e) => setFreeShipping(e.currentTarget.checked)}
+            containerClassName="md:col-span-2"
+          />
         </div>
       </AdminPanel>
 

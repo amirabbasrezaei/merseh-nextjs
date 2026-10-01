@@ -6,8 +6,6 @@ import {
   getCarouselAdminController,
   listActiveCarouselsController,
   listCarouselsAdminController,
-  reorderCarouselsController,
-  reorderCarouselsInput,
   searchCarouselProductsController,
   searchCarouselProductsInput,
   setCarouselActiveController,
@@ -29,9 +27,6 @@ export const carouselRouter = router({
   update: adminProtectedProcedure
     .input(updateCarouselInput)
     .mutation(updateCarouselController),
-  reorder: adminProtectedProcedure
-    .input(reorderCarouselsInput)
-    .mutation(reorderCarouselsController),
   setActive: adminProtectedProcedure
     .input(setCarouselActiveInput)
     .mutation(setCarouselActiveController),

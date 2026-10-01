@@ -2,7 +2,12 @@ import { z } from "zod";
 import { ArgsStructure } from "./category.controller";
 import { TRPCClientError } from "@trpc/client";
 import { childrenCategories, parentCategories } from "../utils/category";
-import { galleryImageUrls, galleryInclude } from "../utils/storage";
+import {
+  firstGalleryImageUrl,
+  galleryImageUrls,
+  galleryInclude,
+  publicUrl,
+} from "../utils/storage";
 import { mapStoreBrand } from "../utils/productCard";
 
 export const FilterProductArgsSchema = z.object({
@@ -34,6 +39,8 @@ export async function filterProductController({
       select: {
         id: true,
         price: true,
+        discount: true,
+        freeShipping: true,
         ProductVariation: {
           include: {
             values: true,
@@ -56,8 +63,6 @@ export async function filterProductController({
         title: true,
       },
     });
-
-    console.log(categoryId);
 
     return {
       products: filterProducts.map((product) => {
@@ -82,6 +87,9 @@ export async function filterProductController({
   }
 }
 
+const SEARCH_PRODUCT_LIMIT = 5;
+const SEARCH_CATEGORY_LIMIT = 5;
+
 export const SearchControllerInputSchema = z.object({
   text: z.string(),
 });
@@ -91,16 +99,42 @@ export async function searchController({
   input,
 }: ArgsStructure<z.infer<typeof SearchControllerInputSchema>>) {
   try {
-    const searchResults = await prisma.category.findMany({
-      where: {
-        title: {
-          contains: input.text,
+    const [categories, products] = await Promise.all([
+      prisma.category.findMany({
+        where: { status: "ENABLED", title: { contains: input.text } },
+        take: SEARCH_CATEGORY_LIMIT,
+        select: {
+          id: true,
+          title: true,
+          imageFile: { select: { key: true } },
         },
-      },
-    });
+      }),
+      prisma.product.findMany({
+        where: { status: "PUBLISHED", name: { contains: input.text } },
+        take: SEARCH_PRODUCT_LIMIT,
+        select: {
+          id: true,
+          name: true,
+          price: true,
+          discount: true,
+          ...galleryInclude(),
+        },
+      }),
+    ]);
 
-    return { result: searchResults, status: "ok", error: null };
+    return {
+      result: categories.map(({ imageFile, ...category }) => ({
+        ...category,
+        imageUrl: imageFile ? publicUrl(imageFile.key) : "",
+      })),
+      products: products.map(({ galleryFiles, ...product }) => ({
+        ...product,
+        imageUrl: firstGalleryImageUrl(galleryFiles),
+      })),
+      status: "ok",
+      error: null,
+    };
   } catch (error) {
-    return { result: [], status: "failed", error };
+    return { result: [], products: [], status: "failed", error };
   }
 }

@@ -1,19 +1,24 @@
 import {
   AddAddressInputSchema,
   GetCitiesInputSchema,
-  ShippingPricesInputSchema,
   addAddressController,
   getCitiesController,
-  getShippingPricesController,
   importCities,
+  listCarriersAdminController,
+  shippingMethodsController,
+  updateCarrierController,
+  updateCarrierInput,
   userAddressesController,
 } from "../Controllers/shipping.controller";
-import { publicProcedure, router, userProtectedProcedure } from "../trpc";
+import {
+  adminProtectedProcedure,
+  publicProcedure,
+  router,
+  userProtectedProcedure,
+} from "../trpc";
 
 export const shippingRouter = router({
-  shippingPrices: userProtectedProcedure
-    .input(ShippingPricesInputSchema)
-    .mutation(getShippingPricesController),
+  methods: userProtectedProcedure.query(shippingMethodsController),
   userAddress: userProtectedProcedure.query(userAddressesController),
   addAddress: userProtectedProcedure
     .input(AddAddressInputSchema)
@@ -22,4 +27,8 @@ export const shippingRouter = router({
   getCities: userProtectedProcedure
     .input(GetCitiesInputSchema)
     .query(getCitiesController),
+  adminCarriers: adminProtectedProcedure.query(listCarriersAdminController),
+  updateCarrier: adminProtectedProcedure
+    .input(updateCarrierInput)
+    .mutation(updateCarrierController),
 });

@@ -1,111 +1,143 @@
-import React from "react";
+import Link from "next/link";
+import BrandWordmark from "./Brand/BrandWordmark";
+import { SITE_NAME } from "@/utils/site";
 import {
   Instagram_SVG,
   Location_Pin,
-  Merseh_nastaliq,
   Phone_SVG,
   Telegram_SVG,
 } from "./SVGS";
 
-import Link from "next/link";
+type FooterLink = {
+  label: string;
+  href: string;
+};
+
+const FOOTER_LINKS: { title: string; links: FooterLink[] }[] = [
+  {
+    title: "فروشگاه",
+    links: [
+      { label: "محصولات", href: "/products" },
+      { label: "برندها", href: "/brands" },
+      { label: "دسته‌بندی‌ها", href: "/mcategory" },
+    ],
+  },
+  {
+    title: SITE_NAME,
+    links: [{ label: `مجله ${SITE_NAME}`, href: "/mag" }],
+  },
+];
+
+const ADDRESSES = [
+  "تهران، میدان تجریش، خیابان دربندی، پلاک ۱۱۸",
+  "استان مرکزی، شهر محلات، خیابان شهید قندی، جنب امامزاده فضل و یحیی",
+];
 
 export default function Footer() {
   return (
-    <footer className="h-fit  max-w-[1400px] relative w-full items-center justify-around flex flex-col pt-16 pb-8 px-10 gap-10 bg-white   ">
-      <hr className="w-full left-0 right-0 absolute top-0 " />
-      <div className="w-full flex flex-col sm:flex-row gap-14">
-        <div className="basis-1/3 flex flex-col   h-full mt-5 sm:mt-0 justify-evenly items-start ">
-          <Merseh_nastaliq classname="w-20 h-auto mb-8 fill-gray-800" />
-          <span className="text-[20px] font-[500] text-[#515151] mb-5">
+    <footer className="w-full rounded-t-panel bg-plum-900 px-6 py-12 text-ivory md:px-10 md:py-16">
+      <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="flex flex-col items-start gap-4">
+          <BrandWordmark className="text-[32px] text-ivory" />
+          <p className="max-w-xs text-small text-blush-200">
+            فروشگاه آنلاین لوازم آرایشی و مراقبت پوست. محصولات اصل، انتخاب
+            ساده‌تر.
+          </p>
+          <div className="flex items-center gap-3">
+            <Link
+              aria-label={`صفحه اینستاگرام ${SITE_NAME}`}
+              href="https://www.instagram.com/mersehcom"
+              target="_blank"
+              rel="noreferrer"
+              className="home-focus flex h-10 w-10 items-center justify-center rounded-full bg-ivory"
+            >
+              <Instagram_SVG classname="w-5" />
+            </Link>
+            <Link
+              aria-label={`کانال تلگرام ${SITE_NAME}`}
+              href="https://t.me/mersehcom"
+              target="_blank"
+              rel="noreferrer"
+              className="home-focus flex h-10 w-10 items-center justify-center rounded-full bg-ivory"
+            >
+              <Telegram_SVG classname="w-5" />
+            </Link>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-6">
+          {FOOTER_LINKS.map((group) => (
+            <div key={group.title} className="flex flex-col gap-3">
+              <span className="text-small font-medium text-champagne">
+                {group.title}
+              </span>
+              <ul className="flex flex-col gap-2">
+                {group.links.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="home-focus text-small text-ivory hover:text-champagne"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <span className="text-small font-medium text-champagne">
             ارتباط با ما
           </span>
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-row gap-2 items-center">
-              <Phone_SVG classname="w-6 h-6 -rotate-[10deg] fill-[#303030]" />
-              <span className="text-[20px] text-[#303030]">
-                <a href="tel:02191694827">021-91694827</a>
-              </span>
-            </div>
-            <div className="flex flex-row gap-2 items-center">
-              <Location_Pin classname="w-6 h-6 fill-green2" />
-              <p className="text-[14px] text-[#303030]">
-                <strong>آدرس شعبه 1:</strong> تهران، میدان تجریش، خیابان دربندی،
-                پلاک 118
-              </p>
-            </div>
-            <div className="flex flex-row gap-2 items-center">
-              <Location_Pin classname="w-6 h-6 fill-green2" />
-              <p className="text-[14px] text-[#303030]">
-                <strong>آدرس شعبه 2:</strong> استان مرکزی، شهر محلات، خیابان
-                شهید قندی، جنب امامزاده فضل و یحیی
-              </p>
-            </div>
-          </div>
+          <a
+            href="tel:02191694827"
+            className="home-focus flex items-center gap-2 text-body text-ivory"
+          >
+            <Phone_SVG classname="h-5 w-5 fill-champagne" />
+            ۰۲۱-۹۱۶۹۴۸۲۷
+          </a>
+          <ul className="flex flex-col gap-3">
+            {ADDRESSES.map((address, index) => (
+              <li key={address} className="flex items-start gap-2">
+                <Location_Pin classname="mt-0.5 h-5 w-5 shrink-0 fill-champagne" />
+                <p className="text-small text-blush-200">
+                  <span className="text-ivory">شعبه {index + 1}: </span>
+                  {address}
+                </p>
+              </li>
+            ))}
+          </ul>
         </div>
-        <div className="basis-1/3 flex flex-col items-center justify-center gap-3">
-          <div className="flex flex-col gap-2">
-            <span className="font-bold text-black1 ">لینک های کاربردی</span>
-            <Link
-              href={
-                "https://merseh.com/category/4/%D8%B1%D9%88%D8%BA%D9%86-%D8%B2%DB%8C%D8%AA%D9%88%D9%86"
-              }
-            >
-              <h2 className="text-black1">قیمت روغن زیتون</h2>
-            </Link>
-            <Link
-              href={
-                "https://merseh.com/product/2/%D8%B1%D9%88%D8%BA%D9%86-%D8%B2%DB%8C%D8%AA%D9%88%D9%86-%D9%81%D8%B1%D8%A7%D8%A8%DA%A9%D8%B1"
-              }
-            >
-              <h2 className="text-black1">روغن زیتون فرابکر اصل 1 لیتری</h2>
-            </Link>
-            <Link
-              href={
-                "https://merseh.com/product/3/%D8%B1%D9%88%D8%BA%D9%86-%D8%B2%DB%8C%D8%AA%D9%88%D9%86-%D8%A8%DB%8C-%D8%A8%D9%88"
-              }
-            >
-              <h2 className="text-black1">روغن زیتون بی بو</h2>
-            </Link>
-            <Link href={"https://merseh.com/mag"}>
-              <h2 className="text-black1">مجله مرسه</h2>
-            </Link>
-          </div>
-        </div>
-        <div className="basis-1/3 flex flex-col items-center justify-center">
+
+        <div className="flex sm:justify-end">
           <Link
             referrerPolicy="origin"
             target="_blank"
+            rel="noreferrer"
             href="https://trustseal.enamad.ir/?id=491421&Code=nWLgfgtO1aZxbPr2nb6vB7LIjve7BrXw"
+            className="home-focus h-fit rounded-card bg-ivory p-3"
           >
             <img
               height={120}
               width={120}
-              alt="enamad"
+              alt="نماد اعتماد الکترونیکی"
               referrerPolicy="origin"
               src="https://trustseal.enamad.ir/logo.aspx?id=491421&Code=nWLgfgtO1aZxbPr2nb6vB7LIjve7BrXw"
               {...{ code: "nWLgfgtO1aZxbPr2nb6vB7LIjve7BrXw" }}
-              style={{ cursor: "pointer" }}
             />
           </Link>
         </div>
       </div>
-      <div className="h-fit flex flex-row items-center gap-8">
-        <Link
-          aria-label="merseh.com instagram page"
-          href={"https://www.instagram.com/mersehcom"}
-        >
-          <Instagram_SVG classname="w-6" />
-        </Link>
-        <Link
-          aria-label="merseh.com telegram channel"
-          href={"https://t.me/mersehcom"}
-        >
-          <Telegram_SVG classname="w-6" />
-        </Link>
+
+      <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-caption text-blush-200 sm:flex-row">
+        <span>تمامی حقوق برای {SITE_NAME} محفوظ است.</span>
+        <span>
+          طراحی شده توسط{" "}
+          <span className="font-medium text-ivory">عباس رضائی</span>
+        </span>
       </div>
-      <span>
-        طراحی شده توسط <span className="font-[700]">عباس رضائی</span>
-      </span>
     </footer>
   );
 }

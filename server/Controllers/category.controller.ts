@@ -5,7 +5,16 @@ import { parentCategories } from "../utils/category";
 import { TRPCError } from "@trpc/server";
 import { TRPCClientError } from "@trpc/client";
 import { CategoryStatus } from "@/generated/prisma/client";
-import { publicUrl } from "../utils/storage";
+import {
+  deleteStoredFile,
+  publicUrl,
+  uploadFromBase64,
+} from "../utils/storage";
+
+const categoryImageInput = z.object({
+  base64: z.string().min(1),
+  name: z.string().min(1),
+});
 
 export type ArgsStructure<T = null> = T extends null
   ? {
@@ -22,6 +31,7 @@ export async function categoriesController({ ctx }: ArgsStructure) {
   let categories = await prisma.category.findMany({
     where: { status: "ENABLED" },
     include: { imageFile: true },
+    orderBy: { id: "asc" },
   });
   categories = categories.map((e) => ({
     ...e,
@@ -116,6 +126,7 @@ export async function categoriesController({ ctx }: ArgsStructure) {
 export const createCategorySchema = z.object({
   title: z.string().min(1),
   parentId: z.number().optional().nullable(),
+  image: categoryImageInput.optional(),
 });
 
 type CreateCategoryArgs = z.infer<typeof createCategorySchema>;
@@ -125,10 +136,23 @@ export async function createCategory({
   ctx,
 }: ArgsStructure<CreateCategoryArgs>) {
   const { prisma } = ctx;
+  let imageFileId: string | undefined;
+  if (input.image) {
+    const file = await uploadFromBase64(input.image, "category");
+    if (!file) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "آپلود تصویر دسته‌بندی ناموفق بود",
+      });
+    }
+    imageFileId = file.id;
+  }
+
   const newCategory = await prisma.category.create({
     data: {
       title: input.title,
       parentCategoryId: input.parentId ?? null,
+      imageFileId,
     },
   });
 
@@ -141,6 +165,7 @@ export const EditCategorySchema = z.object({
   name: z.string(),
   content: z.string(),
   metaDescription: z.string(),
+  image: categoryImageInput.optional(),
 });
 type EditCategory = z.infer<typeof EditCategorySchema>;
 export async function editCategoryController({
@@ -148,23 +173,57 @@ export async function editCategoryController({
   input,
 }: ArgsStructure<EditCategory>) {
   const { prisma } = ctx;
-  try {
-    await prisma.category.update({
-      where: {
-        id: input.categoryId,
-      },
-      data: {
-        content: input.content,
-        englishTitle: input.englishName,
-        title: input.name,
-        updated_at: new Date(Date.now()),
-        metaDescription: input.metaDescription,
-      },
+  const existing = await prisma.category.findUnique({
+    where: { id: input.categoryId },
+  });
+  if (!existing) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "دسته‌بندی یافت نشد",
     });
-    return { status: true, error: null, message: "تغییرات با موفقیت انجام شد" };
-  } catch (error) {
-    return { status: false, error, message: "خطا در تغییر دسته بندی" };
   }
+
+  let imageFileId = existing.imageFileId;
+  let replacedFileId: string | null = null;
+
+  if (input.image) {
+    const file = await uploadFromBase64(input.image, "category");
+    if (!file) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "آپلود تصویر دسته‌بندی ناموفق بود",
+      });
+    }
+    replacedFileId = existing.imageFileId;
+    imageFileId = file.id;
+  }
+
+  if (!imageFileId) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "تصویر دسته‌بندی الزامی است",
+    });
+  }
+
+  await prisma.category.update({
+    where: {
+      id: input.categoryId,
+    },
+    data: {
+      content: input.content,
+      englishTitle: input.englishName,
+      title: input.name,
+      updated_at: new Date(),
+      metaDescription: input.metaDescription,
+      imageFileId,
+    },
+  });
+
+  if (replacedFileId && replacedFileId !== imageFileId) {
+    await deleteStoredFile(replacedFileId);
+  }
+
+  return { status: true, error: null, message: "تغییرات با موفقیت انجام شد" };
 }
 
 export const categoryInfoSchema = z.object({
@@ -217,11 +276,23 @@ export async function flatCategoriesController({
 }: ArgsStructure) {
   try {
     const categories = await prisma.category.findMany({
-      select: { id: true, title: true, updated_at: true, status: true },
+      select: {
+        id: true,
+        title: true,
+        updated_at: true,
+        status: true,
+        imageFile: { select: { key: true } },
+      },
       where: { status: "ENABLED" },
     });
     return {
-      categories,
+      categories: categories.map((category) => ({
+        id: category.id,
+        title: category.title,
+        updated_at: category.updated_at,
+        status: category.status,
+        imageUrl: category.imageFile ? publicUrl(category.imageFile.key) : "",
+      })),
       statusOptions: [
         { value: "ENABLED", name: "فعال" },
         { value: "DISABLED", name: "غیرفعال" },

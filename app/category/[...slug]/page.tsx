@@ -1,10 +1,9 @@
 import Layout from "@/Components/Layout/Layout";
-import Products from "@/Components/Products/Products";
+import Products, { ProductsFallback } from "@/Components/Products/Products";
 
 import axios from "axios";
 import { Metadata } from "next";
-import dynamic from "next/dynamic";
-import React, { cache } from "react";
+import { Suspense, cache } from "react";
 
 export type NextPagePropsType = {
   params: Promise<{ slug: string[] }>;
@@ -64,10 +63,13 @@ export default async function page({ params }: NextPagePropsType) {
   const category = await getCategory(slug[0]);
   return (
     <Layout>
-      <Products
-        categoryContent={category?.category}
-        categoryId={Number(slug[0])}
-      />
+      <Suspense fallback={<ProductsFallback category={category?.category} />}>
+        <Products
+          key={slug[0]}
+          category={category?.category}
+          categoryId={Number(slug[0])}
+        />
+      </Suspense>
     </Layout>
   );
 }

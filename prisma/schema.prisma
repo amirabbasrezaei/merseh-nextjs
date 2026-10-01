@@ -120,10 +120,38 @@ model OrderShipping {
 model ShippingPartner {
   id            String          @id @default(uuid())
   name          String
+  price         Int             @default(0)
+  isActive      Boolean         @default(false)
+  sortOrder     Int             @default(0)
   imageFileId   String?         @unique
   imageFile     File?           @relation(fields: [imageFileId], references: [id])
   Order         Order[]
   OrderShipping OrderShipping[]
+
+  @@index([isActive])
+}
+
+enum CouponType {
+  FREE_SHIPPING
+  PERCENT
+  FIXED
+}
+
+model Coupon {
+  id          Int        @id @default(autoincrement())
+  code        String     @unique
+  type        CouponType
+  value       Int        @default(0)
+  isActive    Boolean    @default(true)
+  expiresAt   DateTime?
+  minSubtotal Int?
+  usageLimit  Int?
+  usedCount   Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  orders      Order[]
+
+  @@index([isActive])
 }
 
 model Product {
@@ -135,6 +163,7 @@ model Product {
   content          String
   engName          String               @default("")
   discount         Int                  @default(0)
+  freeShipping     Boolean              @default(false)
   quantity         Int                  @default(10)
   mainCategoryId   Int                  @default(1)
   metaDescription  String               @default("")
@@ -202,6 +231,12 @@ model Order {
   Payment           Payment[]
   ProductForOrder   ProductForOrder[]
   podroRequestId    String?
+  couponId          Int?
+  coupon            Coupon?           @relation(fields: [couponId], references: [id], onDelete: SetNull)
+  couponCode        String?
+  couponDiscount    Int               @default(0)
+
+  @@index([couponId])
 }
 
 model Category {
@@ -262,6 +297,7 @@ enum HomeCarouselSource {
 
 model HomeCarousel {
   id         Int                   @id @default(autoincrement())
+  slot       String                @unique
   title      String
   logoFileId String?               @unique
   logoFile   File?                 @relation("CarouselLogo", fields: [logoFileId], references: [id], onDelete: SetNull)
@@ -270,13 +306,12 @@ model HomeCarousel {
   category   Category?             @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   brandId    Int?
   brand      Brand?                @relation(fields: [brandId], references: [id], onDelete: SetNull)
-  sortOrder  Int                   @default(0)
   isActive   Boolean               @default(true)
   createdAt  DateTime              @default(now())
   updatedAt  DateTime              @updatedAt
   products   HomeCarouselProduct[]
 
-  @@index([isActive, sortOrder])
+  @@index([isActive])
   @@index([categoryId])
   @@index([brandId])
 }

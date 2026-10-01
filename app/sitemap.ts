@@ -1,92 +1,90 @@
-import axios from "axios";
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
+import { prisma } from "@/server/context";
+
+// Cached by default, and the image build has no database and cannot reach
+// the public site. A prerender here hangs until the static-generation timeout.
+export const dynamic = "force-dynamic";
+
+function siteOrigin(): string {
+  return (process.env.BASE_URL || "http://localhost:3000").replace(/\/$/, "");
+}
+
+function pathSegment(value: string): string {
+  return value.replaceAll(" ", "-");
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const origin = siteOrigin();
   const links: MetadataRoute.Sitemap = [
     {
-      url: "https://merseh.com",
+      url: origin,
       changeFrequency: "daily",
       priority: 1,
     },
     {
-      url: "https://merseh.com/mag",
+      url: `${origin}/mag`,
       changeFrequency: "daily",
       priority: 1,
     },
     {
-      url: "https://merseh.com/mag/articles",
+      url: `${origin}/mag/articles`,
       changeFrequency: "daily",
       priority: 1,
     },
   ];
 
   try {
-    const { data } = await axios.get(
-      `${process.env.BASE_URL}/api/trpc/product.shortInfoProducts`
-    );
-    const { data: categoryData } = await axios.get(
-      `${process.env.BASE_URL}/api/trpc/product.flatCategories`
-    );
-    const { data: articleData } = await axios.get(
-      `${process.env.BASE_URL}/api/trpc/article.sitemapArticle`
-    );
+    const [products, categories, articles] = await Promise.all([
+      prisma.product.findMany({
+        where: { status: "PUBLISHED" },
+        select: { id: true, name: true, updatedAt: true },
+      }),
+      prisma.category.findMany({
+        where: { status: "ENABLED" },
+        select: { id: true, title: true, updated_at: true },
+      }),
+      prisma.article.findMany({
+        where: { status: "PUBLISHED" },
+        select: {
+          id: true,
+          title: true,
+          englishTitle: true,
+          updated_at: true,
+        },
+      }),
+    ]);
 
-    if (data.result.data?.products?.length) {
-      const products = data.result.data.products.map((product: any) => ({
-        url: `${
-          process.env.NODE_ENV === "production"
-            ? process.env.BASE_URL
-            : "http://localhost:3000"
-        }/product/${product.id}/${(product.name as string).replaceAll(
-          " ",
-          "-"
-        )}`,
-        lastModified: new Date(product.updatedAt),
-        changeFrequency: "daily",
-        priority: 0.9,
-      }));
-
-      links.push(...products);
-    }
-
-    if (categoryData.result.data?.categories?.length) {
-      const categories = categoryData.result.data.categories.map(
-        (category: any) => ({
-          url: `${
-            process.env.NODE_ENV === "production"
-              ? process.env.BASE_URL
-              : "http://localhost:3000"
-          }/category/${category.id}/${(category.title as string).replaceAll(
-            " ",
-            "-"
-          )}`,
-          lastModified: new Date(category.updated_at || Date.now()),
+    links.push(
+      ...products.map(
+        (product): MetadataRoute.Sitemap[number] => ({
+          url: `${origin}/product/${product.id}/${pathSegment(product.name)}`,
+          lastModified: product.updatedAt,
           changeFrequency: "daily",
           priority: 0.9,
         })
-      );
-      links.push(...categories);
-    }
-
-    if (articleData.result.data?.articles?.length) {
-      const articles = articleData.result.data.articles.map((article: any) => ({
-        url: `${
-          process.env.NODE_ENV === "production"
-            ? process.env.BASE_URL
-            : "http://localhost:3000"
-        }/mag/${article.id}/${(
-          article.englishTitle || article.title
-        ).replaceAll(" ", "-")}`,
-        lastModified: new Date(article.updated_at || Date.now()),
-        changeFrequency: "daily",
-        priority: 0.9,
-      }));
-      links.push(...articles);
-    }
-
-    return links;
+      ),
+      ...categories.map(
+        (category): MetadataRoute.Sitemap[number] => ({
+          url: `${origin}/category/${category.id}/${pathSegment(category.title)}`,
+          lastModified: category.updated_at ?? new Date(),
+          changeFrequency: "daily",
+          priority: 0.9,
+        })
+      ),
+      ...articles.map(
+        (article): MetadataRoute.Sitemap[number] => ({
+          url: `${origin}/mag/${article.id}/${pathSegment(
+            article.englishTitle || article.title
+          )}`,
+          lastModified: article.updated_at ?? new Date(),
+          changeFrequency: "daily",
+          priority: 0.9,
+        })
+      )
+    );
   } catch (error) {
-    console.log(error);
-    return links;
+    console.error("sitemap: failed to load catalog", error);
   }
+
+  return links;
 }

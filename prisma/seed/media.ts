@@ -12,7 +12,7 @@ import type { SeedPrisma } from "./types";
 const ENDPOINT = process.env.MINIO_ENDPOINT;
 const ACCESS_KEY = process.env.MINIO_ACCESS_KEY;
 const SECRET_KEY = process.env.MINIO_SECRET_KEY;
-const BUCKET = process.env.MINIO_BUCKET || "merseh";
+const BUCKET = process.env.MINIO_BUCKET || "mehrnil";
 const REGION = process.env.MINIO_REGION || "us-east-1";
 
 const downloadCache = new Map<string, { buffer: Buffer; mimeType: string }>();
@@ -32,7 +32,7 @@ let s3Client: S3Client | null = null;
 function getS3Client() {
   if (!ENDPOINT || !ACCESS_KEY || !SECRET_KEY) {
     throw new Error(
-      "MinIO environment variables are missing. Set MINIO_ENDPOINT, MINIO_ACCESS_KEY, and MINIO_SECRET_KEY, then run npm run minio:up"
+      "MinIO environment variables are missing. Set MINIO_ENDPOINT, MINIO_ACCESS_KEY, and MINIO_SECRET_KEY, then run yarn minio:up"
     );
   }
 
@@ -57,7 +57,7 @@ export async function assertMinioReady() {
     await client.send(new HeadBucketCommand({ Bucket: BUCKET }));
   } catch (error) {
     throw new Error(
-      `MinIO bucket "${BUCKET}" is not reachable at ${ENDPOINT}. Run npm run minio:up and wait until the bucket exists. ${String(error)}`
+      `MinIO bucket "${BUCKET}" is not reachable at ${ENDPOINT}. Run yarn minio:up and wait until the bucket exists. ${String(error)}`
     );
   }
 }

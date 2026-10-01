@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import classNames from "classnames";
-import { Merseh_nastaliq } from "@/Components/SVGS";
+import BrandWordmark from "@/Components/Brand/BrandWordmark";
 import AdminNav from "./AdminNav";
 import { ADMIN_NAV_ITEMS, getAdminTitle } from "./adminNavConfig";
 
@@ -50,7 +50,7 @@ export default function AdminShell({ children }: Props) {
             className="flex items-center gap-2"
             onClick={() => setMobileOpen(false)}
           >
-            <Merseh_nastaliq classname="h-7 w-auto fill-green2" />
+            <BrandWordmark className="text-[22px] text-green2" />
             <span className="text-base font-medium text-gray-600">
               پنل مدیریت
             </span>

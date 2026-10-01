@@ -14,7 +14,7 @@ function resolveDatabaseUrl(): string {
 
   const user = process.env.POSTGRES_USER || "postgres";
   const password = process.env.POSTGRES_PASSWORD || "merseh";
-  const db = process.env.POSTGRES_DB || "merseh";
+  const db = process.env.POSTGRES_DB || "mehrnil";
   const port = process.env.POSTGRES_PORT || "5435";
 
   return `postgresql://${user}:${encodeURIComponent(password)}@127.0.0.1:${port}/${db}`;
@@ -23,7 +23,7 @@ function resolveDatabaseUrl(): string {
 const connectionString = resolveDatabaseUrl();
 
 // Bump when the Prisma schema changes so a hot reload drops a stale client.
-const PRISMA_CLIENT_VERSION = 2;
+const PRISMA_CLIENT_VERSION = 4;
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;

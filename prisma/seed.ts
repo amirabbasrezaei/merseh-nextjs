@@ -2,7 +2,7 @@ import "dotenv/config";
 import { PrismaClient } from "../generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
-import { seedCatalog } from "./seed/catalog";
+import { seedMohana } from "./seed/mohana";
 import { seedCommerce } from "./seed/commerce";
 import { seedEditorial } from "./seed/editorial";
 import { seedLocations } from "./seed/locations";
@@ -33,11 +33,11 @@ async function main() {
   await assertMinioReady();
   await resetDatabase(prisma);
   await seedLocations(prisma);
-  const catalog = await seedCatalog(prisma);
+  const catalog = await seedMohana(prisma);
   const editorial = await seedEditorial(prisma, catalog);
   await seedCommerce(prisma, catalog, editorial);
 
-  console.log("Cosmetic catalog seed completed");
+  console.log("Mohana catalog seed completed");
 }
 
 main()

@@ -1,17 +1,24 @@
-import { carouselCardWidthClass } from "./cardWidth";
+import { carouselCardWidthClass, carouselGapClass } from "./cardWidth";
 
 export default function CarouselSkeleton() {
   return (
-    <div className="flex w-full flex-col gap-6" aria-hidden>
-      <div className="h-6 w-40 animate-pulse rounded-card bg-hover1" />
-      <div className="no-scrollbar flex gap-3 overflow-hidden sm:gap-4">
+    <div className="flex w-full flex-col gap-8 md:gap-10" aria-hidden>
+      <div className="flex flex-col gap-3 border-b border-hairline pb-5">
+        <div className="h-3 w-24 animate-pulse rounded-full bg-blush-100" />
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-8 animate-pulse rounded-xl bg-blush-200 md:h-9 md:w-9" />
+          <div className="h-7 w-48 animate-pulse rounded-full bg-blush-100" />
+        </div>
+      </div>
+      <div className={`no-scrollbar flex overflow-hidden ${carouselGapClass}`}>
         {Array.from({ length: 5 }, (_, index) => (
           <div key={index} className={carouselCardWidthClass}>
-            <div className="rounded-card border border-line bg-white p-4 shadow-card">
-              <div className="aspect-square w-full animate-pulse bg-hover1" />
-              <div className="mt-3 h-4 w-full animate-pulse rounded-card bg-hover1" />
-              <div className="mt-2 h-4 w-2/3 animate-pulse rounded-card bg-hover1" />
-              <div className="mt-3 h-4 w-1/3 animate-pulse rounded-card bg-hover1" />
+            <div className="aspect-square w-full animate-pulse rounded-tile bg-ivory" />
+            <div className="flex flex-col gap-2 px-1 pt-4">
+              <div className="h-3 w-1/4 animate-pulse rounded-full bg-blush-100" />
+              <div className="h-4 w-full animate-pulse rounded-full bg-blush-100" />
+              <div className="h-4 w-2/3 animate-pulse rounded-full bg-blush-100" />
+              <div className="mt-1 h-5 w-1/3 animate-pulse rounded-full bg-blush-100" />
             </div>
           </div>
         ))}
