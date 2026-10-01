@@ -28,7 +28,8 @@ const nextConfig = {
           },
           {
             protocol: 'https',
-            hostname: 'static.merseh.ir',
+            hostname: 'static.merseh.com',
+            pathname: '/**',
           },
           {
             protocol: 'https',
