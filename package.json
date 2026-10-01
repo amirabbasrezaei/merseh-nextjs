@@ -68,6 +68,7 @@
     "sharp": "^0.33.5",
     "swiper": "^11.1.4",
     "tailwindcss": "3",
+    "tsx": "^4.23.12",
     "zod": "3",
     "zustand": "^5.0.14"
   },
@@ -80,7 +81,6 @@
     "eslint": "9",
     "eslint-config-next": "^16.3.0",
     "style-loader": "^4.0.0",
-    "tsx": "^4.23.12",
     "typescript": "5",
     "yarn-upgrade-all": "^0.7.4"
   }

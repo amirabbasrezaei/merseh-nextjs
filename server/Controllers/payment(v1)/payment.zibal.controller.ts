@@ -62,7 +62,7 @@ export async function createPaymentControllerZibal({
       amount,
       callbackUrl:
         process.env.NODE_ENV === "production"
-          ? "https://merseh.com/payment"
+          ? "https://mehrnil.com/payment"
           : "http://localhost:3000/payment",
       mobile: user.phoneNumber,
       description: "",

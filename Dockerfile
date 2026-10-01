@@ -19,7 +19,7 @@ RUN yarn install --frozen-lockfile
 COPY . .
 
 # prisma.config.ts requires DATABASE_URL to load. Generate does not connect.
-ENV DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/merseh
+ENV DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/mehrnil
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Public values are inlined into the client bundle. Pass them from the server .env.
