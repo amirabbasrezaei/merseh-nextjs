@@ -4,7 +4,10 @@
 
 {$CADDY_SITE_HOST} {
 	encode gzip zstd
-	reverse_proxy app:3000
+	reverse_proxy app:3000 {
+		# Stream App Router responses instead of buffering them until the end.
+		flush_interval -1
+	}
 }
 
 {$CADDY_FILES_HOST} {

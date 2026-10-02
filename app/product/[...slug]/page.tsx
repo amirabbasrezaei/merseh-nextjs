@@ -1,10 +1,10 @@
 import Layout from "@/Components/Layout/Layout";
 import Product from "@/Components/Product/Product";
 import { Product as ProductSchema, WithContext } from "schema-dts";
-import axios from "axios";
-import { Metadata, NextPage } from "next";
+import { getProductController } from "@/server/Controllers/product.controller";
+import { authedPageContext } from "@/server/pageContext";
+import { Metadata } from "next";
 import { cache } from "react";
-import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { SITE_NAME } from "@/utils/site";
 
@@ -16,32 +16,14 @@ export type NextPagePropsType = {
 };
 
 const getProduct = cache(async (productId: string) => {
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore
-    .getAll()
-    .map((c) => `${c.name}=${c.value}`)
-    .join("; ");
+  const id = Number(productId);
+  if (!Number.isFinite(id)) return null;
 
   try {
-    const { data } = await axios.get(
-      `${
-        process.env.NODE_ENV === "production"
-          ? process.env.BASE_URL
-          : "http://localhost:3000"
-      }/api/trpc/product.getproduct?input=${encodeURIComponent(
-        JSON.stringify({ productId: Number(productId) })
-      )}`,
-      {
-        headers: cookieHeader ? { Cookie: cookieHeader } : undefined,
-        validateStatus: (status) => status < 500,
-      }
-    );
-
-    if (data?.error) {
-      return null;
-    }
-
-    return data.result.data;
+    return await getProductController({
+      input: { productId: id },
+      ctx: await authedPageContext(),
+    });
   } catch {
     return null;
   }

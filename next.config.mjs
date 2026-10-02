@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    // Caddy already compresses responses. Next's own gzip on streamed
+    // HTML breaks HTTP/2 framing for the larger category and product pages.
+    compress: false,
     images: {
         remotePatterns: [
           {

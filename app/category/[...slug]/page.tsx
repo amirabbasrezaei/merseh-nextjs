@@ -1,7 +1,8 @@
 import Layout from "@/Components/Layout/Layout";
 import Products, { ProductsFallback } from "@/Components/Products/Products";
+import { categoryInfoController } from "@/server/Controllers/category.controller";
+import { pageContext } from "@/server/pageContext";
 
-import axios from "axios";
 import { Metadata } from "next";
 import { Suspense, cache } from "react";
 
@@ -13,14 +14,17 @@ export type NextPagePropsType = {
 export const revalidate = 3600;
 
 const getCategory = cache(async (categoryId: string) => {
-  const { data } = await axios.get(
-    `${
-      process.env.NODE_ENV === "production"
-        ? process.env.BASE_URL
-        : "http://localhost:3000"
-    }/api/trpc/product.categoryInfo?input={"categoryId":${categoryId}}`
-  );
-  return data.result.data;
+  const id = Number(categoryId);
+  if (!Number.isFinite(id)) return null;
+
+  try {
+    return await categoryInfoController({
+      input: { categoryId: id },
+      ctx: pageContext(),
+    });
+  } catch {
+    return null;
+  }
 });
 
 // export const metadata: Metadata = {

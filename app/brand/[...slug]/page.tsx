@@ -1,7 +1,8 @@
 import BrandProducts from "@/Components/Brand/BrandProducts";
 import Layout from "@/Components/Layout/Layout";
+import { brandInfoController } from "@/server/Controllers/brand.controller";
+import { pageContext } from "@/server/pageContext";
 import { toPathSlug } from "@/utils/slug";
-import axios from "axios";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import React, { cache } from "react";
@@ -12,20 +13,16 @@ type PageProps = {
   params: Promise<{ slug: string[] }>;
 };
 
-function apiBase() {
-  return process.env.NODE_ENV === "production"
-    ? process.env.BASE_URL
-    : "http://localhost:3000";
-}
-
 const getBrand = cache(async (brandId: string) => {
+  const id = Number(brandId);
+  if (!Number.isInteger(id)) return null;
+
   try {
-    const { data } = await axios.get(
-      `${apiBase()}/api/trpc/brand.info?input=${encodeURIComponent(
-        JSON.stringify({ id: Number(brandId) })
-      )}`
-    );
-    return data?.result?.data?.brand ?? null;
+    const { brand } = await brandInfoController({
+      input: { id },
+      ctx: pageContext(),
+    });
+    return brand;
   } catch {
     return null;
   }

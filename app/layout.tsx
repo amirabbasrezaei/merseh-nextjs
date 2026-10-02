@@ -47,6 +47,7 @@ export default async function RootLayout({
     <html lang="en" dir="rtl">
       <head>
         <meta charSet="utf-8" />
+        <meta name="enamad" content="2032114" />
       </head>
 
       {process.env.NODE_ENV === "production" ? (

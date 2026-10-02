@@ -1,9 +1,9 @@
 import Article from "@/Components/Mag/Article";
 import MagLayout from "@/Components/Layout/MagLayout";
+import { getArticleController } from "@/server/Controllers/article.controller";
+import { authedPageContext } from "@/server/pageContext";
 import React, { cache } from "react";
-import axios from "axios";
 import { Metadata } from "next";
-import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { SITE_NAME } from "@/utils/site";
 
@@ -17,32 +17,14 @@ export type NextPagePropsType = {
 };
 
 const getArticle = cache(async (articleId: string) => {
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore
-    .getAll()
-    .map((c) => `${c.name}=${c.value}`)
-    .join("; ");
+  const id = Number(articleId);
+  if (!Number.isFinite(id)) return null;
 
   try {
-    const { data } = await axios.get(
-      `${
-        process.env.NODE_ENV === "production" || true
-          ? process.env.BASE_URL
-          : "http://localhost:3000"
-      }/api/trpc/article.getArticle?input=${encodeURIComponent(
-        JSON.stringify({ articleId: Number(articleId) })
-      )}`,
-      {
-        headers: cookieHeader ? { Cookie: cookieHeader } : undefined,
-        validateStatus: (status) => status < 500,
-      }
-    );
-
-    if (data?.error) {
-      return null;
-    }
-
-    return data.result.data;
+    return await getArticleController({
+      input: { articleId: id },
+      ctx: await authedPageContext(),
+    });
   } catch {
     return null;
   }
@@ -78,7 +60,7 @@ export async function generateMetadata({
         description: article.article.metaDescription,
         locale: "fa_IR",
         title: { absolute: article.article.title },
-        publishedTime: article.article.created_at,
+        publishedTime: new Date(article.article.created_at).toISOString(),
         phoneNumbers: "+982191694827",
       },
     };
