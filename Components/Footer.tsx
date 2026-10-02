@@ -116,7 +116,7 @@ export default function Footer() {
             referrerPolicy="origin"
             target="_blank"
             rel="noreferrer"
-            href="https://trustseal.enamad.ir/?id=491421&Code=nWLgfgtO1aZxbPr2nb6vB7LIjve7BrXw"
+            href="https://trustseal.enamad.ir/?id=8002544&Code=UsF2FBIx0J7e91I5h3EqOHmCD9U6mQYn"
             className="home-focus h-fit rounded-card bg-ivory p-3"
           >
             <img
@@ -124,8 +124,8 @@ export default function Footer() {
               width={120}
               alt="نماد اعتماد الکترونیکی"
               referrerPolicy="origin"
-              src="https://trustseal.enamad.ir/logo.aspx?id=491421&Code=nWLgfgtO1aZxbPr2nb6vB7LIjve7BrXw"
-              {...{ code: "nWLgfgtO1aZxbPr2nb6vB7LIjve7BrXw" }}
+              src="https://trustseal.enamad.ir/logo.aspx?id=8002544&Code=UsF2FBIx0J7e91I5h3EqOHmCD9U6mQYn"
+              {...{ code: "UsF2FBIx0J7e91I5h3EqOHmCD9U6mQYn" }}
             />
           </Link>
         </div>
