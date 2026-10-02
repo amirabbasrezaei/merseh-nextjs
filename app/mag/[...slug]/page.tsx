@@ -57,7 +57,7 @@ export async function generateMetadata({
         url: `${process.env.BASE_URL}/mag/${slug[0]}/${(
           article.article.englishTitle || article.article.title
         )?.replaceAll(" ", "-")}`,
-        description: article.article.metaDescription,
+        description: article.article.metaDescription ?? undefined,
         locale: "fa_IR",
         title: { absolute: article.article.title },
         publishedTime: new Date(article.article.created_at).toISOString(),
@@ -101,7 +101,7 @@ export default async function page({ params }: NextPagePropsType) {
       width: "1200",
       height: "800",
     },
-    description: article.article.metaDescription,
+    description: article.article.metaDescription ?? undefined,
     author: {
       "@type": "Person",
       name: "امیرعباس رضائی",
@@ -112,9 +112,11 @@ export default async function page({ params }: NextPagePropsType) {
     },
     wordCount: wordCount(),
     headline: article.article.title,
-    datePublished: article.article.created_at,
-    dateCreated: article.article.created_at,
-    dateModified: article.article.updated_at,
+    datePublished: new Date(article.article.created_at).toISOString(),
+    dateCreated: new Date(article.article.created_at).toISOString(),
+    dateModified: article.article.updated_at
+      ? new Date(article.article.updated_at).toISOString()
+      : undefined,
     publisher: {
       "@type": "HealthAndBeautyBusiness",
       name: `مجله ${SITE_NAME}`,

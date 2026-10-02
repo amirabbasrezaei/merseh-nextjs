@@ -146,7 +146,7 @@ export default async function Page({
     url: `${process.env.BASE_URL}/product/${
       product.product.id
     }/${product.product.name.replaceAll(" ", "-")}`,
-    productID: product.product.id,
+    productID: String(product.product.id),
     offers: {
       "@type": "AggregateOffer",
       name: product.product.name,
